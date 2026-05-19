@@ -1,0 +1,311 @@
+id,nome,cargo,departamento,gestor_id
+1,Aline Souza,Gestor de Recursos Humanos,Recursos Humanos,
+2,Bruno Cardoso,Gestor de Tecnologia da Informação,Tecnologia da Informação,
+3,Carla Mendes,Gestor de Financeiro,Financeiro,
+4,Diego Martins,Gestor de Comercial,Comercial,
+5,Eduarda Lima,Gestor de Operações,Operações,
+6,Felipe Rocha,Gestor de Marketing,Marketing,
+7,Gabriela Nunes,Gestor de Engenharia,Engenharia,
+8,Henrique Alves,Gestor de Qualidade,Qualidade,
+9,Isabela Costa,Gestor de Logística,Logística,
+10,João Pereira,Gestor de Suprimentos,Suprimentos,
+11,Lucas Nascimento,Assistente,Tecnologia da Informação,2
+12,Rafael Souza,Consultor,Comercial,4
+13,André Gomes,Analista Júnior,Tecnologia da Informação,2
+14,Pedro Rodrigues,Assistente,Recursos Humanos,1
+15,Bianca Silva,Consultor,Logística,9
+16,Eduardo Mendes,Coordenador,Comercial,4
+17,Felipe Barbosa,Especialista,Comercial,4
+18,Fábio Costa,Coordenador,Recursos Humanos,1
+19,Thiago Pereira,Assistente,Marketing,6
+20,Camila Oliveira,Coordenador,Marketing,6
+21,Beatriz Fernandes,Business Partner,Tecnologia da Informação,2
+22,Giovana Santos,Desenvolvedor,Operações,5
+23,Camila Carvalho,Analista Pleno,Logística,9
+24,Larissa Dias,Técnico,Logística,9
+25,Gustavo Oliveira,Analista Júnior,Suprimentos,10
+26,Fábio Lima,Analista Pleno,Comercial,4
+27,Ingrid Souza,Coordenador,Comercial,4
+28,Felipe Fernandes,Analista Sênior,Operações,5
+29,Beatriz Rodrigues,Especialista,Marketing,6
+30,Bianca Costa,Consultor,Tecnologia da Informação,2
+31,Juliana Martins,Coordenador,Comercial,4
+32,Kelly Mendes,Assistente,Operações,5
+33,Hugo Santos,Assistente,Marketing,6
+34,Giovana Araújo,Coordenador,Recursos Humanos,1
+35,Pedro Rodrigues,Business Partner,Operações,5
+36,Gustavo Rocha,Coordenador,Marketing,6
+37,Rafael Nascimento,Analista Sênior,Qualidade,8
+38,Elaine Mendes,Consultor,Comercial,4
+39,Elaine Barbosa,Coordenador,Operações,5
+40,Rodrigo Fernandes,Assistente,Suprimentos,10
+41,Vinícius Rocha,Analista Pleno,Financeiro,3
+42,Ingrid Souza,Analista Sênior,Recursos Humanos,1
+43,Giovana Gomes,Business Partner,Financeiro,3
+44,Rodrigo Carvalho,Business Partner,Tecnologia da Informação,2
+45,Vinícius Nascimento,Consultor,Qualidade,8
+46,Débora Souza,Consultor,Recursos Humanos,1
+47,Fábio Araújo,Analista Pleno,Operações,5
+48,Amanda Costa,Desenvolvedor,Operações,5
+49,Elaine Nascimento,Consultor,Recursos Humanos,1
+50,Vinícius Souza,Especialista,Financeiro,3
+51,Bianca Rodrigues,Analista Sênior,Logística,9
+52,Fábio Costa,Consultor,Marketing,6
+53,Kelly Silva,Business Partner,Logística,9
+54,Patrícia Silva,Analista Pleno,Marketing,6
+55,Júlio Lima,Assistente,Marketing,6
+56,Fernanda Barbosa,Analista Pleno,Recursos Humanos,1
+57,Elaine Rocha,Analista Pleno,Tecnologia da Informação,2
+58,Fábio Pereira,Analista Sênior,Logística,9
+59,Natália Costa,Especialista,Qualidade,8
+60,Ingrid Dias,Coordenador,Logística,9
+61,Kelly Mendes,Assistente,Comercial,4
+62,Rodrigo Fernandes,Desenvolvedor,Operações,5
+63,Felipe Souza,Assistente,Logística,9
+64,Pedro Araújo,Analista Júnior,Comercial,4
+65,Natália Almeida,Business Partner,Suprimentos,10
+66,Lucas Oliveira,Analista Júnior,Comercial,4
+67,Pedro Santos,Técnico,Comercial,4
+68,Vinícius Almeida,Especialista,Tecnologia da Informação,2
+69,Gustavo Mendes,Analista Sênior,Qualidade,8
+70,André Rocha,Assistente,Suprimentos,10
+71,Giovana Gomes,Assistente,Qualidade,8
+72,Camila Gomes,Técnico,Tecnologia da Informação,2
+73,Amanda Martins,Analista Júnior,Engenharia,7
+74,Mariana Carvalho,Técnico,Tecnologia da Informação,2
+75,Fernanda Rodrigues,Assistente,Tecnologia da Informação,2
+76,Felipe Pereira,Coordenador,Logística,9
+77,Thiago Martins,Assistente,Financeiro,3
+78,Felipe Mendes,Analista Pleno,Tecnologia da Informação,2
+79,Caio Mendes,Analista Júnior,Recursos Humanos,1
+80,Kelly Almeida,Analista Sênior,Tecnologia da Informação,2
+81,Patrícia Rocha,Assistente,Engenharia,7
+82,Júlio Santos,Analista Sênior,Engenharia,7
+83,Lucas Carvalho,Especialista,Engenharia,7
+84,Larissa Gomes,Consultor,Qualidade,8
+85,Rafael Rodrigues,Especialista,Qualidade,8
+86,Mariana Barbosa,Consultor,Comercial,4
+87,Elaine Araújo,Analista Júnior,Recursos Humanos,1
+88,André Rocha,Consultor,Recursos Humanos,1
+89,Juliana Santos,Consultor,Logística,9
+90,Ingrid Costa,Analista Pleno,Tecnologia da Informação,2
+91,Pedro Almeida,Coordenador,Suprimentos,10
+92,Júlio Barbosa,Assistente,Tecnologia da Informação,2
+93,Bianca Santos,Business Partner,Suprimentos,10
+94,Amanda Barbosa,Business Partner,Tecnologia da Informação,2
+95,Matheus Nascimento,Assistente,Logística,9
+96,Fernanda Nascimento,Coordenador,Marketing,6
+97,Débora Lima,Desenvolvedor,Financeiro,3
+98,Kelly Oliveira,Analista Júnior,Marketing,6
+99,Bianca Barbosa,Analista Pleno,Qualidade,8
+100,Natália Rodrigues,Consultor,Tecnologia da Informação,2
+101,Rafael Fernandes,Analista Pleno,Operações,5
+102,Beatriz Lima,Analista Sênior,Comercial,4
+103,Hugo Mendes,Especialista,Qualidade,8
+104,Giovana Ribeiro,Analista Júnior,Suprimentos,10
+105,Larissa Souza,Analista Sênior,Logística,9
+106,Camila Souza,Consultor,Operações,5
+107,Thiago Lima,Business Partner,Financeiro,3
+108,Eduardo Araújo,Assistente,Comercial,4
+109,Vinícius Rocha,Especialista,Operações,5
+110,Pedro Gomes,Especialista,Recursos Humanos,1
+111,Lucas Araújo,Analista Sênior,Recursos Humanos,1
+112,Juliana Martins,Consultor,Operações,5
+113,Natália Silva,Analista Pleno,Engenharia,7
+114,Júlio Pereira,Consultor,Tecnologia da Informação,2
+115,Hugo Fernandes,Business Partner,Recursos Humanos,1
+116,Rafael Gomes,Analista Sênior,Logística,9
+117,Larissa Fernandes,Analista Júnior,Recursos Humanos,1
+118,Gustavo Almeida,Analista Pleno,Marketing,6
+119,Fábio Mendes,Coordenador,Marketing,6
+120,Elaine Pereira,Assistente,Suprimentos,10
+121,Giovana Costa,Coordenador,Financeiro,3
+122,Juliana Araújo,Coordenador,Recursos Humanos,1
+123,Thiago Costa,Analista Pleno,Comercial,4
+124,Ingrid Santos,Desenvolvedor,Engenharia,7
+125,Gustavo Martins,Técnico,Comercial,4
+126,Hugo Almeida,Assistente,Operações,5
+127,Débora Rodrigues,Coordenador,Recursos Humanos,1
+128,Thiago Oliveira,Especialista,Marketing,6
+129,Caio Ribeiro,Coordenador,Marketing,6
+130,Matheus Silva,Analista Pleno,Logística,9
+131,Juliana Barbosa,Especialista,Operações,5
+132,Camila Dias,Coordenador,Recursos Humanos,1
+133,Elaine Araújo,Coordenador,Marketing,6
+134,Vinícius Souza,Coordenador,Suprimentos,10
+135,Gustavo Nascimento,Analista Júnior,Suprimentos,10
+136,Lucas Ribeiro,Consultor,Engenharia,7
+137,Beatriz Gomes,Analista Pleno,Comercial,4
+138,Bianca Araújo,Analista Pleno,Marketing,6
+139,Vinícius Lima,Coordenador,Operações,5
+140,Rodrigo Lima,Consultor,Marketing,6
+141,Gustavo Gomes,Coordenador,Financeiro,3
+142,Bianca Barbosa,Especialista,Financeiro,3
+143,Natália Silva,Especialista,Engenharia,7
+144,Gustavo Gomes,Business Partner,Operações,5
+145,Caio Araújo,Desenvolvedor,Suprimentos,10
+146,Felipe Rodrigues,Consultor,Qualidade,8
+147,Giovana Costa,Analista Pleno,Qualidade,8
+148,Vinícius Dias,Técnico,Operações,5
+149,Hugo Almeida,Especialista,Tecnologia da Informação,2
+150,Giovana Rodrigues,Analista Sênior,Comercial,4
+151,Mariana Almeida,Desenvolvedor,Recursos Humanos,1
+152,Ingrid Oliveira,Desenvolvedor,Suprimentos,10
+153,Júlio Barbosa,Assistente,Engenharia,7
+154,Patrícia Carvalho,Assistente,Engenharia,7
+155,Caio Silva,Analista Pleno,Financeiro,3
+156,Fernanda Costa,Consultor,Engenharia,7
+157,Mariana Mendes,Assistente,Qualidade,8
+158,Felipe Pereira,Desenvolvedor,Tecnologia da Informação,2
+159,Natália Dias,Técnico,Logística,9
+160,Bianca Ribeiro,Coordenador,Qualidade,8
+161,Felipe Costa,Desenvolvedor,Logística,9
+162,Thiago Almeida,Especialista,Qualidade,8
+163,Patrícia Almeida,Especialista,Logística,9
+164,Pedro Lima,Assistente,Qualidade,8
+165,Matheus Araújo,Consultor,Operações,5
+166,Rafael Pereira,Assistente,Tecnologia da Informação,2
+167,Eduardo Pereira,Assistente,Engenharia,7
+168,Amanda Gomes,Técnico,Tecnologia da Informação,2
+169,Felipe Gomes,Analista Júnior,Logística,9
+170,Hugo Gomes,Coordenador,Comercial,4
+171,Eduardo Silva,Business Partner,Suprimentos,10
+172,Patrícia Silva,Técnico,Engenharia,7
+173,Fábio Carvalho,Coordenador,Operações,5
+174,Elaine Mendes,Business Partner,Logística,9
+175,Patrícia Almeida,Especialista,Comercial,4
+176,Patrícia Silva,Coordenador,Engenharia,7
+177,Débora Carvalho,Analista Sênior,Marketing,6
+178,Kelly Pereira,Business Partner,Qualidade,8
+179,Lucas Carvalho,Business Partner,Logística,9
+180,Débora Silva,Analista Pleno,Suprimentos,10
+181,Rafael Martins,Analista Sênior,Engenharia,7
+182,Thiago Carvalho,Técnico,Recursos Humanos,1
+183,Felipe Araújo,Técnico,Comercial,4
+184,Thiago Gomes,Especialista,Engenharia,7
+185,Patrícia Silva,Consultor,Tecnologia da Informação,2
+186,Beatriz Almeida,Analista Pleno,Recursos Humanos,1
+187,Fábio Silva,Assistente,Recursos Humanos,1
+188,Hugo Silva,Business Partner,Comercial,4
+189,Fernanda Pereira,Desenvolvedor,Financeiro,3
+190,André Rodrigues,Desenvolvedor,Tecnologia da Informação,2
+191,Fábio Fernandes,Analista Sênior,Operações,5
+192,Bianca Souza,Analista Sênior,Suprimentos,10
+193,Camila Barbosa,Analista Júnior,Operações,5
+194,André Carvalho,Coordenador,Operações,5
+195,Pedro Barbosa,Assistente,Comercial,4
+196,Eduardo Lima,Business Partner,Tecnologia da Informação,2
+197,Giovana Barbosa,Analista Júnior,Tecnologia da Informação,2
+198,Natália Gomes,Técnico,Marketing,6
+199,Vinícius Araújo,Analista Júnior,Tecnologia da Informação,2
+200,Hugo Rocha,Analista Pleno,Engenharia,7
+201,Beatriz Martins,Analista Sênior,Engenharia,7
+202,Juliana Ribeiro,Especialista,Engenharia,7
+203,Giovana Mendes,Desenvolvedor,Suprimentos,10
+204,Amanda Barbosa,Especialista,Qualidade,8
+205,Ingrid Almeida,Analista Pleno,Marketing,6
+206,Júlio Martins,Assistente,Operações,5
+207,André Dias,Coordenador,Qualidade,8
+208,Lucas Rocha,Técnico,Marketing,6
+209,Patrícia Rodrigues,Técnico,Financeiro,3
+210,Matheus Nascimento,Business Partner,Operações,5
+211,Natália Silva,Consultor,Operações,5
+212,Pedro Almeida,Coordenador,Comercial,4
+213,Natália Almeida,Desenvolvedor,Qualidade,8
+214,Felipe Silva,Analista Pleno,Qualidade,8
+215,Fernanda Carvalho,Assistente,Operações,5
+216,Débora Barbosa,Técnico,Operações,5
+217,Natália Ribeiro,Técnico,Qualidade,8
+218,Elaine Mendes,Técnico,Engenharia,7
+219,Eduardo Martins,Especialista,Marketing,6
+220,Thiago Almeida,Analista Pleno,Operações,5
+221,Matheus Souza,Consultor,Comercial,4
+222,Gustavo Rodrigues,Desenvolvedor,Financeiro,3
+223,Elaine Barbosa,Consultor,Operações,5
+224,Larissa Souza,Assistente,Suprimentos,10
+225,Fernanda Fernandes,Analista Sênior,Operações,5
+226,Lucas Mendes,Analista Sênior,Operações,5
+227,Mariana Santos,Consultor,Operações,5
+228,Eduardo Pereira,Desenvolvedor,Operações,5
+229,Ingrid Silva,Business Partner,Tecnologia da Informação,2
+230,Patrícia Rocha,Desenvolvedor,Operações,5
+231,Juliana Santos,Especialista,Marketing,6
+232,Camila Oliveira,Coordenador,Qualidade,8
+233,Pedro Barbosa,Analista Júnior,Qualidade,8
+234,Rafael Barbosa,Especialista,Financeiro,3
+235,Fernanda Souza,Consultor,Tecnologia da Informação,2
+236,Bianca Dias,Business Partner,Engenharia,7
+237,Fábio Ribeiro,Coordenador,Comercial,4
+238,Kelly Martins,Especialista,Qualidade,8
+239,Amanda Lima,Business Partner,Suprimentos,10
+240,Mariana Dias,Analista Pleno,Suprimentos,10
+241,Caio Rodrigues,Especialista,Comercial,4
+242,Juliana Almeida,Analista Sênior,Tecnologia da Informação,2
+243,Pedro Costa,Analista Júnior,Logística,9
+244,Felipe Dias,Desenvolvedor,Engenharia,7
+245,Mariana Almeida,Especialista,Operações,5
+246,Eduardo Martins,Analista Pleno,Operações,5
+247,Kelly Nascimento,Business Partner,Comercial,4
+248,Amanda Souza,Consultor,Comercial,4
+249,Caio Pereira,Especialista,Comercial,4
+250,Pedro Santos,Analista Sênior,Financeiro,3
+251,Bianca Barbosa,Especialista,Operações,5
+252,Camila Martins,Especialista,Qualidade,8
+253,Thiago Ribeiro,Consultor,Engenharia,7
+254,Felipe Oliveira,Business Partner,Qualidade,8
+255,Júlio Gomes,Técnico,Recursos Humanos,1
+256,Thiago Silva,Analista Pleno,Suprimentos,10
+257,Débora Barbosa,Business Partner,Comercial,4
+258,Fábio Nascimento,Business Partner,Recursos Humanos,1
+259,Fábio Costa,Desenvolvedor,Recursos Humanos,1
+260,Caio Martins,Especialista,Logística,9
+261,André Gomes,Desenvolvedor,Financeiro,3
+262,Patrícia Fernandes,Coordenador,Tecnologia da Informação,2
+263,Matheus Souza,Analista Sênior,Marketing,6
+264,Amanda Rocha,Especialista,Marketing,6
+265,Hugo Mendes,Analista Júnior,Engenharia,7
+266,Pedro Araújo,Especialista,Qualidade,8
+267,Camila Carvalho,Consultor,Marketing,6
+268,Débora Mendes,Desenvolvedor,Recursos Humanos,1
+269,Mariana Rodrigues,Consultor,Engenharia,7
+270,Bianca Rocha,Desenvolvedor,Marketing,6
+271,Gustavo Nascimento,Consultor,Recursos Humanos,1
+272,Kelly Lima,Desenvolvedor,Financeiro,3
+273,Camila Silva,Business Partner,Qualidade,8
+274,Eduardo Costa,Especialista,Comercial,4
+275,Lucas Mendes,Coordenador,Logística,9
+276,Fernanda Souza,Desenvolvedor,Tecnologia da Informação,2
+277,Caio Pereira,Desenvolvedor,Tecnologia da Informação,2
+278,Vinícius Nascimento,Coordenador,Operações,5
+279,Patrícia Almeida,Desenvolvedor,Qualidade,8
+280,Rafael Carvalho,Assistente,Logística,9
+281,Vinícius Pereira,Analista Pleno,Suprimentos,10
+282,Fábio Gomes,Técnico,Operações,5
+283,Thiago Silva,Especialista,Logística,9
+284,Hugo Barbosa,Business Partner,Operações,5
+285,Ingrid Pereira,Desenvolvedor,Qualidade,8
+286,Patrícia Fernandes,Técnico,Logística,9
+287,Fábio Mendes,Coordenador,Logística,9
+288,Kelly Araújo,Assistente,Qualidade,8
+289,André Carvalho,Assistente,Comercial,4
+290,Mariana Araújo,Desenvolvedor,Engenharia,7
+291,Rodrigo Pereira,Desenvolvedor,Engenharia,7
+292,Rafael Ribeiro,Business Partner,Recursos Humanos,1
+293,Ingrid Souza,Desenvolvedor,Marketing,6
+294,Vinícius Martins,Analista Júnior,Tecnologia da Informação,2
+295,Amanda Pereira,Analista Pleno,Financeiro,3
+296,Giovana Nascimento,Técnico,Qualidade,8
+297,Eduardo Carvalho,Analista Pleno,Suprimentos,10
+298,Ingrid Mendes,Coordenador,Marketing,6
+299,Caio Rocha,Consultor,Marketing,6
+300,Bianca Oliveira,Assistente,Recursos Humanos,1
+301,Fernanda Oliveira,Coordenador,Operações,5
+302,Fábio Souza,Desenvolvedor,Tecnologia da Informação,2
+303,Eduardo Lima,Analista Júnior,Financeiro,3
+304,Matheus Santos,Especialista,Recursos Humanos,1
+305,Beatriz Gomes,Analista Sênior,Marketing,6
+306,Vinícius Gomes,Business Partner,Comercial,4
+307,Juliana Costa,Analista Pleno,Financeiro,3
+308,Ingrid Carvalho,Business Partner,Suprimentos,10
+309,Patrícia Barbosa,Analista Sênior,Comercial,4
+310,Felipe Nascimento,Desenvolvedor,Comercial,4

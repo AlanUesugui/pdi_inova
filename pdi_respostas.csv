@@ -1,0 +1,301 @@
+id_colaborador,treinamento_nome,q1_conhecimento,q2_aplicacao,q3_desempenho,q4_eficacia
+11,Inteligência Artificial Aplicada,Ruim,Ruim,Ótimo,Sim
+12,Análise de Dados,Ruim,Bom,Bom,Não
+13,Liderança Colaborativa,Ótimo,Bom,Ruim,Não
+14,Comunicação Assertiva,Ruim,Bom,Bom,Sim
+15,Inteligência Artificial Aplicada,Ótimo,Ruim,Bom,Sim
+16,Excel e Power BI,Ruim,Ótimo,Ruim,Sim
+17,Gestão do Tempo,Bom,Ruim,Ótimo,Sim
+18,Excel e Power BI,Ótimo,Ótimo,Ruim,Não
+19,Inteligência Artificial Aplicada,Bom,Bom,Ruim,Não
+20,Liderança Colaborativa,Ótimo,Ótimo,Ruim,Não
+21,Análise de Dados,Ótimo,Bom,Ruim,Sim
+22,Gestão do Tempo,Bom,Ruim,Bom,Sim
+23,Comunicação Assertiva,Ruim,Ruim,Bom,Sim
+24,Inteligência Artificial Aplicada,Ruim,Bom,Ótimo,Sim
+25,Segurança da Informação,Ótimo,Ótimo,Ótimo,Sim
+26,Feedback Técnico,Bom,Ruim,Ruim,Sim
+27,Gestão do Tempo,Bom,Bom,Ótimo,Não
+28,Gestão de Projetos Ágeis,Bom,Ótimo,Ruim,Não
+29,Análise de Dados,Bom,Ótimo,Ótimo,Não
+30,Comunicação Assertiva,Bom,Ótimo,Ótimo,Sim
+31,Gestão de Projetos Ágeis,Bom,Ótimo,Ruim,Sim
+32,Feedback Técnico,Bom,Ótimo,Ótimo,Sim
+33,Gestão de Projetos Ágeis,Ruim,Bom,Ótimo,Sim
+34,Análise de Dados,Ruim,Ótimo,Ruim,Sim
+35,Feedback Técnico,Ruim,Ótimo,Bom,Sim
+36,Segurança da Informação,Ruim,Ótimo,Ótimo,Não
+37,Liderança Colaborativa,Bom,Ruim,Bom,Sim
+38,Liderança Colaborativa,Ótimo,Bom,Ruim,Não
+39,Feedback Técnico,Ruim,Bom,Ótimo,Sim
+40,Segurança da Informação,Ótimo,Bom,Bom,Não
+41,Atendimento ao Cliente,Bom,Bom,Ruim,Não
+42,Liderança Colaborativa,Ótimo,Ótimo,Ótimo,Não
+43,Feedback Técnico,Ótimo,Ruim,Ruim,Não
+44,Atendimento ao Cliente,Ruim,Bom,Ruim,Sim
+45,Liderança Colaborativa,Ruim,Ruim,Ótimo,Sim
+46,Liderança Colaborativa,Bom,Ruim,Bom,Sim
+47,Análise de Dados,Ruim,Ruim,Ruim,Sim
+48,Excel e Power BI,Bom,Ruim,Bom,Não
+49,Excel e Power BI,Ruim,Ruim,Bom,Sim
+50,Feedback Técnico,Ótimo,Bom,Bom,Não
+51,Inteligência Artificial Aplicada,Ruim,Bom,Ruim,Sim
+52,Gestão do Tempo,Ótimo,Ruim,Ótimo,Não
+53,Gestão do Tempo,Bom,Bom,Bom,Sim
+54,Análise de Dados,Ótimo,Bom,Ruim,Não
+55,Gestão de Projetos Ágeis,Bom,Ruim,Ótimo,Sim
+56,Excel e Power BI,Bom,Bom,Bom,Sim
+57,Excel e Power BI,Ótimo,Bom,Ruim,Sim
+58,Análise de Dados,Ruim,Ótimo,Bom,Sim
+59,Gestão do Tempo,Bom,Ruim,Bom,Não
+60,Comunicação Assertiva,Bom,Ótimo,Ruim,Não
+61,Análise de Dados,Ótimo,Ótimo,Bom,Não
+62,Inteligência Artificial Aplicada,Ruim,Bom,Ótimo,Não
+63,Feedback Técnico,Ruim,Ótimo,Ruim,Sim
+64,Excel e Power BI,Ótimo,Ótimo,Ótimo,Não
+65,Liderança Colaborativa,Ótimo,Ruim,Bom,Não
+66,Atendimento ao Cliente,Ótimo,Bom,Ótimo,Não
+67,Gestão do Tempo,Ótimo,Bom,Ruim,Sim
+68,Comunicação Assertiva,Ótimo,Bom,Bom,Sim
+69,Segurança da Informação,Ruim,Ruim,Ruim,Sim
+70,Gestão do Tempo,Bom,Ruim,Ótimo,Sim
+71,Liderança Colaborativa,Ruim,Ruim,Ótimo,Sim
+72,Feedback Técnico,Ruim,Ruim,Ótimo,Não
+73,Análise de Dados,Bom,Ruim,Ruim,Sim
+74,Atendimento ao Cliente,Ótimo,Ruim,Ruim,Não
+75,Atendimento ao Cliente,Ótimo,Ruim,Ruim,Sim
+76,Excel e Power BI,Ruim,Ruim,Ótimo,Não
+77,Excel e Power BI,Ruim,Ruim,Ruim,Sim
+78,Comunicação Assertiva,Bom,Bom,Ótimo,Sim
+79,Gestão de Projetos Ágeis,Ótimo,Ótimo,Ótimo,Não
+80,Atendimento ao Cliente,Ruim,Ótimo,Ruim,Não
+81,Gestão do Tempo,Ótimo,Ruim,Bom,Sim
+82,Segurança da Informação,Ruim,Bom,Ruim,Não
+83,Segurança da Informação,Ótimo,Bom,Ruim,Não
+84,Feedback Técnico,Ruim,Bom,Ótimo,Sim
+85,Comunicação Assertiva,Ruim,Bom,Bom,Sim
+86,Liderança Colaborativa,Ótimo,Bom,Bom,Sim
+87,Gestão de Projetos Ágeis,Bom,Bom,Ótimo,Não
+88,Gestão de Projetos Ágeis,Bom,Ótimo,Bom,Sim
+89,Atendimento ao Cliente,Ótimo,Ótimo,Ótimo,Não
+90,Segurança da Informação,Bom,Ruim,Ótimo,Sim
+91,Excel e Power BI,Ruim,Ruim,Ruim,Não
+92,Inteligência Artificial Aplicada,Ótimo,Ótimo,Ótimo,Não
+93,Liderança Colaborativa,Bom,Ruim,Ruim,Sim
+94,Inteligência Artificial Aplicada,Bom,Ótimo,Ruim,Não
+95,Liderança Colaborativa,Ruim,Bom,Ótimo,Sim
+96,Análise de Dados,Bom,Bom,Ruim,Sim
+97,Gestão de Projetos Ágeis,Ruim,Ruim,Ruim,Sim
+98,Comunicação Assertiva,Bom,Ruim,Bom,Sim
+99,Excel e Power BI,Ótimo,Ótimo,Ruim,Não
+100,Comunicação Assertiva,Ótimo,Ótimo,Bom,Não
+101,Inteligência Artificial Aplicada,Ótimo,Ruim,Ótimo,Não
+102,Inteligência Artificial Aplicada,Ótimo,Bom,Bom,Não
+103,Atendimento ao Cliente,Ótimo,Bom,Ruim,Não
+104,Análise de Dados,Ótimo,Bom,Ruim,Sim
+105,Liderança Colaborativa,Ótimo,Bom,Ruim,Não
+106,Excel e Power BI,Ruim,Bom,Bom,Não
+107,Inteligência Artificial Aplicada,Ruim,Ótimo,Ótimo,Não
+108,Excel e Power BI,Ruim,Ruim,Bom,Sim
+109,Atendimento ao Cliente,Bom,Bom,Ruim,Sim
+110,Atendimento ao Cliente,Bom,Bom,Ótimo,Sim
+111,Atendimento ao Cliente,Ruim,Bom,Ótimo,Sim
+112,Feedback Técnico,Bom,Ruim,Ótimo,Não
+113,Gestão de Projetos Ágeis,Ruim,Bom,Ruim,Não
+114,Liderança Colaborativa,Bom,Ótimo,Ruim,Não
+115,Liderança Colaborativa,Ruim,Ruim,Bom,Não
+116,Atendimento ao Cliente,Ruim,Ótimo,Ótimo,Sim
+117,Segurança da Informação,Ótimo,Bom,Ruim,Não
+118,Liderança Colaborativa,Bom,Bom,Ruim,Não
+119,Gestão do Tempo,Ótimo,Ótimo,Bom,Sim
+120,Excel e Power BI,Ruim,Ruim,Ruim,Sim
+121,Feedback Técnico,Ótimo,Ótimo,Ruim,Sim
+122,Atendimento ao Cliente,Ruim,Ótimo,Bom,Não
+123,Gestão de Projetos Ágeis,Ruim,Ruim,Bom,Sim
+124,Feedback Técnico,Ruim,Ótimo,Ruim,Sim
+125,Comunicação Assertiva,Ótimo,Ótimo,Ruim,Não
+126,Gestão do Tempo,Ruim,Ótimo,Bom,Não
+127,Gestão de Projetos Ágeis,Ruim,Bom,Bom,Não
+128,Segurança da Informação,Bom,Bom,Bom,Sim
+129,Atendimento ao Cliente,Ruim,Bom,Bom,Sim
+130,Atendimento ao Cliente,Ótimo,Bom,Ótimo,Não
+131,Liderança Colaborativa,Ótimo,Bom,Bom,Não
+132,Gestão do Tempo,Ruim,Bom,Ótimo,Sim
+133,Inteligência Artificial Aplicada,Bom,Ótimo,Ótimo,Não
+134,Gestão de Projetos Ágeis,Ruim,Bom,Ótimo,Sim
+135,Inteligência Artificial Aplicada,Ruim,Ótimo,Ótimo,Não
+136,Análise de Dados,Bom,Ótimo,Bom,Sim
+137,Feedback Técnico,Bom,Ótimo,Bom,Não
+138,Excel e Power BI,Ótimo,Bom,Bom,Não
+139,Gestão de Projetos Ágeis,Ruim,Ruim,Bom,Sim
+140,Atendimento ao Cliente,Bom,Ruim,Bom,Sim
+141,Gestão do Tempo,Bom,Ótimo,Bom,Não
+142,Gestão do Tempo,Bom,Bom,Ótimo,Não
+143,Gestão do Tempo,Bom,Ruim,Ruim,Sim
+144,Gestão do Tempo,Ruim,Ótimo,Ruim,Sim
+145,Feedback Técnico,Ruim,Ruim,Ruim,Não
+146,Gestão do Tempo,Ruim,Ótimo,Ótimo,Sim
+147,Excel e Power BI,Bom,Ruim,Ótimo,Não
+148,Excel e Power BI,Ruim,Ótimo,Ruim,Não
+149,Atendimento ao Cliente,Ótimo,Bom,Ruim,Não
+150,Gestão do Tempo,Bom,Ótimo,Ótimo,Não
+151,Inteligência Artificial Aplicada,Bom,Ruim,Ótimo,Não
+152,Feedback Técnico,Ruim,Bom,Bom,Sim
+153,Atendimento ao Cliente,Ótimo,Bom,Ótimo,Não
+154,Segurança da Informação,Ruim,Bom,Ruim,Não
+155,Feedback Técnico,Ruim,Bom,Ótimo,Sim
+156,Comunicação Assertiva,Ruim,Ruim,Ótimo,Sim
+157,Atendimento ao Cliente,Ruim,Bom,Ótimo,Sim
+158,Segurança da Informação,Bom,Ruim,Ótimo,Não
+159,Liderança Colaborativa,Ruim,Ruim,Ótimo,Sim
+160,Comunicação Assertiva,Bom,Bom,Ótimo,Não
+161,Inteligência Artificial Aplicada,Ruim,Ruim,Ótimo,Não
+162,Excel e Power BI,Ruim,Bom,Bom,Sim
+163,Excel e Power BI,Ruim,Bom,Ruim,Não
+164,Atendimento ao Cliente,Bom,Ruim,Ruim,Sim
+165,Feedback Técnico,Bom,Ótimo,Bom,Sim
+166,Atendimento ao Cliente,Ótimo,Ótimo,Bom,Não
+167,Atendimento ao Cliente,Bom,Ruim,Ruim,Sim
+168,Comunicação Assertiva,Ruim,Ótimo,Bom,Não
+169,Liderança Colaborativa,Ruim,Bom,Bom,Sim
+170,Excel e Power BI,Bom,Ruim,Ruim,Não
+171,Gestão de Projetos Ágeis,Ruim,Ruim,Ótimo,Não
+172,Gestão do Tempo,Ótimo,Ótimo,Ruim,Sim
+173,Atendimento ao Cliente,Ruim,Bom,Ótimo,Sim
+174,Feedback Técnico,Bom,Ótimo,Bom,Sim
+175,Gestão do Tempo,Ótimo,Ruim,Bom,Não
+176,Inteligência Artificial Aplicada,Ótimo,Ruim,Ótimo,Sim
+177,Liderança Colaborativa,Ruim,Ótimo,Ótimo,Não
+178,Excel e Power BI,Ótimo,Ruim,Ruim,Não
+179,Análise de Dados,Bom,Ótimo,Ruim,Sim
+180,Excel e Power BI,Ruim,Bom,Ruim,Sim
+181,Comunicação Assertiva,Bom,Bom,Ruim,Não
+182,Gestão de Projetos Ágeis,Bom,Bom,Ótimo,Não
+183,Análise de Dados,Ruim,Ótimo,Ótimo,Sim
+184,Segurança da Informação,Ruim,Ruim,Ruim,Sim
+185,Segurança da Informação,Ótimo,Ruim,Ótimo,Sim
+186,Gestão do Tempo,Bom,Ruim,Ruim,Não
+187,Feedback Técnico,Ótimo,Bom,Bom,Não
+188,Feedback Técnico,Bom,Ótimo,Bom,Não
+189,Análise de Dados,Ótimo,Bom,Bom,Sim
+190,Gestão de Projetos Ágeis,Bom,Ruim,Ótimo,Não
+191,Feedback Técnico,Ruim,Ótimo,Bom,Sim
+192,Liderança Colaborativa,Bom,Bom,Ótimo,Sim
+193,Gestão do Tempo,Ruim,Ótimo,Ótimo,Sim
+194,Gestão de Projetos Ágeis,Bom,Bom,Ótimo,Sim
+195,Gestão de Projetos Ágeis,Ruim,Ruim,Ruim,Sim
+196,Inteligência Artificial Aplicada,Bom,Bom,Ruim,Não
+197,Feedback Técnico,Bom,Bom,Ótimo,Não
+198,Atendimento ao Cliente,Bom,Bom,Ótimo,Sim
+199,Inteligência Artificial Aplicada,Ruim,Ruim,Ruim,Não
+200,Atendimento ao Cliente,Ótimo,Bom,Ruim,Sim
+201,Segurança da Informação,Ruim,Ruim,Ruim,Não
+202,Excel e Power BI,Ótimo,Ruim,Ruim,Não
+203,Liderança Colaborativa,Ruim,Ótimo,Ótimo,Não
+204,Excel e Power BI,Ótimo,Ótimo,Ruim,Não
+205,Segurança da Informação,Ótimo,Ótimo,Ruim,Não
+206,Feedback Técnico,Bom,Ótimo,Ruim,Não
+207,Liderança Colaborativa,Ruim,Ótimo,Ótimo,Sim
+208,Inteligência Artificial Aplicada,Bom,Ótimo,Bom,Não
+209,Inteligência Artificial Aplicada,Ruim,Ótimo,Ruim,Sim
+210,Análise de Dados,Ruim,Bom,Ótimo,Sim
+211,Segurança da Informação,Bom,Ruim,Bom,Sim
+212,Gestão de Projetos Ágeis,Ruim,Ruim,Bom,Não
+213,Feedback Técnico,Ruim,Ruim,Ótimo,Sim
+214,Gestão de Projetos Ágeis,Ruim,Ótimo,Ruim,Não
+215,Gestão do Tempo,Ótimo,Ruim,Bom,Não
+216,Feedback Técnico,Ruim,Bom,Ótimo,Sim
+217,Atendimento ao Cliente,Ruim,Ruim,Ruim,Não
+218,Inteligência Artificial Aplicada,Bom,Bom,Ótimo,Não
+219,Excel e Power BI,Ruim,Ruim,Ruim,Não
+220,Liderança Colaborativa,Ótimo,Bom,Ótimo,Não
+221,Atendimento ao Cliente,Bom,Ótimo,Ótimo,Sim
+222,Inteligência Artificial Aplicada,Ótimo,Ótimo,Ótimo,Sim
+223,Liderança Colaborativa,Ótimo,Ótimo,Bom,Sim
+224,Comunicação Assertiva,Bom,Bom,Bom,Sim
+225,Análise de Dados,Ótimo,Ótimo,Bom,Não
+226,Liderança Colaborativa,Ótimo,Bom,Bom,Não
+227,Atendimento ao Cliente,Bom,Ótimo,Ruim,Não
+228,Liderança Colaborativa,Ótimo,Bom,Ótimo,Não
+229,Segurança da Informação,Bom,Bom,Ruim,Sim
+230,Segurança da Informação,Bom,Ótimo,Bom,Não
+231,Atendimento ao Cliente,Bom,Bom,Bom,Não
+232,Feedback Técnico,Ótimo,Ruim,Bom,Sim
+233,Análise de Dados,Ruim,Bom,Ótimo,Não
+234,Análise de Dados,Bom,Ótimo,Bom,Não
+235,Feedback Técnico,Ótimo,Bom,Ruim,Sim
+236,Excel e Power BI,Ruim,Ruim,Ótimo,Não
+237,Liderança Colaborativa,Ótimo,Ótimo,Bom,Sim
+238,Atendimento ao Cliente,Bom,Bom,Ruim,Sim
+239,Liderança Colaborativa,Bom,Bom,Ótimo,Sim
+240,Inteligência Artificial Aplicada,Bom,Bom,Ótimo,Não
+241,Segurança da Informação,Ruim,Ruim,Bom,Não
+242,Liderança Colaborativa,Ótimo,Bom,Ruim,Sim
+243,Feedback Técnico,Ótimo,Ruim,Ótimo,Não
+244,Gestão de Projetos Ágeis,Bom,Ruim,Ótimo,Sim
+245,Comunicação Assertiva,Ruim,Ruim,Ótimo,Não
+246,Comunicação Assertiva,Ruim,Ótimo,Ótimo,Não
+247,Feedback Técnico,Ótimo,Bom,Bom,Sim
+248,Segurança da Informação,Ruim,Ruim,Bom,Não
+249,Atendimento ao Cliente,Bom,Bom,Ruim,Sim
+250,Excel e Power BI,Bom,Ótimo,Ótimo,Não
+251,Excel e Power BI,Ruim,Bom,Bom,Sim
+252,Excel e Power BI,Bom,Ruim,Ruim,Sim
+253,Inteligência Artificial Aplicada,Ótimo,Ótimo,Bom,Não
+254,Comunicação Assertiva,Bom,Ótimo,Ótimo,Não
+255,Segurança da Informação,Bom,Ruim,Bom,Não
+256,Gestão de Projetos Ágeis,Bom,Ótimo,Bom,Sim
+257,Segurança da Informação,Ruim,Ruim,Bom,Sim
+258,Feedback Técnico,Bom,Ruim,Ótimo,Não
+259,Liderança Colaborativa,Ruim,Ruim,Ótimo,Não
+260,Inteligência Artificial Aplicada,Bom,Ótimo,Bom,Sim
+261,Gestão do Tempo,Ruim,Bom,Ruim,Não
+262,Gestão de Projetos Ágeis,Ótimo,Ruim,Bom,Não
+263,Inteligência Artificial Aplicada,Bom,Ruim,Bom,Sim
+264,Inteligência Artificial Aplicada,Ruim,Ótimo,Ruim,Sim
+265,Gestão de Projetos Ágeis,Ruim,Bom,Bom,Sim
+266,Análise de Dados,Bom,Ótimo,Ruim,Sim
+267,Segurança da Informação,Bom,Bom,Ruim,Sim
+268,Atendimento ao Cliente,Ótimo,Ruim,Bom,Sim
+269,Inteligência Artificial Aplicada,Bom,Bom,Bom,Sim
+270,Comunicação Assertiva,Ótimo,Ótimo,Ruim,Não
+271,Segurança da Informação,Bom,Ótimo,Bom,Sim
+272,Excel e Power BI,Bom,Ótimo,Ruim,Não
+273,Excel e Power BI,Ótimo,Bom,Ruim,Não
+274,Liderança Colaborativa,Ruim,Ótimo,Ótimo,Sim
+275,Gestão do Tempo,Ótimo,Ruim,Ruim,Não
+276,Liderança Colaborativa,Bom,Ruim,Ótimo,Não
+277,Liderança Colaborativa,Ruim,Ótimo,Ótimo,Não
+278,Análise de Dados,Ótimo,Ruim,Ruim,Sim
+279,Segurança da Informação,Bom,Ruim,Ótimo,Sim
+280,Liderança Colaborativa,Ótimo,Ótimo,Ótimo,Não
+281,Excel e Power BI,Ótimo,Bom,Ruim,Sim
+282,Inteligência Artificial Aplicada,Ótimo,Ruim,Ruim,Sim
+283,Comunicação Assertiva,Ótimo,Bom,Bom,Sim
+284,Feedback Técnico,Ótimo,Bom,Bom,Sim
+285,Feedback Técnico,Ruim,Ótimo,Bom,Sim
+286,Inteligência Artificial Aplicada,Ótimo,Ótimo,Ótimo,Não
+287,Análise de Dados,Ruim,Bom,Ótimo,Sim
+288,Liderança Colaborativa,Ruim,Ótimo,Ótimo,Não
+289,Análise de Dados,Ruim,Ótimo,Ótimo,Sim
+290,Segurança da Informação,Ruim,Ruim,Ótimo,Não
+291,Comunicação Assertiva,Ruim,Ótimo,Ruim,Sim
+292,Feedback Técnico,Ruim,Ruim,Bom,Sim
+293,Liderança Colaborativa,Ótimo,Bom,Bom,Não
+294,Gestão do Tempo,Ruim,Ótimo,Bom,Não
+295,Segurança da Informação,Ruim,Ótimo,Bom,Sim
+296,Gestão de Projetos Ágeis,Ruim,Ruim,Ótimo,Sim
+297,Comunicação Assertiva,Bom,Bom,Bom,Sim
+298,Gestão de Projetos Ágeis,Bom,Ótimo,Bom,Não
+299,Liderança Colaborativa,Ruim,Ruim,Ótimo,Sim
+300,Liderança Colaborativa,Bom,Bom,Bom,Não
+301,Atendimento ao Cliente,Ótimo,Bom,Ruim,Não
+302,Atendimento ao Cliente,Ruim,Bom,Ótimo,Sim
+303,Comunicação Assertiva,Ótimo,Ruim,Bom,Sim
+304,Inteligência Artificial Aplicada,Ótimo,Ótimo,Ruim,Sim
+305,Excel e Power BI,Ruim,Bom,Ótimo,Sim
+306,Segurança da Informação,Ruim,Ótimo,Ruim,Sim
+307,Liderança Colaborativa,Ruim,Ruim,Ótimo,Não
+308,Inteligência Artificial Aplicada,Bom,Bom,Bom,Não
+309,Gestão de Projetos Ágeis,Ótimo,Ótimo,Ótimo,Sim
+310,Segurança da Informação,Bom,Bom,Bom,Sim

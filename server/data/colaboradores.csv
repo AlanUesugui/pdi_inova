@@ -1,0 +1,8 @@
+id,nome,cargo,departamento,gestor_id
+1,Jane Doe,Principal Product Designer,Design,100
+2,Marcus Reed,Senior Engineering Lead,Engineering,100
+3,Sarah Chen,Full Stack Architect,Engineering,101
+4,Thomas Klein,Operations Manager,Operations,101
+5,Lila Amin,Marketing Strategist,Marketing,100
+100,Alex Sterling,Head of Operations,Executive,0
+101,Sofia Rodriguez,VP of Engineering,Executive,0

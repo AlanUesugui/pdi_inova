@@ -1,0 +1,41 @@
+﻿id,id_cargo,cargo,competencia,tipo,nivel_necessario
+1,1,Analista Junior,Fundamentos de análise de dados,Técnica,Básico
+2,1,Analista Junior,Excel básico,Técnica,Básico
+3,1,Analista Junior,Comunicação clara,Comportamental,Intermediário
+4,1,Analista Junior,Aprendizado rápido,Comportamental,Intermediário
+5,2,Analista Pleno,Análise de dados,Técnica,Intermediário
+6,2,Analista Pleno,SQL / BI,Técnica,Intermediário
+7,2,Analista Pleno,Resolução de problemas,Comportamental,Avançado
+8,2,Analista Pleno,Autonomia,Comportamental,Avançado
+9,3,Analista Senior,Modelagem de dados,Técnica,Avançado
+10,3,Analista Senior,Gestão de projetos,Técnica,Avançado
+11,3,Analista Senior,Tomada de decisão,Comportamental,Avançado
+12,3,Analista Senior,Mentoria,Comportamental,Intermediário
+13,4,Assistente,Rotinas administrativas,Técnica,Intermediário
+14,4,Assistente,Organização,Comportamental,Avançado
+15,4,Assistente,Atendimento,Comportamental,Intermediário
+16,4,Assistente,Controle de dados,Técnica,Básico
+17,5,Business Partner,Gestão estratégica de pessoas,Técnica,Avançado
+18,5,Business Partner,Indicadores de RH,Técnica,Intermediário
+19,5,Business Partner,Influência,Comportamental,Avançado
+20,5,Business Partner,Comunicação executiva,Comportamental,Avançado
+21,6,Consultor,Diagnóstico organizacional,Técnica,Avançado
+22,6,Consultor,Mapeamento de processos,Técnica,Intermediário
+23,6,Consultor,Apresentação,Comportamental,Avançado
+24,6,Consultor,Pensamento analítico,Comportamental,Avançado
+25,7,Coordenador,Gestão de equipe,Técnica,Avançado
+26,7,Coordenador,Planejamento,Técnica,Avançado
+27,7,Coordenador,Liderança,Comportamental,Avançado
+28,7,Coordenador,Delegação,Comportamental,Intermediário
+29,8,Desenvolvedor,Programação,Técnica,Avançado
+30,8,Desenvolvedor,Estrutura de dados,Técnica,Intermediário
+31,8,Desenvolvedor,Versionamento (Git),Técnica,Intermediário
+32,8,Desenvolvedor,Lógica,Comportamental,Avançado
+33,9,Especialista,Domínio técnico profundo,Técnica,Avançado
+34,9,Especialista,Definição de padrões,Técnica,Avançado
+35,9,Especialista,Visão estratégica,Comportamental,Avançado
+36,9,Especialista,Referência técnica,Comportamental,Avançado
+37,10,Técnico,Execução técnica,Técnica,Intermediário
+38,10,Técnico,Manutenção,Técnica,Intermediário
+39,10,Técnico,Atenção a detalhes,Comportamental,Avançado
+40,10,Técnico,Conformidade,Comportamental,Avançado
