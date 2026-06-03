@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Briefcase, Search, Star, Award, BookOpen, Layers } from 'lucide-react';
+import { Briefcase, Search, Layers } from 'lucide-react';
 import axios from 'axios';
 
 interface Competency {

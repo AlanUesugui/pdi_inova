@@ -37,13 +37,6 @@ const TrainingHistoryModal: React.FC<TrainingHistoryModalProps> = ({
     return 'text-rose-600 bg-rose-50 border-rose-200';
   };
 
-  const getScoreBarColor = (score: number) => {
-    if (score >= 80) return 'bg-emerald-500';
-    if (score >= 60) return 'bg-primary-500';
-    if (score >= 40) return 'bg-amber-500';
-    return 'bg-rose-500';
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-navy-900/40 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-gray-100 overflow-hidden animate-in zoom-in-95 duration-200">

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  X, Sparkles, TrendingUp, TrendingDown, Target, Lightbulb,
-  AlertTriangle, CheckCircle2, Calendar, User, Zap, ChevronRight, Briefcase
+  X, Sparkles, TrendingUp, Target, Lightbulb,
+  AlertTriangle, CheckCircle2, Calendar, User, Zap, Briefcase
 } from 'lucide-react';
 import { type PDITraining } from './TrainingHistoryModal';
 import axios from 'axios';

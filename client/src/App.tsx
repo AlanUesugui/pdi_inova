@@ -5,9 +5,8 @@ import RolesManagement from './components/RolesManagement';
 import CareerMap from './components/CareerMap';
 import Login from './components/Login';
 import { getDynamicProgressColor } from './utils/colors';
-import { Search, Bell, Settings, Upload, Download, Sparkles, Star, ChevronRight } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
 import axios from 'axios';
-import jsPDF from 'jspdf';
 
 interface RadarChartProps {
   averages: number[];
@@ -181,7 +180,6 @@ const App: React.FC = () => {
   const [insight, setInsight] = useState("Carregando diagnóstico do time...");
   const [displayedText, setDisplayedText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [dashboardTeam, setDashboardTeam] = useState<any[]>([]);
   const [fullTeam, setFullTeam] = useState<any[]>([]);
   const [stats, setStats] = useState<any>({
     activeMembersCount: 24,
@@ -216,8 +214,6 @@ const App: React.FC = () => {
           // Take active collaborators (filter out gestor)
           const filtered = res.data.filter((m: any) => !m.role.toLowerCase().includes('gestor'));
           setFullTeam(filtered);
-          // Take top 3 for the dashboard individual performance summary
-          setDashboardTeam(filtered.slice(0, 3));
         })
         .catch(err => {
           console.warn("Failed to load team data, using fallback", err);
@@ -228,7 +224,6 @@ const App: React.FC = () => {
             { id: "3", name: "Fabio Souza", role: "Project Manager", pdiAverage: 58, avatar: "https://i.pravatar.cc/150?u=fabio", aiHealth: "Attention" }
           ];
           setFullTeam(mockData);
-          setDashboardTeam(mockData.slice(0, 3));
         });
     }
   }, [user]);
@@ -275,66 +270,7 @@ const App: React.FC = () => {
     }
   }, [user]);
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
 
-    setIsLoading(true);
-    const formData = new FormData();
-    formData.append('report', file);
-
-    try {
-      const response = await axios.post('http://localhost:3001/api/upload', formData);
-      alert(response.data.message);
-      setInsight(`Relatório importado com sucesso. Novas competências extraídas: ${response.data.extractedSkills.join(', ')}. PDIs recomendados atualizados.`);
-    } catch (error) {
-      console.warn("Upload failed, using simulation", error);
-      await new Promise(resolve => setTimeout(resolve, 1200));
-      setInsight("Simulação: Relatório técnico processado. Foram atualizadas competências para Liderança de Equipe e Engenharia DevOps.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleExport = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(22);
-    doc.setTextColor(91, 47, 140); // Brand Violet Color
-    doc.text("Inova Skill - Indicadores do Time", 20, 25);
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text("Grupo Jacto - Relatorio Corporativo de Desempenho e PDI", 20, 32);
-    doc.line(20, 36, 190, 36);
-    
-    doc.setFontSize(13);
-    doc.setTextColor(30, 30, 30);
-    doc.text("Insight de IA do Periodo:", 20, 48);
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    const splitText = doc.splitTextToSize(insight, 170);
-    doc.text(splitText, 20, 56);
-
-    doc.setFontSize(13);
-    doc.setTextColor(30, 30, 30);
-    doc.text("Mapeamento e Metricas de Competencia:", 20, 95);
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    doc.text("- Membros Ativos do Time: 24 colaboradores", 25, 105);
-    doc.text("- Skills Mapeados no Ciclo: 148 skills (82% de validacao)", 25, 112);
-    doc.text("- Conclusao de Workshops Tecnicos: 88%", 25, 119);
-    doc.text("- Conclusao de Programas de Mentoria: 64%", 25, 126);
-
-    doc.setFontSize(13);
-    doc.setTextColor(30, 30, 30);
-    doc.text("Resumo de Performance Individual (Destaques):", 20, 145);
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    dashboardTeam.forEach((member, i) => {
-      doc.text(`${i + 1}. ${member.name} (${member.role}) - PDI: ${member.pdiAverage}% - Status: ${member.pdiAverage >= 85 ? 'Promovido' : member.pdiAverage >= 60 ? 'No Caminho' : 'Precisa de Foco'}`, 25, 155 + (i * 7));
-    });
-
-    doc.save("indicadores-time-inova.pdf");
-  };
 
   // Calculate team distribution stats
   const totalCollabs = fullTeam.length || 1;
