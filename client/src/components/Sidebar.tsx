@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, User, Target, TrendingUp, Award, MessageSquare, BarChart2, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Target, TrendingUp, MessageSquare, Sparkles, Settings, Briefcase } from 'lucide-react';
 
 interface SidebarProps {
   onGenerateReport: () => void;
@@ -12,30 +12,14 @@ const Sidebar: React.FC<SidebarProps> = ({ onGenerateReport, currentView, onView
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-100 flex flex-col z-50">
       <div className="p-6">
-        {/* Brand Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
-            <Sparkles className="text-white w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="text-gray-900 font-extrabold text-base leading-none tracking-tight">Inova Skill</h1>
-            <p className="text-primary-600 text-[10px] uppercase tracking-widest font-black mt-1">HR Platform</p>
-          </div>
-        </div>
-
         {/* Sidebar Navigation */}
-        <nav className="space-y-1">
+        <nav className="space-y-1 mt-6">
           <button 
             onClick={() => onViewChange('dashboard')}
             className={currentView === 'dashboard' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
           >
             <LayoutDashboard className="w-5 h-5 mr-3 shrink-0" />
             Início
-          </button>
-          
-          <button className="sidebar-link w-full text-left opacity-60 cursor-not-allowed">
-            <User className="w-5 h-5 mr-3 shrink-0" />
-            Meu Perfil
           </button>
 
           <button 
@@ -46,14 +30,20 @@ const Sidebar: React.FC<SidebarProps> = ({ onGenerateReport, currentView, onView
             PDI
           </button>
 
-          <button className="sidebar-link w-full text-left opacity-60 cursor-not-allowed">
-            <TrendingUp className="w-5 h-5 mr-3 shrink-0" />
-            Carreira
+          <button 
+            onClick={() => onViewChange('roles')}
+            className={currentView === 'roles' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
+          >
+            <Briefcase className="w-5 h-5 mr-3 shrink-0" />
+            Cargos
           </button>
 
-          <button className="sidebar-link w-full text-left opacity-60 cursor-not-allowed">
-            <Award className="w-5 h-5 mr-3 shrink-0" />
-            Experiências
+          <button
+            onClick={() => onViewChange('career')}
+            className={currentView === 'career' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
+          >
+            <TrendingUp className="w-5 h-5 mr-3 shrink-0" />
+            Carreira
           </button>
 
           <button className="sidebar-link w-full text-left opacity-60 cursor-not-allowed">
@@ -61,12 +51,9 @@ const Sidebar: React.FC<SidebarProps> = ({ onGenerateReport, currentView, onView
             Feedback e 1:1
           </button>
 
-          <button 
-            onClick={() => onViewChange('dashboard')}
-            className="sidebar-link w-full text-left opacity-60 cursor-not-allowed"
-          >
-            <BarChart2 className="w-5 h-5 mr-3 shrink-0" />
-            Indicadores
+          <button className="sidebar-link w-full text-left opacity-60 cursor-not-allowed">
+            <Settings className="w-5 h-5 mr-3 shrink-0" />
+            Configurações
           </button>
         </nav>
       </div>

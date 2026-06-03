@@ -1,6 +1,6 @@
-id_colaborador,comentarios_soft_skills,avaliacao_pessoal_texto,data
-1,"Excelente comunicação e liderança natural.","Promissora para cargos de diretoria.",2024-03-01
-2,"Ótimo tecnicamente, mas precisa melhorar oratória.","Consistente no desempenho técnico.",2024-03-05
-3,"Muito reservada, precisa de mais proatividade em reuniões.","Risco de estagnação por falta de visibilidade.",2024-03-10
-4,"Foco total em processos, às vezes esquece o lado humano.","Líder operacional eficiente.",2024-03-12
-5,"Criativa e ágil, mas tem dificuldade com prazos longos.","Grande potencial criativo.",2024-03-15
+id_colaborador,comentarios_soft_skills,avaliacao_pessoal_texto,data,data_avaliacao,periodo_referencia,nota_desempenho_geral,potencial_crescimento,comentarios_gestor,metas_atingidas,numero_de_feedbacks_dados,colaborador_tem_pdi_ativo,data_ultima_conversa_1_1
+1,"Excelente comunicação e liderança natural.","Promissora para cargos de diretoria.",2024-03-01,2026-01-11,2025-S2,4,Alto,"Excelente comunicação e liderança natural.",100%,3,Não,2026-05-03
+2,"Ótimo tecnicamente, mas precisa melhorar oratória.","Consistente no desempenho técnico.",2025-11-30,,2025-S2,5,Baixo,"Ótimo tecnicamente",75%,5,Sim,2026-05-12
+3,"Muito reservada, precisa de mais proatividade em reuniões.","Risco de estagnação por falta de visibilidade.",2026-01-10,,2025-S2,4,Médio,"Muito reservada",75%,3,Sim,2026-05-31
+4,"Foco total em processos, às vezes esquece o lado humano.","Líder operacional eficiente.",2026-01-02,,2025-S2,4,Baixo,"Foco total em processos",85%,4,Sim,2026-05-05
+5,"Criativa e ágil, mas tem dificuldade com prazos longos.","Grande potencial criativo.",2026-04-13,,2025-S2,4,Médio,"Criativa e ágil",75%,5,Sim,2026-05-08

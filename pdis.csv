@@ -1,0 +1,311 @@
+id_pdi,id_colaborador,data_criacao,data_prazo,status_pdi,objetivo_principal,gestor_responsavel,percentual_conclusao,data_ultima_revisao,proxima_revisao
+PDI-1,1,2026-01-15,2026-07-23,Atrasado,Estruturar pipeline de CI/CD para DevOps,,53,2026-05-19,2026-06-15
+PDI-2,2,2026-01-10,2026-08-08,Atrasado,Melhorar comunicação assertiva e feedback,,88,2026-05-02,2026-06-21
+PDI-3,3,2025-11-27,2026-07-14,Em andamento,Melhorar comunicação assertiva e feedback,,52,2026-05-03,2026-07-14
+PDI-4,4,2025-11-06,2026-09-14,Concluído,Dominar React & Next.js para novos projetos front-end,,46,2026-05-15,2026-07-08
+PDI-5,5,2026-01-02,2026-07-17,Atrasado,Estruturar pipeline de CI/CD para DevOps,,16,2026-05-19,2026-07-02
+PDI-6,6,2026-01-01,2026-10-23,Em andamento,Aprender modelagem de dados e queries avançadas SQL,,23,2026-05-14,2026-06-17
+PDI-7,7,2025-11-21,2026-07-12,Concluído,Dominar React & Next.js para novos projetos front-end,,86,2026-05-29,2026-06-27
+PDI-8,8,2025-12-24,2026-09-24,Concluído,Melhorar habilidades de liderança situacional e delegação,,61,2026-05-24,2026-06-23
+PDI-9,9,2025-11-11,2026-08-14,Concluído,Dominar React & Next.js para novos projetos front-end,,4,2026-05-19,2026-07-03
+PDI-10,10,2025-11-08,2026-08-18,Atrasado,Dominar React & Next.js para novos projetos front-end,,14,2026-05-28,2026-07-07
+PDI-11,11,2026-01-14,2026-09-27,Atrasado,Estruturar pipeline de CI/CD para DevOps,2,17,2026-05-04,2026-07-04
+PDI-12,12,2025-12-22,2026-09-08,Concluído,Estruturar pipeline de CI/CD para DevOps,4,21,2026-05-31,2026-06-26
+PDI-13,13,2025-12-01,2026-08-05,Concluído,Estruturar pipeline de CI/CD para DevOps,2,95,2026-05-26,2026-07-09
+PDI-14,14,2025-11-16,2026-07-18,Atrasado,Dominar React & Next.js para novos projetos front-end,1,60,2026-05-19,2026-06-21
+PDI-15,15,2025-12-21,2026-11-04,Em andamento,Melhorar habilidades de liderança situacional e delegação,9,26,2026-05-03,2026-06-18
+PDI-16,16,2026-01-22,2026-08-27,Concluído,Melhorar comunicação assertiva e feedback,4,67,2026-05-03,2026-07-02
+PDI-17,17,2026-01-12,2026-11-08,Concluído,Aprender modelagem de dados e queries avançadas SQL,4,76,2026-05-07,2026-07-12
+PDI-18,18,2025-12-01,2026-07-29,Em andamento,Aprender modelagem de dados e queries avançadas SQL,1,74,2026-05-14,2026-06-15
+PDI-19,19,2025-11-15,2026-10-18,Atrasado,Melhorar comunicação assertiva e feedback,6,71,2026-05-14,2026-06-20
+PDI-20,20,2025-11-03,2026-09-30,Em andamento,Melhorar habilidades de liderança situacional e delegação,6,8,2026-05-02,2026-07-14
+PDI-21,21,2025-12-07,2026-07-26,Em andamento,Melhorar comunicação assertiva e feedback,2,9,2026-05-20,2026-06-28
+PDI-22,22,2025-12-26,2026-09-09,Em andamento,Aprender modelagem de dados e queries avançadas SQL,5,56,2026-05-04,2026-07-14
+PDI-23,23,2025-12-11,2026-11-21,Concluído,Melhorar comunicação assertiva e feedback,9,43,2026-05-15,2026-06-23
+PDI-24,24,2025-11-10,2026-08-08,Concluído,Estruturar pipeline de CI/CD para DevOps,9,3,2026-05-06,2026-07-12
+PDI-25,25,2025-11-16,2026-11-13,Concluído,Melhorar habilidades de liderança situacional e delegação,10,98,2026-05-27,2026-06-27
+PDI-26,26,2025-11-12,2026-10-08,Em andamento,Aprender modelagem de dados e queries avançadas SQL,4,46,2026-05-25,2026-07-06
+PDI-27,27,2025-12-16,2026-08-28,Concluído,Melhorar habilidades de liderança situacional e delegação,4,19,2026-05-22,2026-07-10
+PDI-28,28,2025-12-20,2026-07-23,Concluído,Aprender modelagem de dados e queries avançadas SQL,5,88,2026-05-16,2026-06-30
+PDI-29,29,2026-01-03,2026-07-28,Em andamento,Dominar React & Next.js para novos projetos front-end,6,21,2026-05-23,2026-07-03
+PDI-30,30,2026-01-26,2026-10-04,Em andamento,Melhorar comunicação assertiva e feedback,2,43,2026-05-07,2026-07-05
+PDI-31,31,2025-11-01,2026-08-28,Em andamento,Aprender modelagem de dados e queries avançadas SQL,4,10,2026-05-05,2026-07-02
+PDI-32,32,2025-12-13,2026-11-04,Concluído,Dominar React & Next.js para novos projetos front-end,5,10,2026-05-27,2026-06-22
+PDI-33,33,2025-12-14,2026-07-28,Concluído,Melhorar comunicação assertiva e feedback,6,81,2026-05-02,2026-06-30
+PDI-34,34,2025-11-14,2026-11-23,Em andamento,Melhorar habilidades de liderança situacional e delegação,1,8,2026-05-14,2026-06-30
+PDI-35,35,2026-01-14,2026-08-09,Concluído,Estruturar pipeline de CI/CD para DevOps,5,91,2026-05-19,2026-07-03
+PDI-36,36,2026-01-31,2026-07-03,Concluído,Dominar React & Next.js para novos projetos front-end,6,23,2026-05-20,2026-07-01
+PDI-37,37,2025-11-04,2026-07-19,Concluído,Melhorar habilidades de liderança situacional e delegação,8,26,2026-05-15,2026-06-20
+PDI-38,38,2026-01-04,2026-08-15,Concluído,Dominar React & Next.js para novos projetos front-end,4,96,2026-05-28,2026-07-01
+PDI-39,39,2025-11-22,2026-10-07,Atrasado,Melhorar habilidades de liderança situacional e delegação,5,41,2026-05-14,2026-07-06
+PDI-40,40,2025-11-28,2026-11-18,Atrasado,Melhorar habilidades de liderança situacional e delegação,10,57,2026-05-20,2026-06-18
+PDI-41,41,2026-01-25,2026-08-03,Atrasado,Melhorar comunicação assertiva e feedback,3,77,2026-05-25,2026-07-14
+PDI-42,42,2026-01-18,2026-08-18,Concluído,Melhorar habilidades de liderança situacional e delegação,1,63,2026-05-08,2026-07-14
+PDI-43,43,2025-12-08,2026-11-21,Em andamento,Melhorar habilidades de liderança situacional e delegação,3,21,2026-05-16,2026-06-29
+PDI-44,44,2026-01-28,2026-10-28,Em andamento,Melhorar habilidades de liderança situacional e delegação,2,96,2026-05-28,2026-06-17
+PDI-45,45,2025-11-27,2026-09-27,Atrasado,Melhorar comunicação assertiva e feedback,8,31,2026-05-24,2026-07-14
+PDI-46,46,2025-11-17,2026-11-06,Em andamento,Estruturar pipeline de CI/CD para DevOps,1,93,2026-05-28,2026-06-17
+PDI-47,47,2025-12-27,2026-09-15,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,61,2026-05-09,2026-06-25
+PDI-48,48,2026-01-27,2026-08-15,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,38,2026-05-22,2026-07-12
+PDI-49,49,2025-11-03,2026-07-31,Em andamento,Melhorar habilidades de liderança situacional e delegação,1,40,2026-05-25,2026-06-30
+PDI-50,50,2025-12-25,2026-08-12,Atrasado,Melhorar habilidades de liderança situacional e delegação,3,75,2026-05-04,2026-06-29
+PDI-51,51,2026-01-26,2026-07-07,Em andamento,Dominar React & Next.js para novos projetos front-end,9,59,2026-05-07,2026-07-08
+PDI-52,52,2025-12-05,2026-11-27,Concluído,Dominar React & Next.js para novos projetos front-end,6,86,2026-05-03,2026-07-06
+PDI-53,53,2026-01-06,2026-09-05,Concluído,Aprender modelagem de dados e queries avançadas SQL,9,78,2026-05-04,2026-06-22
+PDI-54,54,2025-12-06,2026-11-03,Concluído,Aprender modelagem de dados e queries avançadas SQL,6,48,2026-05-14,2026-06-28
+PDI-55,55,2025-11-17,2026-11-03,Em andamento,Aprender modelagem de dados e queries avançadas SQL,6,14,2026-05-26,2026-06-30
+PDI-56,56,2025-12-02,2026-10-15,Atrasado,Dominar React & Next.js para novos projetos front-end,1,82,2026-05-21,2026-07-03
+PDI-57,57,2025-11-26,2026-09-18,Concluído,Melhorar habilidades de liderança situacional e delegação,2,92,2026-05-06,2026-07-01
+PDI-58,58,2025-12-23,2026-10-30,Em andamento,Aprender modelagem de dados e queries avançadas SQL,9,43,2026-05-15,2026-07-03
+PDI-59,59,2025-11-25,2026-07-29,Em andamento,Dominar React & Next.js para novos projetos front-end,8,26,2026-05-10,2026-07-01
+PDI-60,60,2026-01-11,2026-10-04,Atrasado,Estruturar pipeline de CI/CD para DevOps,9,76,2026-05-30,2026-06-28
+PDI-61,61,2026-01-31,2026-10-24,Em andamento,Melhorar habilidades de liderança situacional e delegação,4,46,2026-05-26,2026-06-30
+PDI-62,62,2025-11-06,2026-08-27,Concluído,Aprender modelagem de dados e queries avançadas SQL,5,34,2026-05-29,2026-07-14
+PDI-63,63,2025-12-24,2026-07-25,Concluído,Estruturar pipeline de CI/CD para DevOps,9,65,2026-05-25,2026-06-16
+PDI-64,64,2026-01-11,2026-08-31,Concluído,Estruturar pipeline de CI/CD para DevOps,4,80,2026-05-18,2026-06-28
+PDI-65,65,2025-12-25,2026-11-13,Concluído,Dominar React & Next.js para novos projetos front-end,10,7,2026-05-20,2026-07-04
+PDI-66,66,2026-01-07,2026-09-11,Concluído,Dominar React & Next.js para novos projetos front-end,4,34,2026-05-05,2026-07-08
+PDI-67,67,2025-12-05,2026-09-05,Em andamento,Aprender modelagem de dados e queries avançadas SQL,4,60,2026-05-27,2026-06-25
+PDI-68,68,2026-01-09,2026-08-09,Em andamento,Melhorar habilidades de liderança situacional e delegação,2,3,2026-05-18,2026-06-19
+PDI-69,69,2026-01-03,2026-09-14,Concluído,Melhorar comunicação assertiva e feedback,8,7,2026-05-29,2026-07-03
+PDI-70,70,2025-11-18,2026-07-09,Concluído,Aprender modelagem de dados e queries avançadas SQL,10,21,2026-05-08,2026-07-12
+PDI-71,71,2026-01-26,2026-07-29,Concluído,Aprender modelagem de dados e queries avançadas SQL,8,38,2026-05-09,2026-07-10
+PDI-72,72,2025-12-25,2026-09-05,Em andamento,Melhorar habilidades de liderança situacional e delegação,2,31,2026-05-22,2026-07-05
+PDI-73,73,2026-01-18,2026-11-30,Em andamento,Melhorar comunicação assertiva e feedback,7,28,2026-05-15,2026-07-03
+PDI-74,74,2025-11-02,2026-07-10,Atrasado,Dominar React & Next.js para novos projetos front-end,2,83,2026-05-07,2026-06-25
+PDI-75,75,2025-12-30,2026-11-01,Atrasado,Estruturar pipeline de CI/CD para DevOps,2,84,2026-05-16,2026-06-20
+PDI-76,76,2025-12-08,2026-11-17,Em andamento,Dominar React & Next.js para novos projetos front-end,9,57,2026-05-20,2026-07-04
+PDI-77,77,2025-11-19,2026-08-06,Atrasado,Estruturar pipeline de CI/CD para DevOps,3,82,2026-05-03,2026-07-12
+PDI-78,78,2025-12-06,2026-07-03,Em andamento,Dominar React & Next.js para novos projetos front-end,2,4,2026-05-31,2026-07-04
+PDI-79,79,2025-12-13,2026-11-21,Concluído,Dominar React & Next.js para novos projetos front-end,1,92,2026-05-24,2026-06-26
+PDI-80,80,2025-11-14,2026-09-19,Concluído,Melhorar comunicação assertiva e feedback,2,0,2026-05-01,2026-06-15
+PDI-81,81,2025-12-24,2026-09-18,Concluído,Melhorar habilidades de liderança situacional e delegação,7,77,2026-05-17,2026-07-10
+PDI-82,82,2026-01-21,2026-08-22,Em andamento,Dominar React & Next.js para novos projetos front-end,7,40,2026-05-01,2026-06-28
+PDI-83,83,2025-11-08,2026-07-03,Concluído,Estruturar pipeline de CI/CD para DevOps,7,61,2026-05-07,2026-06-29
+PDI-84,84,2025-11-28,2026-10-05,Atrasado,Melhorar habilidades de liderança situacional e delegação,8,44,2026-05-07,2026-07-03
+PDI-85,85,2025-12-22,2026-11-01,Atrasado,Estruturar pipeline de CI/CD para DevOps,8,95,2026-05-11,2026-07-14
+PDI-86,86,2026-01-28,2026-08-05,Em andamento,Melhorar habilidades de liderança situacional e delegação,4,6,2026-05-08,2026-06-18
+PDI-87,87,2025-11-03,2026-07-22,Em andamento,Estruturar pipeline de CI/CD para DevOps,1,71,2026-05-02,2026-07-10
+PDI-88,88,2025-12-01,2026-11-10,Concluído,Melhorar comunicação assertiva e feedback,1,33,2026-05-14,2026-07-12
+PDI-89,89,2025-12-20,2026-08-15,Em andamento,Melhorar habilidades de liderança situacional e delegação,9,53,2026-05-21,2026-07-04
+PDI-90,90,2025-12-01,2026-08-16,Em andamento,Estruturar pipeline de CI/CD para DevOps,2,15,2026-05-28,2026-06-28
+PDI-91,91,2025-12-18,2026-07-10,Concluído,Estruturar pipeline de CI/CD para DevOps,10,85,2026-05-04,2026-07-08
+PDI-92,92,2026-01-03,2026-07-28,Concluído,Dominar React & Next.js para novos projetos front-end,2,78,2026-05-30,2026-06-29
+PDI-93,93,2026-01-16,2026-09-05,Em andamento,Aprender modelagem de dados e queries avançadas SQL,10,31,2026-05-09,2026-06-19
+PDI-94,94,2025-11-08,2026-08-07,Concluído,Estruturar pipeline de CI/CD para DevOps,2,36,2026-05-06,2026-07-14
+PDI-95,95,2026-01-24,2026-11-15,Em andamento,Melhorar habilidades de liderança situacional e delegação,9,58,2026-05-22,2026-06-30
+PDI-96,96,2026-01-07,2026-10-13,Atrasado,Estruturar pipeline de CI/CD para DevOps,6,29,2026-05-05,2026-07-12
+PDI-97,97,2026-01-22,2026-09-12,Concluído,Estruturar pipeline de CI/CD para DevOps,3,11,2026-05-04,2026-07-09
+PDI-98,98,2025-12-16,2026-09-17,Em andamento,Melhorar habilidades de liderança situacional e delegação,6,83,2026-05-13,2026-07-14
+PDI-99,99,2025-11-12,2026-11-25,Concluído,Melhorar habilidades de liderança situacional e delegação,8,34,2026-05-25,2026-07-11
+PDI-100,100,2026-01-03,2026-09-01,Concluído,Estruturar pipeline de CI/CD para DevOps,2,31,2026-05-07,2026-06-26
+PDI-101,101,2025-11-10,2026-10-04,Concluído,Melhorar habilidades de liderança situacional e delegação,5,78,2026-05-23,2026-06-17
+PDI-102,102,2026-01-24,2026-10-08,Atrasado,Melhorar habilidades de liderança situacional e delegação,4,18,2026-05-02,2026-07-06
+PDI-103,103,2025-11-24,2026-11-19,Atrasado,Melhorar comunicação assertiva e feedback,8,25,2026-05-09,2026-07-05
+PDI-104,104,2025-12-20,2026-07-27,Atrasado,Estruturar pipeline de CI/CD para DevOps,10,69,2026-05-19,2026-06-27
+PDI-105,105,2026-01-15,2026-09-01,Atrasado,Dominar React & Next.js para novos projetos front-end,9,81,2026-05-14,2026-06-15
+PDI-106,106,2026-01-04,2026-08-14,Concluído,Dominar React & Next.js para novos projetos front-end,5,81,2026-05-19,2026-07-10
+PDI-107,107,2026-01-05,2026-08-12,Atrasado,Melhorar habilidades de liderança situacional e delegação,3,6,2026-05-14,2026-07-05
+PDI-108,108,2026-01-30,2026-10-20,Concluído,Aprender modelagem de dados e queries avançadas SQL,4,12,2026-05-28,2026-07-03
+PDI-109,109,2025-12-08,2026-10-02,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,16,2026-05-29,2026-07-10
+PDI-110,110,2025-11-14,2026-11-29,Em andamento,Melhorar habilidades de liderança situacional e delegação,1,28,2026-05-06,2026-07-01
+PDI-111,111,2025-11-20,2026-07-21,Em andamento,Melhorar comunicação assertiva e feedback,1,66,2026-05-28,2026-06-21
+PDI-112,112,2025-11-21,2026-08-11,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,54,2026-05-10,2026-06-20
+PDI-113,113,2025-12-11,2026-09-29,Concluído,Aprender modelagem de dados e queries avançadas SQL,7,43,2026-05-12,2026-06-16
+PDI-114,114,2025-12-17,2026-10-25,Atrasado,Estruturar pipeline de CI/CD para DevOps,2,75,2026-05-11,2026-06-16
+PDI-115,115,2025-12-24,2026-09-22,Concluído,Melhorar comunicação assertiva e feedback,1,81,2026-05-17,2026-07-14
+PDI-116,116,2025-12-09,2026-12-01,Em andamento,Dominar React & Next.js para novos projetos front-end,9,55,2026-05-17,2026-06-23
+PDI-117,117,2026-01-16,2026-08-09,Em andamento,Melhorar comunicação assertiva e feedback,1,27,2026-05-12,2026-07-10
+PDI-118,118,2025-12-04,2026-08-08,Em andamento,Estruturar pipeline de CI/CD para DevOps,6,25,2026-05-07,2026-07-03
+PDI-119,119,2025-11-03,2026-11-18,Em andamento,Melhorar habilidades de liderança situacional e delegação,6,13,2026-05-31,2026-06-16
+PDI-120,120,2026-01-25,2026-11-04,Atrasado,Aprender modelagem de dados e queries avançadas SQL,10,24,2026-05-19,2026-07-03
+PDI-121,121,2025-11-26,2026-09-27,Atrasado,Melhorar comunicação assertiva e feedback,3,44,2026-05-08,2026-07-14
+PDI-122,122,2025-11-06,2026-07-28,Em andamento,Estruturar pipeline de CI/CD para DevOps,1,39,2026-05-01,2026-06-26
+PDI-123,123,2026-01-03,2026-08-27,Atrasado,Dominar React & Next.js para novos projetos front-end,4,52,2026-05-30,2026-06-16
+PDI-124,124,2026-01-20,2026-11-05,Em andamento,Dominar React & Next.js para novos projetos front-end,7,90,2026-05-06,2026-07-12
+PDI-125,125,2025-11-23,2026-10-17,Atrasado,Aprender modelagem de dados e queries avançadas SQL,4,2,2026-05-04,2026-06-20
+PDI-126,126,2025-12-01,2026-09-02,Atrasado,Estruturar pipeline de CI/CD para DevOps,5,84,2026-05-18,2026-06-29
+PDI-127,127,2026-01-18,2026-07-03,Em andamento,Estruturar pipeline de CI/CD para DevOps,1,90,2026-05-07,2026-07-06
+PDI-128,128,2026-01-07,2026-08-10,Atrasado,Melhorar comunicação assertiva e feedback,6,52,2026-05-09,2026-07-02
+PDI-129,129,2026-01-18,2026-08-28,Em andamento,Dominar React & Next.js para novos projetos front-end,6,66,2026-05-18,2026-07-14
+PDI-130,130,2025-11-09,2026-11-04,Atrasado,Melhorar comunicação assertiva e feedback,9,20,2026-05-26,2026-07-10
+PDI-131,131,2025-12-17,2026-07-04,Atrasado,Melhorar habilidades de liderança situacional e delegação,5,85,2026-05-23,2026-07-07
+PDI-132,132,2025-11-15,2026-09-10,Concluído,Estruturar pipeline de CI/CD para DevOps,1,20,2026-05-03,2026-06-15
+PDI-133,133,2025-11-14,2026-07-07,Atrasado,Melhorar comunicação assertiva e feedback,6,83,2026-05-11,2026-07-04
+PDI-134,134,2025-11-11,2026-10-29,Atrasado,Dominar React & Next.js para novos projetos front-end,10,70,2026-05-02,2026-07-09
+PDI-135,135,2026-01-01,2026-07-03,Em andamento,Dominar React & Next.js para novos projetos front-end,10,40,2026-05-23,2026-06-19
+PDI-136,136,2025-11-30,2026-07-10,Em andamento,Melhorar comunicação assertiva e feedback,7,63,2026-05-18,2026-06-28
+PDI-137,137,2026-01-03,2026-07-22,Atrasado,Estruturar pipeline de CI/CD para DevOps,4,19,2026-06-01,2026-06-24
+PDI-138,138,2025-11-12,2026-09-19,Em andamento,Melhorar habilidades de liderança situacional e delegação,6,2,2026-05-06,2026-07-05
+PDI-139,139,2025-12-14,2026-11-14,Atrasado,Melhorar habilidades de liderança situacional e delegação,5,46,2026-05-31,2026-06-21
+PDI-140,140,2026-01-19,2026-11-24,Atrasado,Estruturar pipeline de CI/CD para DevOps,6,55,2026-05-30,2026-06-16
+PDI-141,141,2026-01-02,2026-08-12,Atrasado,Melhorar habilidades de liderança situacional e delegação,3,2,2026-05-26,2026-07-07
+PDI-142,142,2025-12-29,2026-09-08,Atrasado,Melhorar comunicação assertiva e feedback,3,45,2026-05-03,2026-07-12
+PDI-143,143,2026-01-06,2026-08-27,Atrasado,Melhorar habilidades de liderança situacional e delegação,7,81,2026-05-27,2026-07-13
+PDI-144,144,2026-01-11,2026-11-11,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,8,2026-05-15,2026-06-17
+PDI-145,145,2025-11-19,2026-09-29,Em andamento,Aprender modelagem de dados e queries avançadas SQL,10,99,2026-05-15,2026-06-23
+PDI-146,146,2026-01-17,2026-09-08,Atrasado,Dominar React & Next.js para novos projetos front-end,8,10,2026-05-25,2026-07-06
+PDI-147,147,2025-11-10,2026-11-24,Concluído,Aprender modelagem de dados e queries avançadas SQL,8,23,2026-05-20,2026-07-11
+PDI-148,148,2026-01-02,2026-08-09,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,42,2026-05-19,2026-06-25
+PDI-149,149,2025-12-05,2026-10-17,Atrasado,Melhorar habilidades de liderança situacional e delegação,2,90,2026-05-29,2026-07-01
+PDI-150,150,2026-01-26,2026-09-25,Em andamento,Melhorar habilidades de liderança situacional e delegação,4,62,2026-05-28,2026-06-29
+PDI-151,151,2025-11-25,2026-08-09,Em andamento,Melhorar habilidades de liderança situacional e delegação,1,46,2026-05-16,2026-07-12
+PDI-152,152,2025-12-25,2026-11-28,Atrasado,Dominar React & Next.js para novos projetos front-end,10,36,2026-05-15,2026-06-30
+PDI-153,153,2025-11-14,2026-08-26,Atrasado,Melhorar comunicação assertiva e feedback,7,34,2026-05-17,2026-07-03
+PDI-154,154,2026-01-29,2026-09-30,Em andamento,Melhorar habilidades de liderança situacional e delegação,7,14,2026-05-14,2026-06-24
+PDI-155,155,2025-12-31,2026-11-17,Atrasado,Estruturar pipeline de CI/CD para DevOps,3,6,2026-05-14,2026-06-29
+PDI-156,156,2025-12-19,2026-11-10,Concluído,Melhorar comunicação assertiva e feedback,7,81,2026-05-21,2026-07-04
+PDI-157,157,2025-12-30,2026-07-04,Em andamento,Estruturar pipeline de CI/CD para DevOps,8,1,2026-05-09,2026-07-05
+PDI-158,158,2025-12-22,2026-08-21,Atrasado,Dominar React & Next.js para novos projetos front-end,2,81,2026-05-02,2026-06-25
+PDI-159,159,2025-11-17,2026-10-11,Concluído,Melhorar comunicação assertiva e feedback,9,44,2026-05-20,2026-07-01
+PDI-160,160,2025-12-25,2026-07-09,Em andamento,Melhorar habilidades de liderança situacional e delegação,8,82,2026-05-17,2026-06-18
+PDI-161,161,2025-11-06,2026-10-05,Concluído,Melhorar habilidades de liderança situacional e delegação,9,21,2026-05-08,2026-07-14
+PDI-162,162,2025-11-01,2026-10-19,Em andamento,Dominar React & Next.js para novos projetos front-end,8,91,2026-05-10,2026-07-11
+PDI-163,163,2026-01-24,2026-10-29,Atrasado,Estruturar pipeline de CI/CD para DevOps,9,93,2026-05-10,2026-06-17
+PDI-164,164,2026-01-07,2026-08-06,Em andamento,Dominar React & Next.js para novos projetos front-end,8,6,2026-05-19,2026-06-18
+PDI-165,165,2026-01-20,2026-10-04,Concluído,Melhorar comunicação assertiva e feedback,5,3,2026-05-08,2026-07-06
+PDI-166,166,2025-12-15,2026-07-22,Atrasado,Estruturar pipeline de CI/CD para DevOps,2,91,2026-05-22,2026-07-03
+PDI-167,167,2026-01-01,2026-08-28,Atrasado,Estruturar pipeline de CI/CD para DevOps,7,70,2026-05-28,2026-07-12
+PDI-168,168,2025-12-24,2026-08-14,Em andamento,Aprender modelagem de dados e queries avançadas SQL,2,58,2026-05-28,2026-07-05
+PDI-169,169,2025-11-03,2026-10-30,Concluído,Dominar React & Next.js para novos projetos front-end,9,91,2026-05-21,2026-07-08
+PDI-170,170,2025-12-08,2026-10-03,Atrasado,Melhorar habilidades de liderança situacional e delegação,4,76,2026-05-07,2026-07-01
+PDI-171,171,2026-01-11,2026-10-30,Em andamento,Aprender modelagem de dados e queries avançadas SQL,10,57,2026-05-15,2026-07-03
+PDI-172,172,2025-11-03,2026-07-11,Concluído,Melhorar habilidades de liderança situacional e delegação,7,4,2026-05-03,2026-06-29
+PDI-173,173,2026-01-15,2026-10-19,Em andamento,Melhorar comunicação assertiva e feedback,5,31,2026-05-20,2026-06-21
+PDI-174,174,2026-01-23,2026-07-18,Concluído,Melhorar habilidades de liderança situacional e delegação,9,57,2026-05-28,2026-06-24
+PDI-175,175,2026-01-06,2026-09-27,Em andamento,Dominar React & Next.js para novos projetos front-end,4,37,2026-05-23,2026-07-12
+PDI-176,176,2025-12-30,2026-07-13,Em andamento,Melhorar comunicação assertiva e feedback,7,78,2026-05-12,2026-07-08
+PDI-177,177,2026-01-09,2026-07-02,Concluído,Melhorar habilidades de liderança situacional e delegação,6,37,2026-05-01,2026-07-12
+PDI-178,178,2025-11-15,2026-07-18,Atrasado,Aprender modelagem de dados e queries avançadas SQL,8,19,2026-05-05,2026-07-12
+PDI-179,179,2025-12-27,2026-09-04,Em andamento,Dominar React & Next.js para novos projetos front-end,9,31,2026-05-24,2026-06-27
+PDI-180,180,2025-12-05,2026-11-27,Atrasado,Melhorar habilidades de liderança situacional e delegação,10,83,2026-05-13,2026-06-29
+PDI-181,181,2026-01-20,2026-08-01,Atrasado,Melhorar habilidades de liderança situacional e delegação,7,76,2026-05-04,2026-06-21
+PDI-182,182,2026-01-31,2026-10-26,Atrasado,Dominar React & Next.js para novos projetos front-end,1,68,2026-05-22,2026-06-22
+PDI-183,183,2025-11-25,2026-10-03,Atrasado,Melhorar habilidades de liderança situacional e delegação,4,85,2026-05-05,2026-07-07
+PDI-184,184,2025-12-02,2026-09-04,Concluído,Melhorar habilidades de liderança situacional e delegação,7,12,2026-05-17,2026-06-18
+PDI-185,185,2026-01-19,2026-11-28,Em andamento,Aprender modelagem de dados e queries avançadas SQL,2,14,2026-05-14,2026-06-27
+PDI-186,186,2025-12-04,2026-09-14,Em andamento,Aprender modelagem de dados e queries avançadas SQL,1,61,2026-05-08,2026-07-12
+PDI-187,187,2026-01-19,2026-07-03,Atrasado,Aprender modelagem de dados e queries avançadas SQL,1,95,2026-05-30,2026-07-09
+PDI-188,188,2025-12-05,2026-11-11,Atrasado,Aprender modelagem de dados e queries avançadas SQL,4,18,2026-05-06,2026-07-04
+PDI-189,189,2025-12-21,2026-09-11,Concluído,Melhorar comunicação assertiva e feedback,3,62,2026-06-01,2026-06-23
+PDI-190,190,2026-01-14,2026-08-27,Atrasado,Estruturar pipeline de CI/CD para DevOps,2,70,2026-05-03,2026-06-29
+PDI-191,191,2025-11-04,2026-10-21,Atrasado,Dominar React & Next.js para novos projetos front-end,5,81,2026-05-29,2026-06-20
+PDI-192,192,2025-12-08,2026-09-07,Concluído,Estruturar pipeline de CI/CD para DevOps,10,36,2026-05-09,2026-06-19
+PDI-193,193,2026-01-01,2026-10-01,Concluído,Aprender modelagem de dados e queries avançadas SQL,5,35,2026-05-12,2026-06-22
+PDI-194,194,2025-11-14,2026-07-14,Atrasado,Estruturar pipeline de CI/CD para DevOps,5,43,2026-05-15,2026-07-10
+PDI-195,195,2026-01-14,2026-09-26,Concluído,Dominar React & Next.js para novos projetos front-end,4,28,2026-05-09,2026-07-11
+PDI-196,196,2025-11-26,2026-11-28,Em andamento,Estruturar pipeline de CI/CD para DevOps,2,98,2026-05-03,2026-06-25
+PDI-197,197,2025-11-17,2026-10-30,Atrasado,Estruturar pipeline de CI/CD para DevOps,2,34,2026-05-18,2026-07-14
+PDI-198,198,2025-12-20,2026-08-23,Atrasado,Dominar React & Next.js para novos projetos front-end,6,63,2026-05-13,2026-07-11
+PDI-199,199,2026-01-30,2026-09-27,Concluído,Estruturar pipeline de CI/CD para DevOps,2,31,2026-05-05,2026-06-16
+PDI-200,200,2026-01-19,2026-09-02,Concluído,Dominar React & Next.js para novos projetos front-end,7,42,2026-05-08,2026-06-25
+PDI-201,201,2025-11-22,2026-10-02,Em andamento,Melhorar comunicação assertiva e feedback,7,60,2026-05-29,2026-07-09
+PDI-202,202,2025-11-26,2026-08-19,Atrasado,Melhorar comunicação assertiva e feedback,7,86,2026-05-28,2026-06-17
+PDI-203,203,2026-01-21,2026-08-10,Em andamento,Dominar React & Next.js para novos projetos front-end,10,46,2026-05-09,2026-06-28
+PDI-204,204,2025-11-11,2026-10-12,Atrasado,Dominar React & Next.js para novos projetos front-end,8,86,2026-05-09,2026-07-05
+PDI-205,205,2025-11-10,2026-10-24,Concluído,Estruturar pipeline de CI/CD para DevOps,6,50,2026-05-22,2026-06-24
+PDI-206,206,2026-01-23,2026-11-08,Concluído,Aprender modelagem de dados e queries avançadas SQL,5,85,2026-05-21,2026-06-16
+PDI-207,207,2025-12-05,2026-07-22,Atrasado,Dominar React & Next.js para novos projetos front-end,8,26,2026-05-07,2026-07-01
+PDI-208,208,2025-11-30,2026-11-08,Concluído,Aprender modelagem de dados e queries avançadas SQL,6,82,2026-05-23,2026-07-02
+PDI-209,209,2026-01-21,2026-07-04,Em andamento,Melhorar comunicação assertiva e feedback,3,88,2026-05-31,2026-06-18
+PDI-210,210,2026-01-16,2026-10-16,Atrasado,Estruturar pipeline de CI/CD para DevOps,5,53,2026-05-29,2026-06-25
+PDI-211,211,2025-12-06,2026-07-22,Atrasado,Estruturar pipeline de CI/CD para DevOps,5,18,2026-05-14,2026-06-26
+PDI-212,212,2025-12-06,2026-10-29,Atrasado,Estruturar pipeline de CI/CD para DevOps,4,14,2026-05-01,2026-07-02
+PDI-213,213,2026-01-08,2026-07-09,Atrasado,Melhorar habilidades de liderança situacional e delegação,8,19,2026-05-30,2026-06-28
+PDI-214,214,2026-01-24,2026-07-12,Atrasado,Melhorar comunicação assertiva e feedback,8,14,2026-05-15,2026-07-14
+PDI-215,215,2025-11-16,2026-07-27,Concluído,Dominar React & Next.js para novos projetos front-end,5,38,2026-05-31,2026-06-16
+PDI-216,216,2025-12-04,2026-10-24,Em andamento,Melhorar comunicação assertiva e feedback,5,72,2026-05-19,2026-06-24
+PDI-217,217,2026-01-29,2026-10-01,Atrasado,Estruturar pipeline de CI/CD para DevOps,8,94,2026-05-05,2026-06-22
+PDI-218,218,2026-01-25,2026-10-05,Em andamento,Aprender modelagem de dados e queries avançadas SQL,7,25,2026-05-18,2026-06-28
+PDI-219,219,2026-01-13,2026-11-23,Em andamento,Melhorar habilidades de liderança situacional e delegação,6,41,2026-05-15,2026-06-27
+PDI-220,220,2025-11-08,2026-09-20,Concluído,Melhorar comunicação assertiva e feedback,5,68,2026-05-06,2026-07-05
+PDI-221,221,2025-12-27,2026-10-12,Atrasado,Estruturar pipeline de CI/CD para DevOps,4,45,2026-05-17,2026-06-20
+PDI-222,222,2025-12-25,2026-08-13,Atrasado,Aprender modelagem de dados e queries avançadas SQL,3,13,2026-05-05,2026-06-24
+PDI-223,223,2025-11-25,2026-09-30,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,63,2026-05-14,2026-06-20
+PDI-224,224,2025-12-04,2026-11-26,Em andamento,Melhorar comunicação assertiva e feedback,10,37,2026-05-10,2026-06-21
+PDI-225,225,2026-01-02,2026-07-28,Atrasado,Aprender modelagem de dados e queries avançadas SQL,5,59,2026-05-28,2026-06-20
+PDI-226,226,2026-01-16,2026-07-30,Em andamento,Dominar React & Next.js para novos projetos front-end,5,23,2026-05-03,2026-06-23
+PDI-227,227,2025-11-12,2026-11-20,Em andamento,Melhorar habilidades de liderança situacional e delegação,5,71,2026-05-03,2026-06-25
+PDI-228,228,2026-01-08,2026-08-22,Atrasado,Estruturar pipeline de CI/CD para DevOps,5,28,2026-05-30,2026-07-04
+PDI-229,229,2026-01-08,2026-10-23,Atrasado,Estruturar pipeline de CI/CD para DevOps,2,86,2026-05-22,2026-06-27
+PDI-230,230,2025-11-13,2026-11-15,Em andamento,Melhorar habilidades de liderança situacional e delegação,5,75,2026-05-23,2026-07-05
+PDI-231,231,2025-12-28,2026-09-05,Concluído,Dominar React & Next.js para novos projetos front-end,6,90,2026-05-21,2026-07-08
+PDI-232,232,2026-01-01,2026-08-31,Concluído,Melhorar habilidades de liderança situacional e delegação,8,55,2026-05-30,2026-06-20
+PDI-233,233,2026-01-12,2026-07-25,Atrasado,Melhorar comunicação assertiva e feedback,8,43,2026-05-16,2026-07-12
+PDI-234,234,2026-01-24,2026-09-07,Atrasado,Melhorar comunicação assertiva e feedback,3,48,2026-05-31,2026-06-28
+PDI-235,235,2026-01-06,2026-07-18,Em andamento,Melhorar comunicação assertiva e feedback,2,63,2026-05-26,2026-07-04
+PDI-236,236,2025-11-10,2026-11-25,Concluído,Melhorar comunicação assertiva e feedback,7,49,2026-05-19,2026-07-10
+PDI-237,237,2025-12-23,2026-07-31,Em andamento,Estruturar pipeline de CI/CD para DevOps,4,32,2026-05-19,2026-06-17
+PDI-238,238,2025-11-09,2026-10-08,Em andamento,Melhorar comunicação assertiva e feedback,8,93,2026-05-12,2026-07-05
+PDI-239,239,2025-11-13,2026-09-11,Em andamento,Estruturar pipeline de CI/CD para DevOps,10,51,2026-05-09,2026-06-26
+PDI-240,240,2025-12-16,2026-09-14,Atrasado,Melhorar comunicação assertiva e feedback,10,20,2026-05-29,2026-07-11
+PDI-241,241,2026-01-17,2026-07-04,Atrasado,Aprender modelagem de dados e queries avançadas SQL,4,83,2026-05-20,2026-07-09
+PDI-242,242,2026-01-09,2026-09-17,Atrasado,Melhorar habilidades de liderança situacional e delegação,2,23,2026-05-08,2026-06-19
+PDI-243,243,2026-01-23,2026-11-11,Concluído,Estruturar pipeline de CI/CD para DevOps,9,70,2026-05-21,2026-06-22
+PDI-244,244,2026-01-18,2026-08-31,Atrasado,Aprender modelagem de dados e queries avançadas SQL,7,66,2026-05-09,2026-06-18
+PDI-245,245,2026-01-02,2026-10-25,Em andamento,Melhorar habilidades de liderança situacional e delegação,5,13,2026-05-18,2026-07-11
+PDI-246,246,2026-01-11,2026-07-25,Em andamento,Dominar React & Next.js para novos projetos front-end,5,62,2026-05-10,2026-06-23
+PDI-247,247,2025-12-25,2026-10-24,Atrasado,Estruturar pipeline de CI/CD para DevOps,4,27,2026-05-13,2026-06-30
+PDI-248,248,2025-11-21,2026-08-06,Atrasado,Aprender modelagem de dados e queries avançadas SQL,4,50,2026-05-30,2026-07-08
+PDI-249,249,2025-12-08,2026-10-10,Concluído,Estruturar pipeline de CI/CD para DevOps,4,85,2026-05-19,2026-06-26
+PDI-250,250,2025-12-07,2026-08-13,Atrasado,Melhorar habilidades de liderança situacional e delegação,3,12,2026-05-15,2026-06-15
+PDI-251,251,2025-11-13,2026-10-16,Atrasado,Melhorar comunicação assertiva e feedback,5,41,2026-05-30,2026-07-01
+PDI-252,252,2026-01-13,2026-11-13,Concluído,Estruturar pipeline de CI/CD para DevOps,8,75,2026-05-15,2026-07-13
+PDI-253,253,2025-12-23,2026-09-10,Em andamento,Aprender modelagem de dados e queries avançadas SQL,7,90,2026-05-24,2026-07-03
+PDI-254,254,2025-11-17,2026-08-30,Em andamento,Melhorar habilidades de liderança situacional e delegação,8,67,2026-05-06,2026-07-07
+PDI-255,255,2025-12-05,2026-08-18,Atrasado,Aprender modelagem de dados e queries avançadas SQL,1,93,2026-05-07,2026-07-01
+PDI-256,256,2026-01-19,2026-11-30,Concluído,Melhorar comunicação assertiva e feedback,10,78,2026-05-13,2026-06-30
+PDI-257,257,2026-01-03,2026-08-23,Atrasado,Estruturar pipeline de CI/CD para DevOps,4,30,2026-05-13,2026-07-09
+PDI-258,258,2025-12-17,2026-07-18,Concluído,Melhorar comunicação assertiva e feedback,1,30,2026-05-25,2026-07-06
+PDI-259,259,2025-11-16,2026-09-07,Atrasado,Aprender modelagem de dados e queries avançadas SQL,1,47,2026-05-27,2026-07-04
+PDI-260,260,2026-01-12,2026-07-16,Concluído,Dominar React & Next.js para novos projetos front-end,9,20,2026-05-26,2026-07-11
+PDI-261,261,2025-12-06,2026-08-26,Em andamento,Melhorar comunicação assertiva e feedback,3,18,2026-05-11,2026-06-26
+PDI-262,262,2025-12-14,2026-11-12,Concluído,Melhorar comunicação assertiva e feedback,2,39,2026-05-26,2026-06-17
+PDI-263,263,2025-11-20,2026-07-15,Concluído,Estruturar pipeline de CI/CD para DevOps,6,45,2026-05-11,2026-06-18
+PDI-264,264,2026-01-29,2026-10-02,Concluído,Dominar React & Next.js para novos projetos front-end,6,38,2026-05-18,2026-07-08
+PDI-265,265,2025-12-06,2026-07-04,Concluído,Melhorar comunicação assertiva e feedback,7,40,2026-05-05,2026-06-21
+PDI-266,266,2025-12-28,2026-08-04,Atrasado,Melhorar habilidades de liderança situacional e delegação,8,59,2026-05-31,2026-07-06
+PDI-267,267,2025-11-06,2026-07-25,Atrasado,Melhorar habilidades de liderança situacional e delegação,6,1,2026-05-14,2026-06-15
+PDI-268,268,2025-11-08,2026-11-24,Atrasado,Melhorar habilidades de liderança situacional e delegação,1,62,2026-05-11,2026-06-27
+PDI-269,269,2026-01-05,2026-07-31,Concluído,Melhorar habilidades de liderança situacional e delegação,7,99,2026-05-04,2026-06-29
+PDI-270,270,2025-12-11,2026-09-26,Concluído,Melhorar comunicação assertiva e feedback,6,13,2026-05-25,2026-07-06
+PDI-271,271,2026-01-06,2026-07-12,Atrasado,Estruturar pipeline de CI/CD para DevOps,1,62,2026-05-15,2026-06-22
+PDI-272,272,2026-01-06,2026-11-18,Concluído,Dominar React & Next.js para novos projetos front-end,3,15,2026-05-26,2026-07-10
+PDI-273,273,2025-12-03,2026-07-06,Concluído,Melhorar habilidades de liderança situacional e delegação,8,85,2026-05-09,2026-06-25
+PDI-274,274,2026-01-14,2026-09-05,Atrasado,Dominar React & Next.js para novos projetos front-end,4,4,2026-05-14,2026-07-04
+PDI-275,275,2025-11-06,2026-07-28,Atrasado,Melhorar comunicação assertiva e feedback,9,92,2026-05-28,2026-06-26
+PDI-276,276,2025-12-20,2026-11-22,Atrasado,Melhorar habilidades de liderança situacional e delegação,2,9,2026-05-29,2026-06-30
+PDI-277,277,2025-11-15,2026-08-25,Concluído,Melhorar habilidades de liderança situacional e delegação,2,57,2026-05-15,2026-07-14
+PDI-278,278,2025-11-06,2026-11-19,Concluído,Aprender modelagem de dados e queries avançadas SQL,5,83,2026-05-14,2026-07-14
+PDI-279,279,2025-11-10,2026-09-30,Em andamento,Melhorar comunicação assertiva e feedback,8,61,2026-05-17,2026-07-10
+PDI-280,280,2025-12-11,2026-10-30,Concluído,Dominar React & Next.js para novos projetos front-end,9,37,2026-05-14,2026-06-27
+PDI-281,281,2025-11-21,2026-09-30,Concluído,Melhorar habilidades de liderança situacional e delegação,10,27,2026-05-25,2026-06-25
+PDI-282,282,2025-12-27,2026-08-22,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,37,2026-05-08,2026-07-03
+PDI-283,283,2025-11-23,2026-10-05,Atrasado,Melhorar comunicação assertiva e feedback,9,40,2026-05-11,2026-06-22
+PDI-284,284,2026-01-13,2026-09-28,Em andamento,Estruturar pipeline de CI/CD para DevOps,5,9,2026-05-23,2026-06-19
+PDI-285,285,2025-12-25,2026-07-16,Em andamento,Melhorar comunicação assertiva e feedback,8,37,2026-05-26,2026-07-10
+PDI-286,286,2026-01-25,2026-11-25,Em andamento,Dominar React & Next.js para novos projetos front-end,9,88,2026-05-05,2026-07-04
+PDI-287,287,2026-01-20,2026-10-04,Concluído,Dominar React & Next.js para novos projetos front-end,9,83,2026-05-03,2026-06-29
+PDI-288,288,2025-11-15,2026-08-02,Atrasado,Melhorar habilidades de liderança situacional e delegação,8,85,2026-05-23,2026-06-30
+PDI-289,289,2026-01-12,2026-07-19,Em andamento,Aprender modelagem de dados e queries avançadas SQL,4,24,2026-05-20,2026-06-21
+PDI-290,290,2026-01-21,2026-10-03,Atrasado,Dominar React & Next.js para novos projetos front-end,7,59,2026-05-27,2026-07-09
+PDI-291,291,2025-11-25,2026-10-12,Em andamento,Melhorar habilidades de liderança situacional e delegação,7,1,2026-05-31,2026-06-15
+PDI-292,292,2025-12-12,2026-07-27,Em andamento,Melhorar habilidades de liderança situacional e delegação,1,22,2026-05-28,2026-06-23
+PDI-293,293,2025-12-09,2026-09-17,Atrasado,Melhorar habilidades de liderança situacional e delegação,6,87,2026-05-31,2026-06-19
+PDI-294,294,2025-11-04,2026-07-04,Em andamento,Melhorar comunicação assertiva e feedback,2,7,2026-05-02,2026-07-05
+PDI-295,295,2025-11-02,2026-08-28,Em andamento,Aprender modelagem de dados e queries avançadas SQL,3,43,2026-05-28,2026-07-03
+PDI-296,296,2025-12-20,2026-07-12,Concluído,Aprender modelagem de dados e queries avançadas SQL,8,33,2026-05-13,2026-06-17
+PDI-297,297,2025-11-17,2026-07-30,Em andamento,Dominar React & Next.js para novos projetos front-end,10,53,2026-05-05,2026-06-29
+PDI-298,298,2025-12-14,2026-08-13,Em andamento,Melhorar habilidades de liderança situacional e delegação,6,86,2026-05-10,2026-07-07
+PDI-299,299,2025-12-10,2026-08-15,Em andamento,Dominar React & Next.js para novos projetos front-end,6,57,2026-05-01,2026-06-28
+PDI-300,300,2026-01-05,2026-10-20,Em andamento,Melhorar habilidades de liderança situacional e delegação,1,73,2026-05-30,2026-06-19
+PDI-301,301,2026-01-01,2026-11-04,Concluído,Dominar React & Next.js para novos projetos front-end,5,84,2026-05-09,2026-07-08
+PDI-302,302,2026-01-07,2026-11-08,Concluído,Estruturar pipeline de CI/CD para DevOps,2,47,2026-05-20,2026-06-20
+PDI-303,303,2026-01-30,2026-08-01,Atrasado,Dominar React & Next.js para novos projetos front-end,3,99,2026-05-15,2026-07-01
+PDI-304,304,2026-01-20,2026-08-17,Atrasado,Melhorar habilidades de liderança situacional e delegação,1,18,2026-05-23,2026-06-21
+PDI-305,305,2025-11-13,2026-08-03,Concluído,Estruturar pipeline de CI/CD para DevOps,6,5,2026-05-21,2026-07-07
+PDI-306,306,2025-12-13,2026-11-09,Atrasado,Melhorar comunicação assertiva e feedback,4,43,2026-05-26,2026-06-25
+PDI-307,307,2025-11-13,2026-09-19,Em andamento,Dominar React & Next.js para novos projetos front-end,3,9,2026-05-25,2026-07-05
+PDI-308,308,2026-01-28,2026-08-08,Atrasado,Aprender modelagem de dados e queries avançadas SQL,10,48,2026-05-25,2026-06-23
+PDI-309,309,2025-12-04,2026-10-29,Em andamento,Melhorar comunicação assertiva e feedback,4,51,2026-05-19,2026-06-17
+PDI-310,310,2025-11-11,2026-09-26,Em andamento,Melhorar habilidades de liderança situacional e delegação,4,22,2026-05-24,2026-07-05

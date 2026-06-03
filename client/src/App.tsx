@@ -1,13 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import TeamManagement from './components/TeamManagement';
+import RolesManagement from './components/RolesManagement';
+import CareerMap from './components/CareerMap';
 import Login from './components/Login';
+import { getDynamicProgressColor } from './utils/colors';
 import { Search, Bell, Settings, Upload, Download, Sparkles, Star, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import jsPDF from 'jspdf';
 
-// --- Pure CSS/SVG Radar Chart (Skill Matrix) ---
-const RadarChart: React.FC = () => {
+interface RadarChartProps {
+  averages: number[];
+}
+
+const RadarChart: React.FC<RadarChartProps> = ({ averages }) => {
   const cx = 150;
   const cy = 120;
   const r = 70;
@@ -31,10 +37,10 @@ const RadarChart: React.FC = () => {
     }).join(' ');
   });
 
-  // Mapped time metrics (e.g., Liderança: 82%, Tech: 91%, Soft Skills: 76%, Agile: 84%, Negócio: 68%)
+  // Mapped time metrics dynamically from averages
   const timePoints = angles.map((a, i) => {
-    const pcts = [0.82, 0.91, 0.76, 0.84, 0.68];
-    const p = getPoint(a, pcts[i]!);
+    const val = averages[i] !== undefined ? averages[i] : 0.7;
+    const p = getPoint(a, val);
     return `${p.x},${p.y}`;
   }).join(' ');
 
@@ -99,8 +105,8 @@ const RadarChart: React.FC = () => {
         />
         {/* Vertices indicator dots */}
         {angles.map((a, i) => {
-          const pcts = [0.82, 0.91, 0.76, 0.84, 0.68];
-          const p = getPoint(a, pcts[i]!);
+          const val = averages[i] !== undefined ? averages[i] : 0.7;
+          const p = getPoint(a, val);
           return (
             <circle
               key={i}
@@ -172,10 +178,35 @@ const App: React.FC = () => {
   const [user, setUser] = useState<any>(null);
   const [currentView, setCurrentView] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
-  const [insight, setInsight] = useState("Sua área está 15% acima da média da empresa em competências de Liderança. O investimento em mentorias no último trimestre impulsionou a evolução técnica do time de Engenharia.");
+  const [insight, setInsight] = useState("Carregando diagnóstico do time...");
   const [displayedText, setDisplayedText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [dashboardTeam, setDashboardTeam] = useState<any[]>([]);
+  const [fullTeam, setFullTeam] = useState<any[]>([]);
+  const [stats, setStats] = useState<any>({
+    activeMembersCount: 24,
+    mappedSkillsCount: 148,
+    eNPS: 78,
+    moodAvg: "4.2",
+    retentionRate: 96,
+    workshopsRate: 88,
+    mentoringRate: 64,
+    coursesRate: 42,
+    certsRate: 91
+  });
+
+  // Fetch dashboard stats dynamically
+  useEffect(() => {
+    if (user) {
+      axios.get(`http://localhost:3001/api/dashboard-stats?managerId=${user.id}`)
+        .then(res => {
+          setStats(res.data);
+        })
+        .catch(err => {
+          console.warn("Failed to load dashboard stats", err);
+        });
+    }
+  }, [user]);
 
   // Fetch dashboard collaborators dynamically
   useEffect(() => {
@@ -184,17 +215,20 @@ const App: React.FC = () => {
         .then(res => {
           // Take active collaborators (filter out gestor)
           const filtered = res.data.filter((m: any) => !m.role.toLowerCase().includes('gestor'));
+          setFullTeam(filtered);
           // Take top 3 for the dashboard individual performance summary
           setDashboardTeam(filtered.slice(0, 3));
         })
         .catch(err => {
           console.warn("Failed to load team data, using fallback", err);
           // Fallback static mock
-          setDashboardTeam([
+          const mockData = [
             { id: "1", name: "Ricardo Borges", role: "DevOps Engineer", pdiAverage: 92, avatar: "https://i.pravatar.cc/150?u=ricardo", aiHealth: "Healthy" },
             { id: "2", name: "Mariana Lima", role: "UX Designer", pdiAverage: 85, avatar: "https://i.pravatar.cc/150?u=mariana", aiHealth: "Healthy" },
             { id: "3", name: "Fabio Souza", role: "Project Manager", pdiAverage: 58, avatar: "https://i.pravatar.cc/150?u=fabio", aiHealth: "Attention" }
-          ]);
+          ];
+          setFullTeam(mockData);
+          setDashboardTeam(mockData.slice(0, 3));
         });
     }
   }, [user]);
@@ -218,24 +252,28 @@ const App: React.FC = () => {
   }, [insight, isLoading]);
 
   const handleGenerateReport = async () => {
+    if (!user) return;
     setIsLoading(true);
     try {
       const response = await axios.post('http://localhost:3001/api/analyze', {
-        profileData: {
-          pastExperiences: ["Senior Dev at TechCorp", "Lead at Innovate"],
-          currentSkills: ["React", "Node", "System Design"],
-          trainingHistory: ["Leadership 101", "Advanced Architecture"]
-        }
+        managerId: user.id
       });
       setInsight(response.data.insight);
     } catch (error) {
       console.warn("Backend analyze failed, using simulation", error);
       await new Promise(resolve => setTimeout(resolve, 1500));
-      setInsight("Sua área está 22% acima da meta em competências de Agile e Gestão Técnica. Recomenda-se focar na validação de marcos de Arquitetura de Nuvem para os próximos 15 dias.");
+      setInsight("Seu time apresenta bom engajamento geral no desenvolvimento dos Planos de Desenvolvimento Individual (PDI).");
     } finally {
       setIsLoading(false);
     }
   };
+
+  // Automatically load team PDI insight when user logs in
+  useEffect(() => {
+    if (user) {
+      handleGenerateReport();
+    }
+  }, [user]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -298,6 +336,70 @@ const App: React.FC = () => {
     doc.save("indicadores-time-inova.pdf");
   };
 
+  // Calculate team distribution stats
+  const totalCollabs = fullTeam.length || 1;
+  const healthyCount = fullTeam.filter(m => m.aiHealth === 'Healthy').length;
+  const attentionCount = fullTeam.filter(m => m.aiHealth === 'Attention').length;
+  const riskCount = fullTeam.filter(m => m.aiHealth === 'Risk').length;
+
+  const lowPdiCount = fullTeam.filter(m => m.pdiAverage < 60).length;
+  const midPdiCount = fullTeam.filter(m => m.pdiAverage >= 60 && m.pdiAverage < 85).length;
+  const highPdiCount = fullTeam.filter(m => m.pdiAverage >= 85).length;
+
+  // Compute Role Levels
+  const roleDistribution: { [key: string]: number } = {};
+  fullTeam.forEach(m => {
+    let roleGroup = "Outros";
+    const r = m.role.toLowerCase();
+    if (r.includes("analista")) {
+      roleGroup = "Analistas";
+    } else if (r.includes("coordenador") || r.includes("gestor")) {
+      roleGroup = "Liderança";
+    } else if (r.includes("assistente") || r.includes("técnico") || r.includes("auxiliar") || r.includes("assist.")) {
+      roleGroup = "Técnicos/Assist.";
+    } else if (r.includes("especialista") || r.includes("consultor") || r.includes("partner") || r.includes("bp")) {
+      roleGroup = "Espec./Consultores";
+    } else if (r.includes("desenvolvedor") || r.includes("engineer") || r.includes("designer") || r.includes("dev")) {
+      roleGroup = "Devs/Designers";
+    }
+    roleDistribution[roleGroup] = (roleDistribution[roleGroup] || 0) + 1;
+  });
+
+  // Calculate average scores for radar chart categories
+  const categories = ["Liderança", "Tech", "Soft Skills", "Agile", "Negócio"];
+  const categoryScores = [0, 0, 0, 0, 0];
+  const categoryCounts = [0, 0, 0, 0, 0];
+  const defaultAverages = [0.82, 0.91, 0.76, 0.84, 0.68];
+
+  fullTeam.forEach(member => {
+    if (member.pdiHistory && member.pdiHistory.length > 0) {
+      member.pdiHistory.forEach((h: any) => {
+        const name = (h.treinamento_nome || "").toLowerCase();
+        let catIndex = 1; // Default to Tech
+        
+        if (name.includes("liderança") || name.includes("feedback") || name.includes("gestão situacional")) {
+          catIndex = 0; // Liderança
+        } else if (name.includes("comunicação") || name.includes("assertiva") || name.includes("empatia")) {
+          catIndex = 2; // Soft Skills
+        } else if (name.includes("ágeis") || name.includes("projetos") || name.includes("tempo") || name.includes("organização")) {
+          catIndex = 3; // Agile
+        } else if (name.includes("negócio") || name.includes("financeiro") || name.includes("vendas") || name.includes("cliente")) {
+          catIndex = 4; // Negócio
+        }
+        
+        categoryScores[catIndex] += h.score / 100;
+        categoryCounts[catIndex] += 1;
+      });
+    }
+  });
+
+  const radarAverages = categories.map((_, i) => {
+    if (categoryCounts[i]! > 0) {
+      return categoryScores[i]! / categoryCounts[i]!;
+    }
+    return defaultAverages[i]!;
+  });
+
   if (!user) {
     return <Login onLoginSuccess={setUser} />;
   }
@@ -325,28 +427,7 @@ const App: React.FC = () => {
             />
           </div>
           
-          <div className="flex items-center gap-6">
-            <label className="flex items-center gap-2 px-4 py-2.5 bg-primary-50 text-primary-600 rounded-xl text-xs font-bold cursor-pointer hover:bg-primary-100/70 transition-all border border-primary-100">
-              <Upload className="w-4 h-4" />
-              Upload de Relatório
-              <input type="file" className="hidden" onChange={handleFileUpload} accept=".pdf,.xlsx,.xls" />
-            </label>
-            <button className="relative p-2.5 text-gray-400 hover:text-primary-600 bg-white border border-gray-100 rounded-xl shadow-sm transition-colors">
-              <Bell className="w-5 h-5" />
-              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-500 rounded-full border border-white"></span>
-            </button>
-            <button className="p-2.5 text-gray-400 hover:text-primary-600 bg-white border border-gray-100 rounded-xl shadow-sm transition-colors">
-              <Settings className="w-5 h-5" />
-            </button>
-            <div className="h-8 w-px bg-gray-200"></div>
-            <div className="text-right">
-              <p className="text-sm font-bold text-gray-900 leading-none">{user.name}</p>
-              <p className="text-[10px] text-gray-400 font-extrabold uppercase tracking-widest mt-1">Gestor de Inovação</p>
-            </div>
-            <div className="w-10 h-10 rounded-full bg-primary-50 border border-primary-100 flex items-center justify-center text-primary-600 font-black text-sm shadow-sm">
-              {user.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2)}
-            </div>
-          </div>
+
         </header>
 
         {currentView === 'dashboard' ? (
@@ -356,19 +437,6 @@ const App: React.FC = () => {
               <div>
                 <h1 className="text-3xl font-black text-gray-900 tracking-tight">Indicadores e Evolução do Time</h1>
                 <p className="text-gray-500 mt-2 text-sm font-medium">Visão analítica de performance, engajamento e desenvolvimento contínuo.</p>
-              </div>
-              <div className="flex gap-3">
-                <button 
-                  onClick={handleExport}
-                  className="flex items-center gap-2 px-5 py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm active:scale-95"
-                >
-                  <Download className="w-4 h-4" />
-                  Exportar PDF
-                </button>
-                <button className="flex items-center gap-2 px-5 py-3 bg-primary-600 text-white rounded-xl text-xs font-bold hover:bg-primary-700 transition-all shadow-md shadow-primary-600/10 active:scale-95">
-                  <Sparkles className="w-4 h-4" />
-                  Configurar Alertas
-                </button>
               </div>
             </div>
 
@@ -419,7 +487,7 @@ const App: React.FC = () => {
                   </span>
                 </div>
                 
-                <RadarChart />
+                <RadarChart averages={radarAverages} />
               </div>
             </div>
 
@@ -430,7 +498,7 @@ const App: React.FC = () => {
                 <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex items-center justify-between group hover:-translate-y-1 transition-all duration-300">
                   <div>
                     <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Membros Ativos</p>
-                    <p className="text-3xl font-black text-gray-900 mt-2">24</p>
+                    <p className="text-3xl font-black text-gray-900 mt-2">{stats.activeMembersCount}</p>
                     <p className="text-emerald-500 text-xs font-bold mt-1">↑ +2 este mês</p>
                   </div>
                   <div className="w-12 h-12 bg-primary-50 border border-primary-100 text-primary-600 rounded-xl flex items-center justify-center font-black">
@@ -441,8 +509,8 @@ const App: React.FC = () => {
                 <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex items-center justify-between group hover:-translate-y-1 transition-all duration-300">
                   <div>
                     <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Skills Mapeados</p>
-                    <p className="text-3xl font-black text-gray-900 mt-2">148</p>
-                    <p className="text-gray-400 text-xs font-medium mt-1">82% de validação ativa</p>
+                    <p className="text-3xl font-black text-gray-900 mt-2">{stats.mappedSkillsCount}</p>
+                    <p className="text-gray-400 text-xs font-medium mt-1">Validação ativa baseada em cargos</p>
                   </div>
                   <div className="w-12 h-12 bg-emerald-50 border border-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center font-black">
                     ✓
@@ -462,15 +530,15 @@ const App: React.FC = () => {
                 <div className="grid grid-cols-3 gap-2 border-t border-gray-50 pt-4 text-center">
                   <div>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">eNPS</p>
-                    <p className="text-lg font-black text-gray-900 mt-0.5">78</p>
+                    <p className="text-lg font-black text-gray-900 mt-0.5">{stats.eNPS}</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Mood Avg</p>
-                    <p className="text-lg font-black text-gray-900 mt-0.5">4.2/5</p>
+                    <p className="text-lg font-black text-gray-900 mt-0.5">{stats.moodAvg}/5</p>
                   </div>
                   <div>
                     <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Retenção</p>
-                    <p className="text-lg font-black text-gray-900 mt-0.5">96%</p>
+                    <p className="text-lg font-black text-gray-900 mt-0.5">{stats.retentionRate}%</p>
                   </div>
                 </div>
               </div>
@@ -485,130 +553,245 @@ const App: React.FC = () => {
                   <div>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
                       <span>Workshops Técnicos</span>
-                      <span>88%</span>
+                      <span>{stats.workshopsRate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-primary-600 h-full rounded-full" style={{ width: '88%' }}></div>
+                      <div className="h-full rounded-full" style={{ width: `${stats.workshopsRate}%`, backgroundColor: getDynamicProgressColor(stats.workshopsRate) }}></div>
                     </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
                       <span>Programas de Mentoria</span>
-                      <span>64%</span>
+                      <span>{stats.mentoringRate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-primary-600 h-full rounded-full" style={{ width: '64%' }}></div>
+                      <div className="h-full rounded-full" style={{ width: `${stats.mentoringRate}%`, backgroundColor: getDynamicProgressColor(stats.mentoringRate) }}></div>
                     </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
                       <span>Cursos Externos</span>
-                      <span>42%</span>
+                      <span>{stats.coursesRate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-primary-600 h-full rounded-full" style={{ width: '42%' }}></div>
+                      <div className="h-full rounded-full" style={{ width: `${stats.coursesRate}%`, backgroundColor: getDynamicProgressColor(stats.coursesRate) }}></div>
                     </div>
                   </div>
                   <div>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
                       <span>Certificações</span>
-                      <span>91%</span>
+                      <span>{stats.certsRate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-primary-600 h-full rounded-full" style={{ width: '91%' }}></div>
+                      <div className="h-full rounded-full" style={{ width: `${stats.certsRate}%`, backgroundColor: getDynamicProgressColor(stats.certsRate) }}></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Row: Performance Individual */}
-            <div className="bg-white border border-gray-100 shadow-md rounded-2xl overflow-hidden">
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/20">
+            {/* Bottom Row: Dashboard de Dados Gerais dos Colaboradores */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+              
+              {/* Card 1: Distribuição de Saúde / Risco (AI Health) */}
+              <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-base font-black text-gray-900">Performance Individual</h3>
-                  <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mt-0.5">Destaques e evolução de PDIs do ciclo atual</p>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-base font-black text-gray-900">Saúde do Time (AI Health)</h3>
+                      <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">Indicador de engajamento e risco de desvio no PDI</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-center py-6 relative">
+                    <svg className="w-36 h-36 transform -rotate-90">
+                      {/* Base Track */}
+                      <circle cx="72" cy="72" r="54" fill="transparent" stroke="#F3F4F6" strokeWidth="12" />
+                      
+                      {/* Arc 1: Healthy */}
+                      <circle 
+                        cx="72" 
+                        cy="72" 
+                        r="54" 
+                        fill="transparent" 
+                        stroke="#10B981" 
+                        strokeWidth="12" 
+                        strokeDasharray={`${2 * Math.PI * 54}`}
+                        strokeDashoffset={`${2 * Math.PI * 54 * (1 - (healthyCount / totalCollabs))}`}
+                        className="transition-all duration-1000 ease-out"
+                      />
+                      
+                      {/* Arc 2: Attention */}
+                      {attentionCount > 0 && (
+                        <circle 
+                          cx="72" 
+                          cy="72" 
+                          r="54" 
+                          fill="transparent" 
+                          stroke="#F59E0B" 
+                          strokeWidth="12" 
+                          strokeDasharray={`${2 * Math.PI * 54}`}
+                          strokeDashoffset={`${2 * Math.PI * 54 * (1 - (attentionCount / totalCollabs))}`}
+                          style={{ transform: `rotate(${(healthyCount / totalCollabs) * 360}deg)`, transformOrigin: '72px 72px' }}
+                          className="transition-all duration-1000 ease-out"
+                        />
+                      )}
+                      
+                      {/* Arc 3: Risk */}
+                      {riskCount > 0 && (
+                        <circle 
+                          cx="72" 
+                          cy="72" 
+                          r="54" 
+                          fill="transparent" 
+                          stroke="#EF4444" 
+                          strokeWidth="12" 
+                          strokeDasharray={`${2 * Math.PI * 54}`}
+                          strokeDashoffset={`${2 * Math.PI * 54 * (1 - (riskCount / totalCollabs))}`}
+                          style={{ transform: `rotate(${((healthyCount + attentionCount) / totalCollabs) * 360}deg)`, transformOrigin: '72px 72px' }}
+                          className="transition-all duration-1000 ease-out"
+                        />
+                      )}
+                    </svg>
+                    
+                    <div className="absolute flex flex-col items-center justify-center">
+                      <span className="text-2xl font-black text-gray-900">{fullTeam.length}</span>
+                      <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros</span>
+                    </div>
+                  </div>
                 </div>
-                <button 
-                  onClick={() => setCurrentView('team')}
-                  className="text-primary-600 text-xs font-black hover:underline uppercase tracking-widest flex items-center gap-1"
-                >
-                  Ver todos os 24 membros do time
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                
+                <div className="space-y-2 mt-4 pt-4 border-t border-gray-50">
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <div className="flex items-center gap-2 text-emerald-600">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+                      <span>No Caminho (Healthy)</span>
+                    </div>
+                    <span className="text-gray-500">{healthyCount} ({Math.round((healthyCount / totalCollabs) * 100)}%)</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <div className="flex items-center gap-2 text-amber-500">
+                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                      <span>Atenção (Attention)</span>
+                    </div>
+                    <span className="text-gray-500">{attentionCount} ({Math.round((attentionCount / totalCollabs) * 100)}%)</span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs font-bold">
+                    <div className="flex items-center gap-2 text-rose-500">
+                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500 inline-block"></span>
+                      <span>Abaixo do Esperado (Risk)</span>
+                    </div>
+                    <span className="text-gray-500">{riskCount} ({Math.round((riskCount / totalCollabs) * 100)}%)</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-gray-50/50 border-b border-gray-100 text-gray-400 text-[10px] font-black uppercase tracking-widest">
-                      <th className="px-6 py-4">Colaborador</th>
-                      <th className="px-6 py-4">Maturidade Skill</th>
-                      <th className="px-6 py-4">Conclusão PDI</th>
-                      <th className="px-6 py-4">Último Feedback</th>
-                      <th className="px-6 py-4 text-right">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {dashboardTeam.map((member) => (
-                      <tr key={member.id} className="hover:bg-gray-50/50 transition-colors group">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-full bg-primary-50 border border-primary-100 overflow-hidden flex items-center justify-center font-bold text-primary-600 text-xs">
-                              {member.avatar ? (
-                                <img src={member.avatar} alt={member.name} className="w-full h-full object-cover" />
-                              ) : (
-                                member.name.split(' ').map((n: string) => n[0]).join('').substring(0, 2)
-                              )}
-                            </div>
-                            <div>
-                              <p className="font-bold text-gray-900 text-sm">{member.name}</p>
-                              <p className="text-gray-400 text-xs mt-0.5">{member.role}</p>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-1 text-amber-500">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star 
-                                key={star} 
-                                className={`w-3.5 h-3.5 ${star <= (member.pdiAverage >= 85 ? 5 : member.pdiAverage >= 70 ? 4 : 3) ? 'fill-current' : 'text-gray-200'}`} 
-                              />
-                            ))}
-                            <span className="text-xs font-bold text-gray-500 ml-1.5">
-                              {(member.pdiAverage / 20).toFixed(1)}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3 max-w-[150px]">
-                            <div className="flex-1 bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                              <div className="bg-primary-600 h-full rounded-full" style={{ width: `${member.pdiAverage}%` }}></div>
-                            </div>
-                            <span className="text-xs font-bold text-gray-700">{member.pdiAverage}%</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-xs font-medium text-gray-500">
-                          {member.pdiAverage >= 85 ? '12 Jan, 2026' : member.pdiAverage >= 60 ? '05 Fev, 2026' : '28 Jan, 2026'}
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          <span className={`text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider border ${
-                            member.pdiAverage >= 85 
-                              ? 'bg-purple-50 text-purple-600 border-purple-100' 
-                              : member.pdiAverage >= 60 
-                                ? 'bg-emerald-50 text-emerald-600 border-emerald-100' 
-                                : 'bg-amber-50 text-amber-600 border-amber-100'
-                          }`}>
-                            {member.pdiAverage >= 85 ? 'Promoted' : member.pdiAverage >= 60 ? 'On Track' : 'Needs Focus'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              {/* Card 2: Progresso dos PDIs */}
+              <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-base font-black text-gray-900">Progresso dos PDIs</h3>
+                      <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">Evolução do time por faixas de conclusão</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-5 py-4">
+                    <div>
+                      <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-primary-600"></span>
+                          <span>Destaques / Avançado (≥ 85%)</span>
+                        </div>
+                        <span>{highPdiCount} membros</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${(highPdiCount / totalCollabs) * 100}%`, backgroundColor: getDynamicProgressColor((highPdiCount / totalCollabs) * 100) }}></div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                          <span>No Ritmo Correto (60% - 84%)</span>
+                        </div>
+                        <span>{midPdiCount} membros</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${(midPdiCount / totalCollabs) * 100}%`, backgroundColor: getDynamicProgressColor((midPdiCount / totalCollabs) * 100) }}></div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                          <span>Necessita Acompanhamento (&lt; 60%)</span>
+                        </div>
+                        <span>{lowPdiCount} membros</span>
+                      </div>
+                      <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                        <div className="h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${(lowPdiCount / totalCollabs) * 100}%`, backgroundColor: getDynamicProgressColor((lowPdiCount / totalCollabs) * 100) }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-50 text-center">
+                  <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                    Média Conclusão do Time: <span className="text-primary-600 font-black text-xs">
+                      {fullTeam.length > 0 ? Math.round(fullTeam.reduce((acc, curr) => acc + curr.pdiAverage, 0) / fullTeam.length) : 0}%
+                    </span>
+                  </p>
+                </div>
               </div>
+
+              {/* Card 3: Distribuição de Cargos */}
+              <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
+                <div>
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h3 className="text-base font-black text-gray-900">Distribuição por Funções</h3>
+                      <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">Composição estrutural de cargos</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3.5 py-2">
+                    {Object.entries(roleDistribution).map(([roleGroup, count]) => (
+                      <div key={roleGroup} className="flex flex-col gap-1">
+                        <div className="flex justify-between text-xs font-bold">
+                          <span className="text-gray-700">{roleGroup}</span>
+                          <span className="text-gray-500">{count} ({Math.round((count / totalCollabs) * 100)}%)</span>
+                        </div>
+                        <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full rounded-full transition-all duration-1000 ease-out" 
+                            style={{ width: `${(count / totalCollabs) * 100}%`, backgroundColor: getDynamicProgressColor((count / totalCollabs) * 100) }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-gray-50 mt-4">
+                  <button 
+                    onClick={() => setCurrentView('team')}
+                    className="w-full flex items-center justify-between text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50/50 hover:bg-primary-50 border border-primary-100/50 px-4 py-3 rounded-xl transition-all"
+                  >
+                    <span>Ver lista completa de colaboradores</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
             </div>
           </>
+        ) : currentView === 'roles' ? (
+          <RolesManagement />
+        ) : currentView === 'career' ? (
+          <CareerMap managerId={user.id} />
         ) : (
           <TeamManagement search={searchTerm} managerId={user.id} />
         )}

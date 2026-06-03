@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, BookOpen, Target, Activity, Award } from 'lucide-react';
+import { getDynamicProgressColor } from '../utils/colors';
 
 export interface PDITraining {
   treinamento_nome: string;
@@ -79,8 +80,8 @@ const TrainingHistoryModal: React.FC<TrainingHistoryModalProps> = ({
           
           <div className="w-full max-w-md mt-6 bg-gray-100 h-2.5 rounded-full overflow-hidden relative z-10">
             <div 
-              className={`h-full rounded-full transition-all duration-1000 ${getScoreBarColor(pdiAverage)}`}
-              style={{ width: `${pdiAverage}%` }}
+              className="h-full rounded-full transition-all duration-1000"
+              style={{ width: `${pdiAverage}%`, backgroundColor: getDynamicProgressColor(pdiAverage) }}
             ></div>
           </div>
         </div>

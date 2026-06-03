@@ -1,5 +1,6 @@
 import React from 'react';
 import { AlertCircle, ChevronRight } from 'lucide-react';
+import { getDynamicProgressColor } from '../utils/colors';
 
 const gaps = [
   { 
@@ -73,8 +74,8 @@ const TalentGapsTable: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <div className="flex-1 bg-gray-100 h-1.5 rounded-full overflow-hidden min-w-[120px]">
                       <div 
-                        className="bg-primary-500 h-full rounded-full transition-all duration-1000" 
-                        style={{ width: `${gap.status}%` }}
+                        className="h-full rounded-full transition-all duration-1000" 
+                        style={{ width: `${gap.status}%`, backgroundColor: getDynamicProgressColor(gap.status) }}
                       ></div>
                     </div>
                     <span className="text-xs font-bold text-gray-500">{gap.status}%</span>

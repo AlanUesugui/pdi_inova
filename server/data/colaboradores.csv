@@ -1,8 +1,8 @@
-id,nome,cargo,departamento,gestor_id
-1,Jane Doe,Principal Product Designer,Design,100
-2,Marcus Reed,Senior Engineering Lead,Engineering,100
-3,Sarah Chen,Full Stack Architect,Engineering,101
-4,Thomas Klein,Operations Manager,Operations,101
-5,Lila Amin,Marketing Strategist,Marketing,100
-100,Alex Sterling,Head of Operations,Executive,0
-101,Sofia Rodriguez,VP of Engineering,Executive,0
+id,nome,cargo,departamento,gestor_id,data_admissao,status,modalidade_trabalho,email,nivel_cargo,centro_de_custo,tipo_contrato
+1,Jane Doe,Principal Product Designer,Design,100,2019-09-04,Ativo,Remoto,jane@pdi.com,Assistente,CC-101 (Engenharia),CLT
+2,Marcus Reed,Senior Engineering Lead,Engineering,100,2020-08-23,Ativo,Presencial,marcus@pdi.com,Sênior,CC-104 (Operações),CLT
+3,Sarah Chen,Full Stack Architect,Engineering,101,2021-05-28,Ativo,Presencial,sarah@pdi.com,Assistente,CC-101 (Engenharia),CLT
+4,Thomas Klein,Operations Manager,Operations,101,2024-12-31,Ativo,Remoto,thomas@pdi.com,Assistente,CC-104 (Operações),CLT
+5,Lila Amin,Marketing Strategist,Marketing,100,2023-10-23,Ativo,Híbrido,lila@pdi.com,Assistente,CC-101 (Engenharia),CLT
+100,Alex Sterling,Head of Operations,Executive,0,2022-03-07,Ativo,Híbrido,alex@pdi.com,Assistente,CC-102 (Marketing),CLT
+101,Sofia Rodriguez,VP of Engineering,Executive,0,2018-01-22,Ativo,Remoto,sofia@pdi.com,Assistente,CC-101 (Engenharia),CLT

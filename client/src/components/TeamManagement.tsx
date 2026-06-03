@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { RotateCw, UserPlus, Eye, Zap, ChevronLeft, ChevronRight, Filter, BookOpen } from 'lucide-react';
+import { Eye, Zap, ChevronLeft, ChevronRight, Filter, Sparkles } from 'lucide-react';
 import axios from 'axios';
 import AIDrawer from './AIDrawer';
-import AnalysisReportModal from './AnalysisReportModal';
 import TrainingHistoryModal, { type PDITraining } from './TrainingHistoryModal';
+import CollaboratorAnalysisPanel from './CollaboratorAnalysisPanel';
+import { getDynamicProgressColor } from '../utils/colors';
 
 interface TeamMember {
   id: string;
@@ -27,10 +28,8 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
   // Toast State for validations
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Analysis Modal State
-  const [isReportOpen, setIsReportOpen] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<any>(null);
+  // Analysis Panel State
+  const [analysisMember, setAnalysisMember] = useState<TeamMember | null>(null);
 
   // History Modal State
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -41,8 +40,8 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
   }, []);
 
   useEffect(() => {
-    const filtered = team.filter(m => 
-      !m.role.toLowerCase().includes('gestor') && // Exibe apenas colaboradores
+    const filtered = team.filter(m =>
+      !m.role.toLowerCase().includes('gestor') &&
       (m.name.toLowerCase().includes(search.toLowerCase()) ||
        m.role.toLowerCase().includes(search.toLowerCase()) ||
        m.skills.some(skill => skill.toLowerCase().includes(search.toLowerCase())))
@@ -57,7 +56,6 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
       setFilteredTeam(response.data);
     } catch (error) {
       console.error("Failed to fetch team", error);
-      // Fallback fallback simulated data in case server is off
       const mockTeam: TeamMember[] = [
         {
           id: "1",
@@ -110,10 +108,10 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
           name: "Julia Rezende",
           role: "UX Designer Pleno",
           level: "Pleno",
-          pdiGoal: "Product discovery Frameworks",
+          pdiGoal: "Product Discovery Frameworks",
           pdiAverage: 82,
           pdiHistory: [
-            { treinamento_nome: "Product discovery Frameworks", score: 80, conhecimento: "Alto", aplicacao: "Alta", desempenho: "Destaque", eficacia: "Sim" },
+            { treinamento_nome: "Product Discovery Frameworks", score: 80, conhecimento: "Alto", aplicacao: "Alta", desempenho: "Destaque", eficacia: "Sim" },
             { treinamento_nome: "Comunicação com Stakeholders", score: 65, conhecimento: "Alto", aplicacao: "Media", desempenho: "Consistente", eficacia: "Sim" }
           ],
           aiHealth: "Healthy",
@@ -128,32 +126,9 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
     }
   };
 
-  const handleAnalyze = async (id: string) => {
-    setIsReportOpen(true);
-    setIsAnalyzing(true);
-    setSelectedReport(null);
-    try {
-      const response = await axios.get(`http://localhost:3001/api/analyze-collaborator/${id}`);
-      setSelectedReport(response.data);
-    } catch (error) {
-      console.warn("Failed to fetch AI analysis report, simulating feedback", error);
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSelectedReport({
-        collaborator: team.find(m => m.id === id) || { name: "Colaborador", role: "Especialista" },
-        insightText: "Ricardo está evoluindo de forma constante. Recomenda-se reforçar a prática do treinamento 'Arquitetura de Microserviços' nos próximos projetos técnicos da área. Soft skills avaliadas como ótimas e alinhadas ao target.",
-        gaps: ["Kubernetes Multi-cluster", "Segurança em APIs"],
-        developmentPlan: ["Curso avançado de Kubernetes", "Mentoria focada com DevOps Principal"]
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
-  };
-
   const handleValidateMilestone = (name: string, pdiGoal: string) => {
     setToastMessage(`Marco de PDI "${pdiGoal}" de ${name} validado com sucesso!`);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 4000);
+    setTimeout(() => setToastMessage(null), 4000);
   };
 
   const getStatusBadge = (avg: number) => {
@@ -172,21 +147,19 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <AIDrawer isOpen={isDrawerOpen} onClose={() => setIsDrawerOpen(false)} />
-      
-      <AnalysisReportModal 
-        isOpen={isReportOpen} 
-        onClose={() => setIsReportOpen(false)} 
-        report={selectedReport}
-        isLoading={isAnalyzing}
-      />
 
-      <TrainingHistoryModal 
+      <TrainingHistoryModal
         isOpen={isHistoryOpen}
         onClose={() => setIsHistoryOpen(false)}
         collaboratorName={selectedMemberHistory?.name || ''}
         collaboratorAvatar={selectedMemberHistory?.avatar || ''}
         pdiHistory={selectedMemberHistory?.pdiHistory || []}
         pdiAverage={selectedMemberHistory?.pdiAverage || 0}
+      />
+
+      <CollaboratorAnalysisPanel
+        member={analysisMember}
+        onClose={() => setAnalysisMember(null)}
       />
 
       {/* Validation Toast Notification */}
@@ -202,59 +175,6 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
         <div>
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">Gestão de PDIs do Time</h1>
           <p className="text-gray-500 mt-2 text-sm font-medium">Acompanhe e valide o desenvolvimento contínuo dos seus liderados.</p>
-        </div>
-        <div className="flex gap-3">
-          <button 
-            onClick={fetchTeam}
-            className="flex items-center gap-2 px-5 py-3 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 transition-all shadow-sm active:scale-95"
-          >
-            <RotateCw className="w-4 h-4" />
-            Sincronizar
-          </button>
-          <button 
-            onClick={() => setIsDrawerOpen(true)}
-            className="flex items-center gap-2 px-5 py-3 bg-primary-600 text-white rounded-xl text-xs font-bold hover:bg-primary-700 transition-all shadow-md shadow-primary-600/10 active:scale-95"
-          >
-            <UserPlus className="w-4 h-4" />
-            Adicionar Membro
-          </button>
-        </div>
-      </div>
-
-      {/* Top metrics summary cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center border border-primary-100">
-            <Zap className="w-6 h-6 text-primary-600" />
-          </div>
-          <div>
-            <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Objetivos Ativos</p>
-            <p className="text-2xl font-black text-gray-900 mt-0.5">{filteredTeam.length * 2}</p>
-          </div>
-        </div>
-
-        <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-5 flex items-center gap-4">
-          <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center border border-emerald-100">
-            <BookOpen className="w-6 h-6 text-emerald-600" />
-          </div>
-          <div>
-            <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Concluídos este mês</p>
-            <p className="text-2xl font-black text-gray-900 mt-0.5">06</p>
-          </div>
-        </div>
-
-        <div className="bg-navy-900 text-white shadow-xl rounded-2xl p-5 flex items-center justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-primary-600/20 blur-2xl rounded-full"></div>
-          <div>
-            <p className="text-primary-300 text-[9px] font-black uppercase tracking-wider">Suporte de IA</p>
-            <p className="text-sm font-black mt-1">Assistant pronto para análise</p>
-          </div>
-          <button 
-            onClick={() => setIsDrawerOpen(true)}
-            className="bg-white text-navy-900 text-xs font-black px-4 py-2 rounded-xl hover:bg-gray-100 transition-all active:scale-95 shadow-md"
-          >
-            Launch Assistant
-          </button>
         </div>
       </div>
 
@@ -273,15 +193,16 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
         <p className="text-xs text-gray-400 font-bold">Mostrando {filteredTeam.length} colaboradores ativos</p>
       </div>
 
-      {/* Card Grid Overhaul (Stitch "Gestão de PDIs" design) */}
+      {/* Card Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {isLoading ? (
           <div className="col-span-full py-16 text-center text-gray-400 font-bold">Carregando dados do time...</div>
         ) : filteredTeam.map((m) => {
           const status = getStatusBadge(m.pdiAverage);
+
           return (
             <div key={m.id} className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between group hover:shadow-lg transition-all duration-300">
-              
+
               {/* Card Header */}
               <div>
                 <div className="flex justify-between items-start mb-6">
@@ -299,7 +220,7 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
                   </span>
                 </div>
 
-                {/* Subtitle - Last modified info */}
+                {/* Subtitle */}
                 <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-4 border-b border-gray-50 pb-2">
                   Última atualização: 12 dias atrás
                 </p>
@@ -322,13 +243,12 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
                               {goalStatus.text}
                             </span>
                           </div>
-                          
                           <div className="flex items-center gap-3">
                             <div className="flex-1 bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                              <div 
-                                className="bg-primary-600 h-full rounded-full transition-all duration-1000" 
-                                style={{ width: `${item.score}%` }}
-                              ></div>
+                              <div
+                                className="h-full rounded-full transition-all duration-1000"
+                                style={{ width: `${item.score}%`, backgroundColor: getDynamicProgressColor(item.score) }}
+                              />
                             </div>
                             <span className="text-[10px] font-black text-gray-500 w-8 text-right">{item.score}%</span>
                           </div>
@@ -336,21 +256,18 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
                       );
                     })
                   ) : (
-                    <div className="space-y-4">
-                      {/* Fallback mock goal */}
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center text-xs">
-                          <span className="font-extrabold text-gray-800">{m.pdiGoal || 'Treinamento de Liderança'}</span>
-                          <span className={`text-[9px] font-black px-2 py-0.5 rounded border uppercase tracking-wider bg-amber-50 text-amber-600 border-amber-100`}>
-                            Em andamento
-                          </span>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center text-xs">
+                        <span className="font-extrabold text-gray-800">{m.pdiGoal || 'Treinamento de Liderança'}</span>
+                        <span className="text-[9px] font-black px-2 py-0.5 rounded border uppercase tracking-wider bg-amber-50 text-amber-600 border-amber-100">
+                          Em andamento
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 bg-gray-100 h-1.5 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full" style={{ width: `${m.pdiAverage}%`, backgroundColor: getDynamicProgressColor(m.pdiAverage) }} />
                         </div>
-                        <div className="flex items-center gap-3">
-                          <div className="flex-1 bg-gray-100 h-1.5 rounded-full overflow-hidden">
-                            <div className="bg-primary-600 h-full rounded-full" style={{ width: `${m.pdiAverage}%` }}></div>
-                          </div>
-                          <span className="text-[10px] font-black text-gray-500 w-8 text-right">{m.pdiAverage}%</span>
-                        </div>
+                        <span className="text-[10px] font-black text-gray-500 w-8 text-right">{m.pdiAverage}%</span>
                       </div>
                     </div>
                   )}
@@ -359,19 +276,20 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
 
               {/* Card Actions Footer */}
               <div className="flex items-center gap-3 pt-4 border-t border-gray-50 mt-2">
-                <button 
-                  onClick={() => handleAnalyze(m.id)}
-                  className="flex-1 border border-primary-600 text-primary-600 font-bold py-2.5 rounded-xl hover:bg-primary-50/50 transition-all text-xs text-center active:scale-95"
+                <button
+                  onClick={() => setAnalysisMember(m)}
+                  className="flex-1 flex items-center justify-center gap-1.5 border border-purple-400 text-purple-600 font-bold py-2.5 rounded-xl hover:bg-purple-50 transition-all text-xs active:scale-95"
                 >
-                  Dar Feedback
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Analisar com IA
                 </button>
-                <button 
+                <button
                   onClick={() => handleValidateMilestone(m.name, m.pdiGoal || (m.pdiHistory?.[0]?.treinamento_nome || 'Objetivo PDI'))}
                   className="flex-1 bg-primary-600 text-white font-bold py-2.5 rounded-xl hover:bg-primary-700 transition-all text-xs text-center active:scale-95 shadow-sm"
                 >
                   Validar Marco
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     setSelectedMemberHistory(m);
                     setIsHistoryOpen(true);

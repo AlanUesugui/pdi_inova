@@ -1,311 +1,311 @@
-id,nome,cargo,departamento,gestor_id
-1,Aline Souza,Gestor de Recursos Humanos,Recursos Humanos,
-2,Bruno Cardoso,Gestor de Tecnologia da Informação,Tecnologia da Informação,
-3,Carla Mendes,Gestor de Financeiro,Financeiro,
-4,Diego Martins,Gestor de Comercial,Comercial,
-5,Eduarda Lima,Gestor de Operações,Operações,
-6,Felipe Rocha,Gestor de Marketing,Marketing,
-7,Gabriela Nunes,Gestor de Engenharia,Engenharia,
-8,Henrique Alves,Gestor de Qualidade,Qualidade,
-9,Isabela Costa,Gestor de Logística,Logística,
-10,João Pereira,Gestor de Suprimentos,Suprimentos,
-11,Lucas Nascimento,Assistente,Tecnologia da Informação,2
-12,Rafael Souza,Consultor,Comercial,4
-13,André Gomes,Analista Júnior,Tecnologia da Informação,2
-14,Pedro Rodrigues,Assistente,Recursos Humanos,1
-15,Bianca Silva,Consultor,Logística,9
-16,Eduardo Mendes,Coordenador,Comercial,4
-17,Felipe Barbosa,Especialista,Comercial,4
-18,Fábio Costa,Coordenador,Recursos Humanos,1
-19,Thiago Pereira,Assistente,Marketing,6
-20,Camila Oliveira,Coordenador,Marketing,6
-21,Beatriz Fernandes,Business Partner,Tecnologia da Informação,2
-22,Giovana Santos,Desenvolvedor,Operações,5
-23,Camila Carvalho,Analista Pleno,Logística,9
-24,Larissa Dias,Técnico,Logística,9
-25,Gustavo Oliveira,Analista Júnior,Suprimentos,10
-26,Fábio Lima,Analista Pleno,Comercial,4
-27,Ingrid Souza,Coordenador,Comercial,4
-28,Felipe Fernandes,Analista Sênior,Operações,5
-29,Beatriz Rodrigues,Especialista,Marketing,6
-30,Bianca Costa,Consultor,Tecnologia da Informação,2
-31,Juliana Martins,Coordenador,Comercial,4
-32,Kelly Mendes,Assistente,Operações,5
-33,Hugo Santos,Assistente,Marketing,6
-34,Giovana Araújo,Coordenador,Recursos Humanos,1
-35,Pedro Rodrigues,Business Partner,Operações,5
-36,Gustavo Rocha,Coordenador,Marketing,6
-37,Rafael Nascimento,Analista Sênior,Qualidade,8
-38,Elaine Mendes,Consultor,Comercial,4
-39,Elaine Barbosa,Coordenador,Operações,5
-40,Rodrigo Fernandes,Assistente,Suprimentos,10
-41,Vinícius Rocha,Analista Pleno,Financeiro,3
-42,Ingrid Souza,Analista Sênior,Recursos Humanos,1
-43,Giovana Gomes,Business Partner,Financeiro,3
-44,Rodrigo Carvalho,Business Partner,Tecnologia da Informação,2
-45,Vinícius Nascimento,Consultor,Qualidade,8
-46,Débora Souza,Consultor,Recursos Humanos,1
-47,Fábio Araújo,Analista Pleno,Operações,5
-48,Amanda Costa,Desenvolvedor,Operações,5
-49,Elaine Nascimento,Consultor,Recursos Humanos,1
-50,Vinícius Souza,Especialista,Financeiro,3
-51,Bianca Rodrigues,Analista Sênior,Logística,9
-52,Fábio Costa,Consultor,Marketing,6
-53,Kelly Silva,Business Partner,Logística,9
-54,Patrícia Silva,Analista Pleno,Marketing,6
-55,Júlio Lima,Assistente,Marketing,6
-56,Fernanda Barbosa,Analista Pleno,Recursos Humanos,1
-57,Elaine Rocha,Analista Pleno,Tecnologia da Informação,2
-58,Fábio Pereira,Analista Sênior,Logística,9
-59,Natália Costa,Especialista,Qualidade,8
-60,Ingrid Dias,Coordenador,Logística,9
-61,Kelly Mendes,Assistente,Comercial,4
-62,Rodrigo Fernandes,Desenvolvedor,Operações,5
-63,Felipe Souza,Assistente,Logística,9
-64,Pedro Araújo,Analista Júnior,Comercial,4
-65,Natália Almeida,Business Partner,Suprimentos,10
-66,Lucas Oliveira,Analista Júnior,Comercial,4
-67,Pedro Santos,Técnico,Comercial,4
-68,Vinícius Almeida,Especialista,Tecnologia da Informação,2
-69,Gustavo Mendes,Analista Sênior,Qualidade,8
-70,André Rocha,Assistente,Suprimentos,10
-71,Giovana Gomes,Assistente,Qualidade,8
-72,Camila Gomes,Técnico,Tecnologia da Informação,2
-73,Amanda Martins,Analista Júnior,Engenharia,7
-74,Mariana Carvalho,Técnico,Tecnologia da Informação,2
-75,Fernanda Rodrigues,Assistente,Tecnologia da Informação,2
-76,Felipe Pereira,Coordenador,Logística,9
-77,Thiago Martins,Assistente,Financeiro,3
-78,Felipe Mendes,Analista Pleno,Tecnologia da Informação,2
-79,Caio Mendes,Analista Júnior,Recursos Humanos,1
-80,Kelly Almeida,Analista Sênior,Tecnologia da Informação,2
-81,Patrícia Rocha,Assistente,Engenharia,7
-82,Júlio Santos,Analista Sênior,Engenharia,7
-83,Lucas Carvalho,Especialista,Engenharia,7
-84,Larissa Gomes,Consultor,Qualidade,8
-85,Rafael Rodrigues,Especialista,Qualidade,8
-86,Mariana Barbosa,Consultor,Comercial,4
-87,Elaine Araújo,Analista Júnior,Recursos Humanos,1
-88,André Rocha,Consultor,Recursos Humanos,1
-89,Juliana Santos,Consultor,Logística,9
-90,Ingrid Costa,Analista Pleno,Tecnologia da Informação,2
-91,Pedro Almeida,Coordenador,Suprimentos,10
-92,Júlio Barbosa,Assistente,Tecnologia da Informação,2
-93,Bianca Santos,Business Partner,Suprimentos,10
-94,Amanda Barbosa,Business Partner,Tecnologia da Informação,2
-95,Matheus Nascimento,Assistente,Logística,9
-96,Fernanda Nascimento,Coordenador,Marketing,6
-97,Débora Lima,Desenvolvedor,Financeiro,3
-98,Kelly Oliveira,Analista Júnior,Marketing,6
-99,Bianca Barbosa,Analista Pleno,Qualidade,8
-100,Natália Rodrigues,Consultor,Tecnologia da Informação,2
-101,Rafael Fernandes,Analista Pleno,Operações,5
-102,Beatriz Lima,Analista Sênior,Comercial,4
-103,Hugo Mendes,Especialista,Qualidade,8
-104,Giovana Ribeiro,Analista Júnior,Suprimentos,10
-105,Larissa Souza,Analista Sênior,Logística,9
-106,Camila Souza,Consultor,Operações,5
-107,Thiago Lima,Business Partner,Financeiro,3
-108,Eduardo Araújo,Assistente,Comercial,4
-109,Vinícius Rocha,Especialista,Operações,5
-110,Pedro Gomes,Especialista,Recursos Humanos,1
-111,Lucas Araújo,Analista Sênior,Recursos Humanos,1
-112,Juliana Martins,Consultor,Operações,5
-113,Natália Silva,Analista Pleno,Engenharia,7
-114,Júlio Pereira,Consultor,Tecnologia da Informação,2
-115,Hugo Fernandes,Business Partner,Recursos Humanos,1
-116,Rafael Gomes,Analista Sênior,Logística,9
-117,Larissa Fernandes,Analista Júnior,Recursos Humanos,1
-118,Gustavo Almeida,Analista Pleno,Marketing,6
-119,Fábio Mendes,Coordenador,Marketing,6
-120,Elaine Pereira,Assistente,Suprimentos,10
-121,Giovana Costa,Coordenador,Financeiro,3
-122,Juliana Araújo,Coordenador,Recursos Humanos,1
-123,Thiago Costa,Analista Pleno,Comercial,4
-124,Ingrid Santos,Desenvolvedor,Engenharia,7
-125,Gustavo Martins,Técnico,Comercial,4
-126,Hugo Almeida,Assistente,Operações,5
-127,Débora Rodrigues,Coordenador,Recursos Humanos,1
-128,Thiago Oliveira,Especialista,Marketing,6
-129,Caio Ribeiro,Coordenador,Marketing,6
-130,Matheus Silva,Analista Pleno,Logística,9
-131,Juliana Barbosa,Especialista,Operações,5
-132,Camila Dias,Coordenador,Recursos Humanos,1
-133,Elaine Araújo,Coordenador,Marketing,6
-134,Vinícius Souza,Coordenador,Suprimentos,10
-135,Gustavo Nascimento,Analista Júnior,Suprimentos,10
-136,Lucas Ribeiro,Consultor,Engenharia,7
-137,Beatriz Gomes,Analista Pleno,Comercial,4
-138,Bianca Araújo,Analista Pleno,Marketing,6
-139,Vinícius Lima,Coordenador,Operações,5
-140,Rodrigo Lima,Consultor,Marketing,6
-141,Gustavo Gomes,Coordenador,Financeiro,3
-142,Bianca Barbosa,Especialista,Financeiro,3
-143,Natália Silva,Especialista,Engenharia,7
-144,Gustavo Gomes,Business Partner,Operações,5
-145,Caio Araújo,Desenvolvedor,Suprimentos,10
-146,Felipe Rodrigues,Consultor,Qualidade,8
-147,Giovana Costa,Analista Pleno,Qualidade,8
-148,Vinícius Dias,Técnico,Operações,5
-149,Hugo Almeida,Especialista,Tecnologia da Informação,2
-150,Giovana Rodrigues,Analista Sênior,Comercial,4
-151,Mariana Almeida,Desenvolvedor,Recursos Humanos,1
-152,Ingrid Oliveira,Desenvolvedor,Suprimentos,10
-153,Júlio Barbosa,Assistente,Engenharia,7
-154,Patrícia Carvalho,Assistente,Engenharia,7
-155,Caio Silva,Analista Pleno,Financeiro,3
-156,Fernanda Costa,Consultor,Engenharia,7
-157,Mariana Mendes,Assistente,Qualidade,8
-158,Felipe Pereira,Desenvolvedor,Tecnologia da Informação,2
-159,Natália Dias,Técnico,Logística,9
-160,Bianca Ribeiro,Coordenador,Qualidade,8
-161,Felipe Costa,Desenvolvedor,Logística,9
-162,Thiago Almeida,Especialista,Qualidade,8
-163,Patrícia Almeida,Especialista,Logística,9
-164,Pedro Lima,Assistente,Qualidade,8
-165,Matheus Araújo,Consultor,Operações,5
-166,Rafael Pereira,Assistente,Tecnologia da Informação,2
-167,Eduardo Pereira,Assistente,Engenharia,7
-168,Amanda Gomes,Técnico,Tecnologia da Informação,2
-169,Felipe Gomes,Analista Júnior,Logística,9
-170,Hugo Gomes,Coordenador,Comercial,4
-171,Eduardo Silva,Business Partner,Suprimentos,10
-172,Patrícia Silva,Técnico,Engenharia,7
-173,Fábio Carvalho,Coordenador,Operações,5
-174,Elaine Mendes,Business Partner,Logística,9
-175,Patrícia Almeida,Especialista,Comercial,4
-176,Patrícia Silva,Coordenador,Engenharia,7
-177,Débora Carvalho,Analista Sênior,Marketing,6
-178,Kelly Pereira,Business Partner,Qualidade,8
-179,Lucas Carvalho,Business Partner,Logística,9
-180,Débora Silva,Analista Pleno,Suprimentos,10
-181,Rafael Martins,Analista Sênior,Engenharia,7
-182,Thiago Carvalho,Técnico,Recursos Humanos,1
-183,Felipe Araújo,Técnico,Comercial,4
-184,Thiago Gomes,Especialista,Engenharia,7
-185,Patrícia Silva,Consultor,Tecnologia da Informação,2
-186,Beatriz Almeida,Analista Pleno,Recursos Humanos,1
-187,Fábio Silva,Assistente,Recursos Humanos,1
-188,Hugo Silva,Business Partner,Comercial,4
-189,Fernanda Pereira,Desenvolvedor,Financeiro,3
-190,André Rodrigues,Desenvolvedor,Tecnologia da Informação,2
-191,Fábio Fernandes,Analista Sênior,Operações,5
-192,Bianca Souza,Analista Sênior,Suprimentos,10
-193,Camila Barbosa,Analista Júnior,Operações,5
-194,André Carvalho,Coordenador,Operações,5
-195,Pedro Barbosa,Assistente,Comercial,4
-196,Eduardo Lima,Business Partner,Tecnologia da Informação,2
-197,Giovana Barbosa,Analista Júnior,Tecnologia da Informação,2
-198,Natália Gomes,Técnico,Marketing,6
-199,Vinícius Araújo,Analista Júnior,Tecnologia da Informação,2
-200,Hugo Rocha,Analista Pleno,Engenharia,7
-201,Beatriz Martins,Analista Sênior,Engenharia,7
-202,Juliana Ribeiro,Especialista,Engenharia,7
-203,Giovana Mendes,Desenvolvedor,Suprimentos,10
-204,Amanda Barbosa,Especialista,Qualidade,8
-205,Ingrid Almeida,Analista Pleno,Marketing,6
-206,Júlio Martins,Assistente,Operações,5
-207,André Dias,Coordenador,Qualidade,8
-208,Lucas Rocha,Técnico,Marketing,6
-209,Patrícia Rodrigues,Técnico,Financeiro,3
-210,Matheus Nascimento,Business Partner,Operações,5
-211,Natália Silva,Consultor,Operações,5
-212,Pedro Almeida,Coordenador,Comercial,4
-213,Natália Almeida,Desenvolvedor,Qualidade,8
-214,Felipe Silva,Analista Pleno,Qualidade,8
-215,Fernanda Carvalho,Assistente,Operações,5
-216,Débora Barbosa,Técnico,Operações,5
-217,Natália Ribeiro,Técnico,Qualidade,8
-218,Elaine Mendes,Técnico,Engenharia,7
-219,Eduardo Martins,Especialista,Marketing,6
-220,Thiago Almeida,Analista Pleno,Operações,5
-221,Matheus Souza,Consultor,Comercial,4
-222,Gustavo Rodrigues,Desenvolvedor,Financeiro,3
-223,Elaine Barbosa,Consultor,Operações,5
-224,Larissa Souza,Assistente,Suprimentos,10
-225,Fernanda Fernandes,Analista Sênior,Operações,5
-226,Lucas Mendes,Analista Sênior,Operações,5
-227,Mariana Santos,Consultor,Operações,5
-228,Eduardo Pereira,Desenvolvedor,Operações,5
-229,Ingrid Silva,Business Partner,Tecnologia da Informação,2
-230,Patrícia Rocha,Desenvolvedor,Operações,5
-231,Juliana Santos,Especialista,Marketing,6
-232,Camila Oliveira,Coordenador,Qualidade,8
-233,Pedro Barbosa,Analista Júnior,Qualidade,8
-234,Rafael Barbosa,Especialista,Financeiro,3
-235,Fernanda Souza,Consultor,Tecnologia da Informação,2
-236,Bianca Dias,Business Partner,Engenharia,7
-237,Fábio Ribeiro,Coordenador,Comercial,4
-238,Kelly Martins,Especialista,Qualidade,8
-239,Amanda Lima,Business Partner,Suprimentos,10
-240,Mariana Dias,Analista Pleno,Suprimentos,10
-241,Caio Rodrigues,Especialista,Comercial,4
-242,Juliana Almeida,Analista Sênior,Tecnologia da Informação,2
-243,Pedro Costa,Analista Júnior,Logística,9
-244,Felipe Dias,Desenvolvedor,Engenharia,7
-245,Mariana Almeida,Especialista,Operações,5
-246,Eduardo Martins,Analista Pleno,Operações,5
-247,Kelly Nascimento,Business Partner,Comercial,4
-248,Amanda Souza,Consultor,Comercial,4
-249,Caio Pereira,Especialista,Comercial,4
-250,Pedro Santos,Analista Sênior,Financeiro,3
-251,Bianca Barbosa,Especialista,Operações,5
-252,Camila Martins,Especialista,Qualidade,8
-253,Thiago Ribeiro,Consultor,Engenharia,7
-254,Felipe Oliveira,Business Partner,Qualidade,8
-255,Júlio Gomes,Técnico,Recursos Humanos,1
-256,Thiago Silva,Analista Pleno,Suprimentos,10
-257,Débora Barbosa,Business Partner,Comercial,4
-258,Fábio Nascimento,Business Partner,Recursos Humanos,1
-259,Fábio Costa,Desenvolvedor,Recursos Humanos,1
-260,Caio Martins,Especialista,Logística,9
-261,André Gomes,Desenvolvedor,Financeiro,3
-262,Patrícia Fernandes,Coordenador,Tecnologia da Informação,2
-263,Matheus Souza,Analista Sênior,Marketing,6
-264,Amanda Rocha,Especialista,Marketing,6
-265,Hugo Mendes,Analista Júnior,Engenharia,7
-266,Pedro Araújo,Especialista,Qualidade,8
-267,Camila Carvalho,Consultor,Marketing,6
-268,Débora Mendes,Desenvolvedor,Recursos Humanos,1
-269,Mariana Rodrigues,Consultor,Engenharia,7
-270,Bianca Rocha,Desenvolvedor,Marketing,6
-271,Gustavo Nascimento,Consultor,Recursos Humanos,1
-272,Kelly Lima,Desenvolvedor,Financeiro,3
-273,Camila Silva,Business Partner,Qualidade,8
-274,Eduardo Costa,Especialista,Comercial,4
-275,Lucas Mendes,Coordenador,Logística,9
-276,Fernanda Souza,Desenvolvedor,Tecnologia da Informação,2
-277,Caio Pereira,Desenvolvedor,Tecnologia da Informação,2
-278,Vinícius Nascimento,Coordenador,Operações,5
-279,Patrícia Almeida,Desenvolvedor,Qualidade,8
-280,Rafael Carvalho,Assistente,Logística,9
-281,Vinícius Pereira,Analista Pleno,Suprimentos,10
-282,Fábio Gomes,Técnico,Operações,5
-283,Thiago Silva,Especialista,Logística,9
-284,Hugo Barbosa,Business Partner,Operações,5
-285,Ingrid Pereira,Desenvolvedor,Qualidade,8
-286,Patrícia Fernandes,Técnico,Logística,9
-287,Fábio Mendes,Coordenador,Logística,9
-288,Kelly Araújo,Assistente,Qualidade,8
-289,André Carvalho,Assistente,Comercial,4
-290,Mariana Araújo,Desenvolvedor,Engenharia,7
-291,Rodrigo Pereira,Desenvolvedor,Engenharia,7
-292,Rafael Ribeiro,Business Partner,Recursos Humanos,1
-293,Ingrid Souza,Desenvolvedor,Marketing,6
-294,Vinícius Martins,Analista Júnior,Tecnologia da Informação,2
-295,Amanda Pereira,Analista Pleno,Financeiro,3
-296,Giovana Nascimento,Técnico,Qualidade,8
-297,Eduardo Carvalho,Analista Pleno,Suprimentos,10
-298,Ingrid Mendes,Coordenador,Marketing,6
-299,Caio Rocha,Consultor,Marketing,6
-300,Bianca Oliveira,Assistente,Recursos Humanos,1
-301,Fernanda Oliveira,Coordenador,Operações,5
-302,Fábio Souza,Desenvolvedor,Tecnologia da Informação,2
-303,Eduardo Lima,Analista Júnior,Financeiro,3
-304,Matheus Santos,Especialista,Recursos Humanos,1
-305,Beatriz Gomes,Analista Sênior,Marketing,6
-306,Vinícius Gomes,Business Partner,Comercial,4
-307,Juliana Costa,Analista Pleno,Financeiro,3
-308,Ingrid Carvalho,Business Partner,Suprimentos,10
-309,Patrícia Barbosa,Analista Sênior,Comercial,4
-310,Felipe Nascimento,Desenvolvedor,Comercial,4
+id,nome,cargo,departamento,gestor_id,data_admissao,status,modalidade_trabalho,email,nivel_cargo,centro_de_custo,tipo_contrato
+1,Aline Souza,Gestor de Recursos Humanos,Recursos Humanos,,2021-02-14,Ativo,Presencial,aline@pdi.com,Gestor,CC-104 (Operações),CLT
+2,Bruno Cardoso,Gestor de Tecnologia da Informação,Tecnologia da Informação,,2019-11-01,Ativo,Remoto,bruno@pdi.com,Gestor,CC-103 (RH),CLT
+3,Carla Mendes,Gestor de Financeiro,Financeiro,,2022-10-11,Ativo,Presencial,carla@pdi.com,Gestor,CC-103 (RH),CLT
+4,Diego Martins,Gestor de Comercial,Comercial,,2021-01-01,Afastado,Remoto,diego@pdi.com,Gestor,CC-102 (Marketing),CLT
+5,Eduarda Lima,Gestor de Operações,Operações,,2024-06-30,Ativo,Remoto,eduarda@pdi.com,Gestor,CC-103 (RH),PJ
+6,Felipe Rocha,Gestor de Marketing,Marketing,,2022-10-06,Afastado,Presencial,felipe@pdi.com,Gestor,CC-101 (Engenharia),CLT
+7,Gabriela Nunes,Gestor de Engenharia,Engenharia,,2020-12-07,Ativo,Híbrido,gabriela@pdi.com,Gestor,CC-102 (Marketing),CLT
+8,Henrique Alves,Gestor de Qualidade,Qualidade,,2021-04-23,Ativo,Remoto,henrique@pdi.com,Gestor,CC-102 (Marketing),CLT
+9,Isabela Costa,Gestor de Logística,Logística,,2020-10-10,Ativo,Presencial,isabela@pdi.com,Gestor,CC-101 (Engenharia),CLT
+10,João Pereira,Gestor de Suprimentos,Suprimentos,,2019-11-01,Ativo,Presencial,joao@pdi.com,Gestor,CC-102 (Marketing),CLT
+11,Lucas Nascimento,Assistente,Tecnologia da Informação,2,2024-10-12,Ativo,Presencial,lucas@pdi.com,Assistente,CC-101 (Engenharia),CLT
+12,Rafael Souza,Consultor,Comercial,4,2020-04-07,Ativo,Remoto,rafael@pdi.com,Assistente,CC-104 (Operações),CLT
+13,André Gomes,Analista Júnior,Tecnologia da Informação,2,2022-04-02,Ativo,Presencial,andre@pdi.com,Júnior,CC-104 (Operações),CLT
+14,Pedro Rodrigues,Assistente,Recursos Humanos,1,2020-08-25,Ativo,Presencial,pedro@pdi.com,Assistente,CC-101 (Engenharia),PJ
+15,Bianca Silva,Consultor,Logística,9,2020-07-21,Afastado,Híbrido,bianca@pdi.com,Assistente,CC-104 (Operações),CLT
+16,Eduardo Mendes,Coordenador,Comercial,4,2023-04-14,Ativo,Remoto,eduardo@pdi.com,Coordenador,CC-102 (Marketing),CLT
+17,Felipe Barbosa,Especialista,Comercial,4,2022-10-30,Ativo,Presencial,felipe@pdi.com,Assistente,CC-102 (Marketing),CLT
+18,Fábio Costa,Coordenador,Recursos Humanos,1,2022-11-14,Ativo,Presencial,fabio@pdi.com,Coordenador,CC-104 (Operações),CLT
+19,Thiago Pereira,Assistente,Marketing,6,2020-02-10,Ativo,Híbrido,thiago@pdi.com,Assistente,CC-102 (Marketing),CLT
+20,Camila Oliveira,Coordenador,Marketing,6,2023-05-15,Ativo,Remoto,camila@pdi.com,Coordenador,CC-104 (Operações),CLT
+21,Beatriz Fernandes,Business Partner,Tecnologia da Informação,2,2021-04-16,Ativo,Presencial,beatriz@pdi.com,Assistente,CC-104 (Operações),CLT
+22,Giovana Santos,Desenvolvedor,Operações,5,2020-03-07,Ativo,Remoto,giovana@pdi.com,Assistente,CC-101 (Engenharia),CLT
+23,Camila Carvalho,Analista Pleno,Logística,9,2022-08-26,Ativo,Remoto,camila@pdi.com,Pleno,CC-102 (Marketing),CLT
+24,Larissa Dias,Técnico,Logística,9,2024-08-24,Ativo,Híbrido,larissa@pdi.com,Assistente,CC-104 (Operações),CLT
+25,Gustavo Oliveira,Analista Júnior,Suprimentos,10,2019-05-16,Ativo,Híbrido,gustavo@pdi.com,Júnior,CC-104 (Operações),CLT
+26,Fábio Lima,Analista Pleno,Comercial,4,2024-12-12,Ativo,Híbrido,fabio@pdi.com,Pleno,CC-101 (Engenharia),CLT
+27,Ingrid Souza,Coordenador,Comercial,4,2018-11-29,Ativo,Híbrido,ingrid@pdi.com,Coordenador,CC-101 (Engenharia),CLT
+28,Felipe Fernandes,Analista Sênior,Operações,5,2018-01-04,Afastado,Híbrido,felipe@pdi.com,Sênior,CC-103 (RH),CLT
+29,Beatriz Rodrigues,Especialista,Marketing,6,2024-03-04,Ativo,Remoto,beatriz@pdi.com,Assistente,CC-103 (RH),CLT
+30,Bianca Costa,Consultor,Tecnologia da Informação,2,2019-12-29,Ativo,Híbrido,bianca@pdi.com,Assistente,CC-103 (RH),CLT
+31,Juliana Martins,Coordenador,Comercial,4,2024-01-22,Ativo,Híbrido,juliana@pdi.com,Coordenador,CC-103 (RH),CLT
+32,Kelly Mendes,Assistente,Operações,5,2024-03-07,Ativo,Híbrido,kelly@pdi.com,Assistente,CC-103 (RH),PJ
+33,Hugo Santos,Assistente,Marketing,6,2019-01-21,Ativo,Híbrido,hugo@pdi.com,Assistente,CC-101 (Engenharia),CLT
+34,Giovana Araújo,Coordenador,Recursos Humanos,1,2018-02-03,Ativo,Remoto,giovana@pdi.com,Coordenador,CC-103 (RH),CLT
+35,Pedro Rodrigues,Business Partner,Operações,5,2023-05-28,Ativo,Presencial,pedro@pdi.com,Assistente,CC-104 (Operações),CLT
+36,Gustavo Rocha,Coordenador,Marketing,6,2022-07-12,Ativo,Remoto,gustavo@pdi.com,Coordenador,CC-102 (Marketing),PJ
+37,Rafael Nascimento,Analista Sênior,Qualidade,8,2024-12-07,Ativo,Presencial,rafael@pdi.com,Sênior,CC-103 (RH),CLT
+38,Elaine Mendes,Consultor,Comercial,4,2021-07-22,Ativo,Remoto,elaine@pdi.com,Assistente,CC-104 (Operações),CLT
+39,Elaine Barbosa,Coordenador,Operações,5,2019-03-07,Ativo,Híbrido,elaine@pdi.com,Coordenador,CC-104 (Operações),CLT
+40,Rodrigo Fernandes,Assistente,Suprimentos,10,2024-05-10,Ativo,Remoto,rodrigo@pdi.com,Assistente,CC-104 (Operações),CLT
+41,Vinícius Rocha,Analista Pleno,Financeiro,3,2021-12-15,Ativo,Híbrido,vinicius@pdi.com,Pleno,CC-102 (Marketing),PJ
+42,Ingrid Souza,Analista Sênior,Recursos Humanos,1,2020-08-05,Afastado,Presencial,ingrid@pdi.com,Sênior,CC-102 (Marketing),CLT
+43,Giovana Gomes,Business Partner,Financeiro,3,2020-09-10,Ativo,Remoto,giovana@pdi.com,Assistente,CC-102 (Marketing),CLT
+44,Rodrigo Carvalho,Business Partner,Tecnologia da Informação,2,2022-09-05,Ativo,Remoto,rodrigo@pdi.com,Assistente,CC-103 (RH),CLT
+45,Vinícius Nascimento,Consultor,Qualidade,8,2021-04-25,Ativo,Híbrido,vinicius@pdi.com,Assistente,CC-103 (RH),PJ
+46,Débora Souza,Consultor,Recursos Humanos,1,2020-12-11,Ativo,Remoto,debora@pdi.com,Assistente,CC-102 (Marketing),CLT
+47,Fábio Araújo,Analista Pleno,Operações,5,2022-02-17,Ativo,Remoto,fabio@pdi.com,Pleno,CC-104 (Operações),CLT
+48,Amanda Costa,Desenvolvedor,Operações,5,2021-12-21,Ativo,Presencial,amanda@pdi.com,Assistente,CC-103 (RH),CLT
+49,Elaine Nascimento,Consultor,Recursos Humanos,1,2024-09-14,Ativo,Híbrido,elaine@pdi.com,Assistente,CC-102 (Marketing),PJ
+50,Vinícius Souza,Especialista,Financeiro,3,2022-04-28,Ativo,Remoto,vinicius@pdi.com,Assistente,CC-103 (RH),CLT
+51,Bianca Rodrigues,Analista Sênior,Logística,9,2019-10-14,Ativo,Híbrido,bianca@pdi.com,Sênior,CC-104 (Operações),CLT
+52,Fábio Costa,Consultor,Marketing,6,2020-04-24,Ativo,Presencial,fabio@pdi.com,Assistente,CC-101 (Engenharia),CLT
+53,Kelly Silva,Business Partner,Logística,9,2018-07-04,Ativo,Presencial,kelly@pdi.com,Assistente,CC-102 (Marketing),CLT
+54,Patrícia Silva,Analista Pleno,Marketing,6,2018-07-13,Afastado,Presencial,patricia@pdi.com,Pleno,CC-104 (Operações),CLT
+55,Júlio Lima,Assistente,Marketing,6,2022-10-25,Ativo,Híbrido,julio@pdi.com,Assistente,CC-103 (RH),CLT
+56,Fernanda Barbosa,Analista Pleno,Recursos Humanos,1,2018-12-22,Ativo,Híbrido,fernanda@pdi.com,Pleno,CC-101 (Engenharia),CLT
+57,Elaine Rocha,Analista Pleno,Tecnologia da Informação,2,2019-12-18,Ativo,Híbrido,elaine@pdi.com,Pleno,CC-103 (RH),CLT
+58,Fábio Pereira,Analista Sênior,Logística,9,2018-08-01,Ativo,Remoto,fabio@pdi.com,Sênior,CC-104 (Operações),CLT
+59,Natália Costa,Especialista,Qualidade,8,2019-07-31,Ativo,Híbrido,natalia@pdi.com,Assistente,CC-103 (RH),PJ
+60,Ingrid Dias,Coordenador,Logística,9,2024-06-10,Ativo,Híbrido,ingrid@pdi.com,Coordenador,CC-101 (Engenharia),CLT
+61,Kelly Mendes,Assistente,Comercial,4,2024-03-21,Ativo,Híbrido,kelly@pdi.com,Assistente,CC-104 (Operações),CLT
+62,Rodrigo Fernandes,Desenvolvedor,Operações,5,2020-03-28,Ativo,Remoto,rodrigo@pdi.com,Assistente,CC-101 (Engenharia),CLT
+63,Felipe Souza,Assistente,Logística,9,2019-08-15,Ativo,Remoto,felipe@pdi.com,Assistente,CC-101 (Engenharia),PJ
+64,Pedro Araújo,Analista Júnior,Comercial,4,2021-04-27,Ativo,Híbrido,pedro@pdi.com,Júnior,CC-104 (Operações),PJ
+65,Natália Almeida,Business Partner,Suprimentos,10,2019-12-20,Ativo,Remoto,natalia@pdi.com,Assistente,CC-102 (Marketing),CLT
+66,Lucas Oliveira,Analista Júnior,Comercial,4,2018-12-06,Ativo,Remoto,lucas@pdi.com,Júnior,CC-102 (Marketing),CLT
+67,Pedro Santos,Técnico,Comercial,4,2023-08-07,Ativo,Híbrido,pedro@pdi.com,Assistente,CC-101 (Engenharia),CLT
+68,Vinícius Almeida,Especialista,Tecnologia da Informação,2,2024-02-27,Ativo,Híbrido,vinicius@pdi.com,Assistente,CC-101 (Engenharia),CLT
+69,Gustavo Mendes,Analista Sênior,Qualidade,8,2018-02-07,Afastado,Híbrido,gustavo@pdi.com,Sênior,CC-103 (RH),CLT
+70,André Rocha,Assistente,Suprimentos,10,2019-12-07,Ativo,Remoto,andre@pdi.com,Assistente,CC-101 (Engenharia),CLT
+71,Giovana Gomes,Assistente,Qualidade,8,2024-08-28,Ativo,Remoto,giovana@pdi.com,Assistente,CC-104 (Operações),PJ
+72,Camila Gomes,Técnico,Tecnologia da Informação,2,2019-05-14,Ativo,Presencial,camila@pdi.com,Assistente,CC-103 (RH),CLT
+73,Amanda Martins,Analista Júnior,Engenharia,7,2023-09-13,Ativo,Presencial,amanda@pdi.com,Júnior,CC-104 (Operações),CLT
+74,Mariana Carvalho,Técnico,Tecnologia da Informação,2,2020-02-20,Afastado,Remoto,mariana@pdi.com,Assistente,CC-104 (Operações),CLT
+75,Fernanda Rodrigues,Assistente,Tecnologia da Informação,2,2021-03-15,Ativo,Presencial,fernanda@pdi.com,Assistente,CC-102 (Marketing),CLT
+76,Felipe Pereira,Coordenador,Logística,9,2019-11-08,Ativo,Híbrido,felipe@pdi.com,Coordenador,CC-101 (Engenharia),CLT
+77,Thiago Martins,Assistente,Financeiro,3,2018-02-19,Ativo,Presencial,thiago@pdi.com,Assistente,CC-104 (Operações),CLT
+78,Felipe Mendes,Analista Pleno,Tecnologia da Informação,2,2024-03-21,Ativo,Híbrido,felipe@pdi.com,Pleno,CC-104 (Operações),CLT
+79,Caio Mendes,Analista Júnior,Recursos Humanos,1,2021-05-23,Ativo,Presencial,caio@pdi.com,Júnior,CC-104 (Operações),CLT
+80,Kelly Almeida,Analista Sênior,Tecnologia da Informação,2,2024-01-04,Ativo,Remoto,kelly@pdi.com,Sênior,CC-101 (Engenharia),CLT
+81,Patrícia Rocha,Assistente,Engenharia,7,2023-02-16,Ativo,Híbrido,patricia@pdi.com,Assistente,CC-103 (RH),CLT
+82,Júlio Santos,Analista Sênior,Engenharia,7,2024-01-15,Ativo,Presencial,julio@pdi.com,Sênior,CC-101 (Engenharia),CLT
+83,Lucas Carvalho,Especialista,Engenharia,7,2023-08-19,Ativo,Remoto,lucas@pdi.com,Assistente,CC-104 (Operações),CLT
+84,Larissa Gomes,Consultor,Qualidade,8,2023-08-14,Ativo,Remoto,larissa@pdi.com,Assistente,CC-101 (Engenharia),CLT
+85,Rafael Rodrigues,Especialista,Qualidade,8,2024-05-10,Ativo,Remoto,rafael@pdi.com,Assistente,CC-104 (Operações),PJ
+86,Mariana Barbosa,Consultor,Comercial,4,2024-03-05,Ativo,Híbrido,mariana@pdi.com,Assistente,CC-104 (Operações),CLT
+87,Elaine Araújo,Analista Júnior,Recursos Humanos,1,2021-11-09,Ativo,Presencial,elaine@pdi.com,Júnior,CC-101 (Engenharia),PJ
+88,André Rocha,Consultor,Recursos Humanos,1,2021-09-24,Ativo,Presencial,andre@pdi.com,Assistente,CC-103 (RH),CLT
+89,Juliana Santos,Consultor,Logística,9,2018-08-21,Afastado,Híbrido,juliana@pdi.com,Assistente,CC-104 (Operações),CLT
+90,Ingrid Costa,Analista Pleno,Tecnologia da Informação,2,2024-10-12,Ativo,Remoto,ingrid@pdi.com,Pleno,CC-104 (Operações),CLT
+91,Pedro Almeida,Coordenador,Suprimentos,10,2022-06-18,Ativo,Remoto,pedro@pdi.com,Coordenador,CC-102 (Marketing),CLT
+92,Júlio Barbosa,Assistente,Tecnologia da Informação,2,2019-09-14,Afastado,Híbrido,julio@pdi.com,Assistente,CC-102 (Marketing),CLT
+93,Bianca Santos,Business Partner,Suprimentos,10,2023-02-05,Ativo,Presencial,bianca@pdi.com,Assistente,CC-103 (RH),CLT
+94,Amanda Barbosa,Business Partner,Tecnologia da Informação,2,2024-12-25,Ativo,Híbrido,amanda@pdi.com,Assistente,CC-103 (RH),CLT
+95,Matheus Nascimento,Assistente,Logística,9,2020-10-11,Ativo,Presencial,matheus@pdi.com,Assistente,CC-104 (Operações),CLT
+96,Fernanda Nascimento,Coordenador,Marketing,6,2019-04-03,Ativo,Remoto,fernanda@pdi.com,Coordenador,CC-103 (RH),CLT
+97,Débora Lima,Desenvolvedor,Financeiro,3,2019-06-15,Ativo,Presencial,debora@pdi.com,Assistente,CC-102 (Marketing),CLT
+98,Kelly Oliveira,Analista Júnior,Marketing,6,2021-10-24,Ativo,Híbrido,kelly@pdi.com,Júnior,CC-104 (Operações),CLT
+99,Bianca Barbosa,Analista Pleno,Qualidade,8,2024-12-28,Ativo,Remoto,bianca@pdi.com,Pleno,CC-101 (Engenharia),PJ
+100,Natália Rodrigues,Consultor,Tecnologia da Informação,2,2021-12-29,Afastado,Remoto,natalia@pdi.com,Assistente,CC-101 (Engenharia),CLT
+101,Rafael Fernandes,Analista Pleno,Operações,5,2022-09-24,Ativo,Remoto,rafael@pdi.com,Pleno,CC-101 (Engenharia),CLT
+102,Beatriz Lima,Analista Sênior,Comercial,4,2024-07-20,Ativo,Remoto,beatriz@pdi.com,Sênior,CC-104 (Operações),CLT
+103,Hugo Mendes,Especialista,Qualidade,8,2019-08-22,Ativo,Híbrido,hugo@pdi.com,Assistente,CC-103 (RH),CLT
+104,Giovana Ribeiro,Analista Júnior,Suprimentos,10,2019-08-16,Ativo,Presencial,giovana@pdi.com,Júnior,CC-102 (Marketing),CLT
+105,Larissa Souza,Analista Sênior,Logística,9,2021-08-19,Ativo,Presencial,larissa@pdi.com,Sênior,CC-101 (Engenharia),PJ
+106,Camila Souza,Consultor,Operações,5,2019-07-29,Ativo,Híbrido,camila@pdi.com,Assistente,CC-104 (Operações),CLT
+107,Thiago Lima,Business Partner,Financeiro,3,2019-06-16,Ativo,Híbrido,thiago@pdi.com,Assistente,CC-101 (Engenharia),CLT
+108,Eduardo Araújo,Assistente,Comercial,4,2021-01-15,Ativo,Híbrido,eduardo@pdi.com,Assistente,CC-102 (Marketing),CLT
+109,Vinícius Rocha,Especialista,Operações,5,2022-10-14,Ativo,Remoto,vinicius@pdi.com,Assistente,CC-104 (Operações),CLT
+110,Pedro Gomes,Especialista,Recursos Humanos,1,2019-03-27,Ativo,Remoto,pedro@pdi.com,Assistente,CC-103 (RH),CLT
+111,Lucas Araújo,Analista Sênior,Recursos Humanos,1,2018-10-02,Ativo,Híbrido,lucas@pdi.com,Sênior,CC-101 (Engenharia),PJ
+112,Juliana Martins,Consultor,Operações,5,2024-12-08,Ativo,Remoto,juliana@pdi.com,Assistente,CC-104 (Operações),CLT
+113,Natália Silva,Analista Pleno,Engenharia,7,2023-05-27,Ativo,Presencial,natalia@pdi.com,Pleno,CC-104 (Operações),CLT
+114,Júlio Pereira,Consultor,Tecnologia da Informação,2,2019-01-26,Ativo,Híbrido,julio@pdi.com,Assistente,CC-102 (Marketing),CLT
+115,Hugo Fernandes,Business Partner,Recursos Humanos,1,2022-12-26,Ativo,Presencial,hugo@pdi.com,Assistente,CC-104 (Operações),CLT
+116,Rafael Gomes,Analista Sênior,Logística,9,2020-02-09,Afastado,Híbrido,rafael@pdi.com,Sênior,CC-103 (RH),CLT
+117,Larissa Fernandes,Analista Júnior,Recursos Humanos,1,2019-02-18,Ativo,Remoto,larissa@pdi.com,Júnior,CC-104 (Operações),CLT
+118,Gustavo Almeida,Analista Pleno,Marketing,6,2023-02-23,Ativo,Presencial,gustavo@pdi.com,Pleno,CC-102 (Marketing),CLT
+119,Fábio Mendes,Coordenador,Marketing,6,2023-10-22,Ativo,Presencial,fabio@pdi.com,Coordenador,CC-102 (Marketing),CLT
+120,Elaine Pereira,Assistente,Suprimentos,10,2021-10-24,Ativo,Presencial,elaine@pdi.com,Assistente,CC-103 (RH),CLT
+121,Giovana Costa,Coordenador,Financeiro,3,2020-06-03,Afastado,Presencial,giovana@pdi.com,Coordenador,CC-102 (Marketing),CLT
+122,Juliana Araújo,Coordenador,Recursos Humanos,1,2019-09-29,Ativo,Remoto,juliana@pdi.com,Coordenador,CC-103 (RH),CLT
+123,Thiago Costa,Analista Pleno,Comercial,4,2018-07-28,Ativo,Remoto,thiago@pdi.com,Pleno,CC-104 (Operações),CLT
+124,Ingrid Santos,Desenvolvedor,Engenharia,7,2021-02-07,Ativo,Presencial,ingrid@pdi.com,Assistente,CC-103 (RH),CLT
+125,Gustavo Martins,Técnico,Comercial,4,2018-07-26,Ativo,Presencial,gustavo@pdi.com,Assistente,CC-103 (RH),PJ
+126,Hugo Almeida,Assistente,Operações,5,2021-12-22,Ativo,Remoto,hugo@pdi.com,Assistente,CC-103 (RH),CLT
+127,Débora Rodrigues,Coordenador,Recursos Humanos,1,2018-05-23,Ativo,Presencial,debora@pdi.com,Coordenador,CC-104 (Operações),PJ
+128,Thiago Oliveira,Especialista,Marketing,6,2019-09-29,Ativo,Remoto,thiago@pdi.com,Assistente,CC-101 (Engenharia),CLT
+129,Caio Ribeiro,Coordenador,Marketing,6,2022-01-25,Afastado,Remoto,caio@pdi.com,Coordenador,CC-103 (RH),CLT
+130,Matheus Silva,Analista Pleno,Logística,9,2021-12-16,Ativo,Híbrido,matheus@pdi.com,Pleno,CC-104 (Operações),PJ
+131,Juliana Barbosa,Especialista,Operações,5,2023-01-05,Ativo,Híbrido,juliana@pdi.com,Assistente,CC-101 (Engenharia),CLT
+132,Camila Dias,Coordenador,Recursos Humanos,1,2019-02-22,Ativo,Remoto,camila@pdi.com,Coordenador,CC-101 (Engenharia),CLT
+133,Elaine Araújo,Coordenador,Marketing,6,2021-06-15,Ativo,Híbrido,elaine@pdi.com,Coordenador,CC-104 (Operações),CLT
+134,Vinícius Souza,Coordenador,Suprimentos,10,2023-11-12,Ativo,Híbrido,vinicius@pdi.com,Coordenador,CC-103 (RH),CLT
+135,Gustavo Nascimento,Analista Júnior,Suprimentos,10,2018-01-17,Ativo,Híbrido,gustavo@pdi.com,Júnior,CC-102 (Marketing),CLT
+136,Lucas Ribeiro,Consultor,Engenharia,7,2022-04-26,Ativo,Presencial,lucas@pdi.com,Assistente,CC-103 (RH),CLT
+137,Beatriz Gomes,Analista Pleno,Comercial,4,2024-04-15,Ativo,Presencial,beatriz@pdi.com,Pleno,CC-103 (RH),CLT
+138,Bianca Araújo,Analista Pleno,Marketing,6,2020-08-30,Ativo,Híbrido,bianca@pdi.com,Pleno,CC-101 (Engenharia),CLT
+139,Vinícius Lima,Coordenador,Operações,5,2019-08-07,Ativo,Remoto,vinicius@pdi.com,Coordenador,CC-104 (Operações),CLT
+140,Rodrigo Lima,Consultor,Marketing,6,2021-06-10,Ativo,Remoto,rodrigo@pdi.com,Assistente,CC-104 (Operações),CLT
+141,Gustavo Gomes,Coordenador,Financeiro,3,2022-03-16,Ativo,Presencial,gustavo@pdi.com,Coordenador,CC-103 (RH),CLT
+142,Bianca Barbosa,Especialista,Financeiro,3,2021-05-26,Ativo,Presencial,bianca@pdi.com,Assistente,CC-101 (Engenharia),CLT
+143,Natália Silva,Especialista,Engenharia,7,2023-06-07,Ativo,Presencial,natalia@pdi.com,Assistente,CC-101 (Engenharia),CLT
+144,Gustavo Gomes,Business Partner,Operações,5,2022-01-14,Afastado,Híbrido,gustavo@pdi.com,Assistente,CC-104 (Operações),CLT
+145,Caio Araújo,Desenvolvedor,Suprimentos,10,2023-09-08,Ativo,Presencial,caio@pdi.com,Assistente,CC-103 (RH),CLT
+146,Felipe Rodrigues,Consultor,Qualidade,8,2023-12-26,Ativo,Remoto,felipe@pdi.com,Assistente,CC-104 (Operações),CLT
+147,Giovana Costa,Analista Pleno,Qualidade,8,2022-11-03,Ativo,Presencial,giovana@pdi.com,Pleno,CC-103 (RH),PJ
+148,Vinícius Dias,Técnico,Operações,5,2021-06-21,Ativo,Presencial,vinicius@pdi.com,Assistente,CC-104 (Operações),CLT
+149,Hugo Almeida,Especialista,Tecnologia da Informação,2,2019-11-12,Ativo,Presencial,hugo@pdi.com,Assistente,CC-101 (Engenharia),PJ
+150,Giovana Rodrigues,Analista Sênior,Comercial,4,2019-12-02,Ativo,Híbrido,giovana@pdi.com,Sênior,CC-102 (Marketing),CLT
+151,Mariana Almeida,Desenvolvedor,Recursos Humanos,1,2018-07-20,Ativo,Presencial,mariana@pdi.com,Assistente,CC-101 (Engenharia),CLT
+152,Ingrid Oliveira,Desenvolvedor,Suprimentos,10,2020-10-28,Afastado,Híbrido,ingrid@pdi.com,Assistente,CC-104 (Operações),CLT
+153,Júlio Barbosa,Assistente,Engenharia,7,2024-03-09,Ativo,Remoto,julio@pdi.com,Assistente,CC-102 (Marketing),CLT
+154,Patrícia Carvalho,Assistente,Engenharia,7,2021-08-13,Ativo,Híbrido,patricia@pdi.com,Assistente,CC-102 (Marketing),CLT
+155,Caio Silva,Analista Pleno,Financeiro,3,2018-04-21,Ativo,Presencial,caio@pdi.com,Pleno,CC-102 (Marketing),CLT
+156,Fernanda Costa,Consultor,Engenharia,7,2018-04-17,Ativo,Remoto,fernanda@pdi.com,Assistente,CC-104 (Operações),CLT
+157,Mariana Mendes,Assistente,Qualidade,8,2021-09-22,Ativo,Híbrido,mariana@pdi.com,Assistente,CC-104 (Operações),CLT
+158,Felipe Pereira,Desenvolvedor,Tecnologia da Informação,2,2021-11-05,Ativo,Híbrido,felipe@pdi.com,Assistente,CC-101 (Engenharia),PJ
+159,Natália Dias,Técnico,Logística,9,2020-01-15,Ativo,Remoto,natalia@pdi.com,Assistente,CC-101 (Engenharia),CLT
+160,Bianca Ribeiro,Coordenador,Qualidade,8,2023-11-08,Ativo,Híbrido,bianca@pdi.com,Coordenador,CC-101 (Engenharia),CLT
+161,Felipe Costa,Desenvolvedor,Logística,9,2022-10-25,Afastado,Presencial,felipe@pdi.com,Assistente,CC-104 (Operações),CLT
+162,Thiago Almeida,Especialista,Qualidade,8,2022-05-08,Ativo,Presencial,thiago@pdi.com,Assistente,CC-104 (Operações),CLT
+163,Patrícia Almeida,Especialista,Logística,9,2022-04-26,Ativo,Remoto,patricia@pdi.com,Assistente,CC-104 (Operações),CLT
+164,Pedro Lima,Assistente,Qualidade,8,2023-12-22,Ativo,Remoto,pedro@pdi.com,Assistente,CC-102 (Marketing),CLT
+165,Matheus Araújo,Consultor,Operações,5,2024-11-01,Ativo,Presencial,matheus@pdi.com,Assistente,CC-104 (Operações),CLT
+166,Rafael Pereira,Assistente,Tecnologia da Informação,2,2018-11-04,Ativo,Presencial,rafael@pdi.com,Assistente,CC-102 (Marketing),CLT
+167,Eduardo Pereira,Assistente,Engenharia,7,2020-12-23,Ativo,Presencial,eduardo@pdi.com,Assistente,CC-104 (Operações),PJ
+168,Amanda Gomes,Técnico,Tecnologia da Informação,2,2021-03-01,Ativo,Presencial,amanda@pdi.com,Assistente,CC-103 (RH),CLT
+169,Felipe Gomes,Analista Júnior,Logística,9,2021-03-09,Afastado,Remoto,felipe@pdi.com,Júnior,CC-101 (Engenharia),CLT
+170,Hugo Gomes,Coordenador,Comercial,4,2018-09-11,Ativo,Híbrido,hugo@pdi.com,Coordenador,CC-102 (Marketing),CLT
+171,Eduardo Silva,Business Partner,Suprimentos,10,2020-05-20,Ativo,Presencial,eduardo@pdi.com,Assistente,CC-101 (Engenharia),CLT
+172,Patrícia Silva,Técnico,Engenharia,7,2021-03-14,Ativo,Remoto,patricia@pdi.com,Assistente,CC-104 (Operações),CLT
+173,Fábio Carvalho,Coordenador,Operações,5,2020-04-14,Ativo,Híbrido,fabio@pdi.com,Coordenador,CC-104 (Operações),PJ
+174,Elaine Mendes,Business Partner,Logística,9,2023-03-13,Ativo,Presencial,elaine@pdi.com,Assistente,CC-102 (Marketing),CLT
+175,Patrícia Almeida,Especialista,Comercial,4,2021-01-20,Ativo,Remoto,patricia@pdi.com,Assistente,CC-102 (Marketing),CLT
+176,Patrícia Silva,Coordenador,Engenharia,7,2020-11-02,Ativo,Remoto,patricia@pdi.com,Coordenador,CC-104 (Operações),CLT
+177,Débora Carvalho,Analista Sênior,Marketing,6,2020-07-11,Ativo,Híbrido,debora@pdi.com,Sênior,CC-101 (Engenharia),CLT
+178,Kelly Pereira,Business Partner,Qualidade,8,2020-07-12,Ativo,Remoto,kelly@pdi.com,Assistente,CC-102 (Marketing),CLT
+179,Lucas Carvalho,Business Partner,Logística,9,2021-01-15,Ativo,Híbrido,lucas@pdi.com,Assistente,CC-103 (RH),CLT
+180,Débora Silva,Analista Pleno,Suprimentos,10,2019-12-02,Ativo,Presencial,debora@pdi.com,Pleno,CC-102 (Marketing),CLT
+181,Rafael Martins,Analista Sênior,Engenharia,7,2019-06-04,Ativo,Remoto,rafael@pdi.com,Sênior,CC-101 (Engenharia),CLT
+182,Thiago Carvalho,Técnico,Recursos Humanos,1,2022-07-07,Ativo,Remoto,thiago@pdi.com,Assistente,CC-101 (Engenharia),CLT
+183,Felipe Araújo,Técnico,Comercial,4,2024-02-08,Afastado,Híbrido,felipe@pdi.com,Assistente,CC-101 (Engenharia),CLT
+184,Thiago Gomes,Especialista,Engenharia,7,2018-11-02,Ativo,Remoto,thiago@pdi.com,Assistente,CC-102 (Marketing),CLT
+185,Patrícia Silva,Consultor,Tecnologia da Informação,2,2020-03-27,Ativo,Presencial,patricia@pdi.com,Assistente,CC-101 (Engenharia),CLT
+186,Beatriz Almeida,Analista Pleno,Recursos Humanos,1,2022-11-01,Ativo,Remoto,beatriz@pdi.com,Pleno,CC-101 (Engenharia),CLT
+187,Fábio Silva,Assistente,Recursos Humanos,1,2022-11-03,Ativo,Híbrido,fabio@pdi.com,Assistente,CC-102 (Marketing),CLT
+188,Hugo Silva,Business Partner,Comercial,4,2023-09-17,Ativo,Presencial,hugo@pdi.com,Assistente,CC-101 (Engenharia),CLT
+189,Fernanda Pereira,Desenvolvedor,Financeiro,3,2020-03-13,Ativo,Remoto,fernanda@pdi.com,Assistente,CC-101 (Engenharia),CLT
+190,André Rodrigues,Desenvolvedor,Tecnologia da Informação,2,2023-10-15,Ativo,Remoto,andre@pdi.com,Assistente,CC-102 (Marketing),CLT
+191,Fábio Fernandes,Analista Sênior,Operações,5,2019-09-03,Afastado,Presencial,fabio@pdi.com,Sênior,CC-104 (Operações),CLT
+192,Bianca Souza,Analista Sênior,Suprimentos,10,2021-09-19,Ativo,Remoto,bianca@pdi.com,Sênior,CC-104 (Operações),CLT
+193,Camila Barbosa,Analista Júnior,Operações,5,2022-02-02,Ativo,Híbrido,camila@pdi.com,Júnior,CC-104 (Operações),PJ
+194,André Carvalho,Coordenador,Operações,5,2023-10-13,Ativo,Presencial,andre@pdi.com,Coordenador,CC-103 (RH),CLT
+195,Pedro Barbosa,Assistente,Comercial,4,2019-08-24,Afastado,Remoto,pedro@pdi.com,Assistente,CC-104 (Operações),CLT
+196,Eduardo Lima,Business Partner,Tecnologia da Informação,2,2024-05-31,Ativo,Presencial,eduardo@pdi.com,Assistente,CC-103 (RH),CLT
+197,Giovana Barbosa,Analista Júnior,Tecnologia da Informação,2,2022-11-02,Ativo,Presencial,giovana@pdi.com,Júnior,CC-103 (RH),CLT
+198,Natália Gomes,Técnico,Marketing,6,2022-03-24,Ativo,Remoto,natalia@pdi.com,Assistente,CC-101 (Engenharia),PJ
+199,Vinícius Araújo,Analista Júnior,Tecnologia da Informação,2,2020-06-04,Ativo,Remoto,vinicius@pdi.com,Júnior,CC-104 (Operações),CLT
+200,Hugo Rocha,Analista Pleno,Engenharia,7,2022-01-02,Ativo,Híbrido,hugo@pdi.com,Pleno,CC-102 (Marketing),CLT
+201,Beatriz Martins,Analista Sênior,Engenharia,7,2020-03-21,Ativo,Presencial,beatriz@pdi.com,Sênior,CC-104 (Operações),CLT
+202,Juliana Ribeiro,Especialista,Engenharia,7,2019-07-10,Ativo,Remoto,juliana@pdi.com,Assistente,CC-103 (RH),CLT
+203,Giovana Mendes,Desenvolvedor,Suprimentos,10,2021-08-09,Ativo,Híbrido,giovana@pdi.com,Assistente,CC-102 (Marketing),CLT
+204,Amanda Barbosa,Especialista,Qualidade,8,2024-04-03,Afastado,Presencial,amanda@pdi.com,Assistente,CC-103 (RH),CLT
+205,Ingrid Almeida,Analista Pleno,Marketing,6,2023-10-28,Ativo,Presencial,ingrid@pdi.com,Pleno,CC-101 (Engenharia),CLT
+206,Júlio Martins,Assistente,Operações,5,2022-09-13,Ativo,Remoto,julio@pdi.com,Assistente,CC-101 (Engenharia),CLT
+207,André Dias,Coordenador,Qualidade,8,2022-04-25,Ativo,Híbrido,andre@pdi.com,Coordenador,CC-101 (Engenharia),CLT
+208,Lucas Rocha,Técnico,Marketing,6,2018-07-03,Ativo,Remoto,lucas@pdi.com,Assistente,CC-103 (RH),CLT
+209,Patrícia Rodrigues,Técnico,Financeiro,3,2020-07-18,Ativo,Presencial,patricia@pdi.com,Assistente,CC-104 (Operações),PJ
+210,Matheus Nascimento,Business Partner,Operações,5,2021-07-26,Ativo,Presencial,matheus@pdi.com,Assistente,CC-101 (Engenharia),CLT
+211,Natália Silva,Consultor,Operações,5,2024-11-19,Ativo,Híbrido,natalia@pdi.com,Assistente,CC-103 (RH),CLT
+212,Pedro Almeida,Coordenador,Comercial,4,2021-10-18,Ativo,Presencial,pedro@pdi.com,Coordenador,CC-101 (Engenharia),PJ
+213,Natália Almeida,Desenvolvedor,Qualidade,8,2018-08-25,Ativo,Híbrido,natalia@pdi.com,Assistente,CC-104 (Operações),PJ
+214,Felipe Silva,Analista Pleno,Qualidade,8,2022-08-09,Ativo,Presencial,felipe@pdi.com,Pleno,CC-101 (Engenharia),CLT
+215,Fernanda Carvalho,Assistente,Operações,5,2018-07-21,Ativo,Presencial,fernanda@pdi.com,Assistente,CC-104 (Operações),CLT
+216,Débora Barbosa,Técnico,Operações,5,2023-10-22,Ativo,Presencial,debora@pdi.com,Assistente,CC-101 (Engenharia),CLT
+217,Natália Ribeiro,Técnico,Qualidade,8,2022-08-30,Ativo,Presencial,natalia@pdi.com,Assistente,CC-104 (Operações),CLT
+218,Elaine Mendes,Técnico,Engenharia,7,2022-10-09,Ativo,Remoto,elaine@pdi.com,Assistente,CC-103 (RH),PJ
+219,Eduardo Martins,Especialista,Marketing,6,2024-01-11,Ativo,Remoto,eduardo@pdi.com,Assistente,CC-103 (RH),CLT
+220,Thiago Almeida,Analista Pleno,Operações,5,2022-01-31,Ativo,Híbrido,thiago@pdi.com,Pleno,CC-101 (Engenharia),CLT
+221,Matheus Souza,Consultor,Comercial,4,2021-04-09,Ativo,Remoto,matheus@pdi.com,Assistente,CC-101 (Engenharia),CLT
+222,Gustavo Rodrigues,Desenvolvedor,Financeiro,3,2021-07-24,Ativo,Híbrido,gustavo@pdi.com,Assistente,CC-101 (Engenharia),PJ
+223,Elaine Barbosa,Consultor,Operações,5,2021-05-09,Ativo,Remoto,elaine@pdi.com,Assistente,CC-103 (RH),CLT
+224,Larissa Souza,Assistente,Suprimentos,10,2018-09-17,Ativo,Híbrido,larissa@pdi.com,Assistente,CC-101 (Engenharia),CLT
+225,Fernanda Fernandes,Analista Sênior,Operações,5,2022-02-09,Ativo,Híbrido,fernanda@pdi.com,Sênior,CC-102 (Marketing),CLT
+226,Lucas Mendes,Analista Sênior,Operações,5,2023-12-07,Ativo,Híbrido,lucas@pdi.com,Sênior,CC-101 (Engenharia),CLT
+227,Mariana Santos,Consultor,Operações,5,2019-09-07,Ativo,Presencial,mariana@pdi.com,Assistente,CC-101 (Engenharia),CLT
+228,Eduardo Pereira,Desenvolvedor,Operações,5,2021-09-29,Ativo,Híbrido,eduardo@pdi.com,Assistente,CC-101 (Engenharia),CLT
+229,Ingrid Silva,Business Partner,Tecnologia da Informação,2,2020-04-03,Ativo,Presencial,ingrid@pdi.com,Assistente,CC-101 (Engenharia),CLT
+230,Patrícia Rocha,Desenvolvedor,Operações,5,2022-04-30,Ativo,Híbrido,patricia@pdi.com,Assistente,CC-104 (Operações),PJ
+231,Juliana Santos,Especialista,Marketing,6,2018-06-08,Ativo,Híbrido,juliana@pdi.com,Assistente,CC-103 (RH),CLT
+232,Camila Oliveira,Coordenador,Qualidade,8,2020-02-14,Afastado,Presencial,camila@pdi.com,Coordenador,CC-101 (Engenharia),CLT
+233,Pedro Barbosa,Analista Júnior,Qualidade,8,2023-06-28,Ativo,Remoto,pedro@pdi.com,Júnior,CC-102 (Marketing),CLT
+234,Rafael Barbosa,Especialista,Financeiro,3,2023-09-22,Ativo,Remoto,rafael@pdi.com,Assistente,CC-103 (RH),CLT
+235,Fernanda Souza,Consultor,Tecnologia da Informação,2,2022-11-23,Ativo,Presencial,fernanda@pdi.com,Assistente,CC-103 (RH),PJ
+236,Bianca Dias,Business Partner,Engenharia,7,2018-03-05,Ativo,Remoto,bianca@pdi.com,Assistente,CC-104 (Operações),CLT
+237,Fábio Ribeiro,Coordenador,Comercial,4,2020-01-17,Ativo,Remoto,fabio@pdi.com,Coordenador,CC-102 (Marketing),CLT
+238,Kelly Martins,Especialista,Qualidade,8,2018-04-08,Ativo,Híbrido,kelly@pdi.com,Assistente,CC-102 (Marketing),CLT
+239,Amanda Lima,Business Partner,Suprimentos,10,2018-08-08,Ativo,Presencial,amanda@pdi.com,Assistente,CC-101 (Engenharia),CLT
+240,Mariana Dias,Analista Pleno,Suprimentos,10,2022-09-07,Ativo,Presencial,mariana@pdi.com,Pleno,CC-101 (Engenharia),CLT
+241,Caio Rodrigues,Especialista,Comercial,4,2018-05-25,Ativo,Remoto,caio@pdi.com,Assistente,CC-102 (Marketing),CLT
+242,Juliana Almeida,Analista Sênior,Tecnologia da Informação,2,2024-05-03,Ativo,Presencial,juliana@pdi.com,Sênior,CC-102 (Marketing),PJ
+243,Pedro Costa,Analista Júnior,Logística,9,2020-12-08,Afastado,Híbrido,pedro@pdi.com,Júnior,CC-104 (Operações),CLT
+244,Felipe Dias,Desenvolvedor,Engenharia,7,2021-10-04,Ativo,Híbrido,felipe@pdi.com,Assistente,CC-104 (Operações),PJ
+245,Mariana Almeida,Especialista,Operações,5,2021-06-08,Ativo,Presencial,mariana@pdi.com,Assistente,CC-104 (Operações),CLT
+246,Eduardo Martins,Analista Pleno,Operações,5,2024-07-01,Ativo,Remoto,eduardo@pdi.com,Pleno,CC-103 (RH),CLT
+247,Kelly Nascimento,Business Partner,Comercial,4,2020-10-31,Ativo,Híbrido,kelly@pdi.com,Assistente,CC-101 (Engenharia),CLT
+248,Amanda Souza,Consultor,Comercial,4,2021-06-07,Ativo,Híbrido,amanda@pdi.com,Assistente,CC-103 (RH),CLT
+249,Caio Pereira,Especialista,Comercial,4,2021-09-19,Ativo,Remoto,caio@pdi.com,Assistente,CC-101 (Engenharia),CLT
+250,Pedro Santos,Analista Sênior,Financeiro,3,2022-04-10,Ativo,Presencial,pedro@pdi.com,Sênior,CC-101 (Engenharia),CLT
+251,Bianca Barbosa,Especialista,Operações,5,2018-03-04,Ativo,Presencial,bianca@pdi.com,Assistente,CC-104 (Operações),CLT
+252,Camila Martins,Especialista,Qualidade,8,2022-06-11,Ativo,Híbrido,camila@pdi.com,Assistente,CC-104 (Operações),CLT
+253,Thiago Ribeiro,Consultor,Engenharia,7,2024-11-08,Ativo,Presencial,thiago@pdi.com,Assistente,CC-102 (Marketing),CLT
+254,Felipe Oliveira,Business Partner,Qualidade,8,2021-04-25,Ativo,Presencial,felipe@pdi.com,Assistente,CC-103 (RH),CLT
+255,Júlio Gomes,Técnico,Recursos Humanos,1,2021-07-28,Ativo,Presencial,julio@pdi.com,Assistente,CC-103 (RH),CLT
+256,Thiago Silva,Analista Pleno,Suprimentos,10,2022-01-27,Ativo,Presencial,thiago@pdi.com,Pleno,CC-101 (Engenharia),CLT
+257,Débora Barbosa,Business Partner,Comercial,4,2021-09-09,Ativo,Híbrido,debora@pdi.com,Assistente,CC-102 (Marketing),CLT
+258,Fábio Nascimento,Business Partner,Recursos Humanos,1,2020-08-11,Ativo,Presencial,fabio@pdi.com,Assistente,CC-103 (RH),CLT
+259,Fábio Costa,Desenvolvedor,Recursos Humanos,1,2023-11-02,Ativo,Presencial,fabio@pdi.com,Assistente,CC-102 (Marketing),PJ
+260,Caio Martins,Especialista,Logística,9,2023-01-01,Ativo,Presencial,caio@pdi.com,Assistente,CC-101 (Engenharia),CLT
+261,André Gomes,Desenvolvedor,Financeiro,3,2020-05-24,Ativo,Remoto,andre@pdi.com,Assistente,CC-103 (RH),CLT
+262,Patrícia Fernandes,Coordenador,Tecnologia da Informação,2,2021-06-10,Ativo,Híbrido,patricia@pdi.com,Coordenador,CC-104 (Operações),CLT
+263,Matheus Souza,Analista Sênior,Marketing,6,2021-11-30,Ativo,Híbrido,matheus@pdi.com,Sênior,CC-103 (RH),CLT
+264,Amanda Rocha,Especialista,Marketing,6,2020-02-28,Ativo,Híbrido,amanda@pdi.com,Assistente,CC-101 (Engenharia),CLT
+265,Hugo Mendes,Analista Júnior,Engenharia,7,2022-11-03,Ativo,Remoto,hugo@pdi.com,Júnior,CC-104 (Operações),CLT
+266,Pedro Araújo,Especialista,Qualidade,8,2018-09-14,Ativo,Remoto,pedro@pdi.com,Assistente,CC-102 (Marketing),CLT
+267,Camila Carvalho,Consultor,Marketing,6,2024-07-22,Ativo,Híbrido,camila@pdi.com,Assistente,CC-101 (Engenharia),CLT
+268,Débora Mendes,Desenvolvedor,Recursos Humanos,1,2019-05-16,Ativo,Híbrido,debora@pdi.com,Assistente,CC-104 (Operações),CLT
+269,Mariana Rodrigues,Consultor,Engenharia,7,2024-07-05,Ativo,Remoto,mariana@pdi.com,Assistente,CC-104 (Operações),CLT
+270,Bianca Rocha,Desenvolvedor,Marketing,6,2020-10-30,Ativo,Remoto,bianca@pdi.com,Assistente,CC-104 (Operações),CLT
+271,Gustavo Nascimento,Consultor,Recursos Humanos,1,2022-04-22,Ativo,Presencial,gustavo@pdi.com,Assistente,CC-102 (Marketing),PJ
+272,Kelly Lima,Desenvolvedor,Financeiro,3,2018-05-18,Ativo,Remoto,kelly@pdi.com,Assistente,CC-103 (RH),CLT
+273,Camila Silva,Business Partner,Qualidade,8,2023-06-27,Ativo,Presencial,camila@pdi.com,Assistente,CC-104 (Operações),CLT
+274,Eduardo Costa,Especialista,Comercial,4,2023-11-04,Ativo,Híbrido,eduardo@pdi.com,Assistente,CC-103 (RH),CLT
+275,Lucas Mendes,Coordenador,Logística,9,2024-12-08,Ativo,Híbrido,lucas@pdi.com,Coordenador,CC-102 (Marketing),CLT
+276,Fernanda Souza,Desenvolvedor,Tecnologia da Informação,2,2021-08-05,Ativo,Remoto,fernanda@pdi.com,Assistente,CC-104 (Operações),CLT
+277,Caio Pereira,Desenvolvedor,Tecnologia da Informação,2,2022-09-13,Ativo,Híbrido,caio@pdi.com,Assistente,CC-104 (Operações),CLT
+278,Vinícius Nascimento,Coordenador,Operações,5,2018-11-23,Ativo,Remoto,vinicius@pdi.com,Coordenador,CC-103 (RH),CLT
+279,Patrícia Almeida,Desenvolvedor,Qualidade,8,2021-07-02,Ativo,Remoto,patricia@pdi.com,Assistente,CC-103 (RH),CLT
+280,Rafael Carvalho,Assistente,Logística,9,2024-05-17,Ativo,Presencial,rafael@pdi.com,Assistente,CC-102 (Marketing),PJ
+281,Vinícius Pereira,Analista Pleno,Suprimentos,10,2023-09-06,Ativo,Híbrido,vinicius@pdi.com,Pleno,CC-104 (Operações),CLT
+282,Fábio Gomes,Técnico,Operações,5,2021-10-15,Ativo,Híbrido,fabio@pdi.com,Assistente,CC-104 (Operações),CLT
+283,Thiago Silva,Especialista,Logística,9,2021-06-18,Ativo,Presencial,thiago@pdi.com,Assistente,CC-103 (RH),PJ
+284,Hugo Barbosa,Business Partner,Operações,5,2023-07-09,Ativo,Presencial,hugo@pdi.com,Assistente,CC-104 (Operações),CLT
+285,Ingrid Pereira,Desenvolvedor,Qualidade,8,2024-03-26,Ativo,Híbrido,ingrid@pdi.com,Assistente,CC-103 (RH),CLT
+286,Patrícia Fernandes,Técnico,Logística,9,2021-02-13,Ativo,Remoto,patricia@pdi.com,Assistente,CC-101 (Engenharia),CLT
+287,Fábio Mendes,Coordenador,Logística,9,2020-02-05,Ativo,Remoto,fabio@pdi.com,Coordenador,CC-104 (Operações),CLT
+288,Kelly Araújo,Assistente,Qualidade,8,2019-10-19,Ativo,Híbrido,kelly@pdi.com,Assistente,CC-104 (Operações),CLT
+289,André Carvalho,Assistente,Comercial,4,2019-03-16,Ativo,Presencial,andre@pdi.com,Assistente,CC-101 (Engenharia),CLT
+290,Mariana Araújo,Desenvolvedor,Engenharia,7,2020-02-26,Ativo,Remoto,mariana@pdi.com,Assistente,CC-104 (Operações),CLT
+291,Rodrigo Pereira,Desenvolvedor,Engenharia,7,2024-04-17,Ativo,Presencial,rodrigo@pdi.com,Assistente,CC-103 (RH),CLT
+292,Rafael Ribeiro,Business Partner,Recursos Humanos,1,2018-03-24,Ativo,Presencial,rafael@pdi.com,Assistente,CC-104 (Operações),CLT
+293,Ingrid Souza,Desenvolvedor,Marketing,6,2024-11-14,Ativo,Híbrido,ingrid@pdi.com,Assistente,CC-102 (Marketing),CLT
+294,Vinícius Martins,Analista Júnior,Tecnologia da Informação,2,2022-09-06,Ativo,Híbrido,vinicius@pdi.com,Júnior,CC-104 (Operações),CLT
+295,Amanda Pereira,Analista Pleno,Financeiro,3,2024-02-14,Ativo,Remoto,amanda@pdi.com,Pleno,CC-104 (Operações),CLT
+296,Giovana Nascimento,Técnico,Qualidade,8,2021-10-01,Ativo,Presencial,giovana@pdi.com,Assistente,CC-101 (Engenharia),CLT
+297,Eduardo Carvalho,Analista Pleno,Suprimentos,10,2023-05-14,Ativo,Presencial,eduardo@pdi.com,Pleno,CC-101 (Engenharia),CLT
+298,Ingrid Mendes,Coordenador,Marketing,6,2019-06-16,Ativo,Híbrido,ingrid@pdi.com,Coordenador,CC-103 (RH),CLT
+299,Caio Rocha,Consultor,Marketing,6,2024-05-17,Ativo,Híbrido,caio@pdi.com,Assistente,CC-104 (Operações),CLT
+300,Bianca Oliveira,Assistente,Recursos Humanos,1,2019-11-09,Ativo,Híbrido,bianca@pdi.com,Assistente,CC-102 (Marketing),CLT
+301,Fernanda Oliveira,Coordenador,Operações,5,2023-01-03,Ativo,Presencial,fernanda@pdi.com,Coordenador,CC-101 (Engenharia),CLT
+302,Fábio Souza,Desenvolvedor,Tecnologia da Informação,2,2018-09-10,Ativo,Remoto,fabio@pdi.com,Assistente,CC-101 (Engenharia),CLT
+303,Eduardo Lima,Analista Júnior,Financeiro,3,2022-12-21,Ativo,Presencial,eduardo@pdi.com,Júnior,CC-102 (Marketing),CLT
+304,Matheus Santos,Especialista,Recursos Humanos,1,2019-05-05,Ativo,Híbrido,matheus@pdi.com,Assistente,CC-103 (RH),CLT
+305,Beatriz Gomes,Analista Sênior,Marketing,6,2019-05-26,Ativo,Remoto,beatriz@pdi.com,Sênior,CC-102 (Marketing),PJ
+306,Vinícius Gomes,Business Partner,Comercial,4,2018-09-15,Ativo,Presencial,vinicius@pdi.com,Assistente,CC-101 (Engenharia),CLT
+307,Juliana Costa,Analista Pleno,Financeiro,3,2021-05-08,Ativo,Híbrido,juliana@pdi.com,Pleno,CC-101 (Engenharia),PJ
+308,Ingrid Carvalho,Business Partner,Suprimentos,10,2024-12-25,Ativo,Híbrido,ingrid@pdi.com,Assistente,CC-102 (Marketing),CLT
+309,Patrícia Barbosa,Analista Sênior,Comercial,4,2024-04-24,Ativo,Presencial,patricia@pdi.com,Sênior,CC-104 (Operações),CLT
+310,Felipe Nascimento,Desenvolvedor,Comercial,4,2020-12-03,Ativo,Remoto,felipe@pdi.com,Assistente,CC-102 (Marketing),PJ

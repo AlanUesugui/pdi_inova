@@ -344,21 +344,11 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         </div>
 
         <div className="flex flex-col h-full p-16 relative z-10 justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary-600 rounded-xl flex items-center justify-center shrink-0 shadow-sm">
-              <Sparkles className="text-white w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-white font-extrabold text-lg leading-none">Inova Skill</p>
-              <p className="text-primary-400 text-[10px] uppercase tracking-widest font-black mt-1">HR Platform</p>
-            </div>
-          </div>
 
           {/* Headline (Enlarged / Amplified) */}
           <div className="my-auto py-16">
             <p className="text-primary-400 text-[10px] font-black tracking-[0.3em] uppercase mb-6 animate-pulse">
-              Plataforma de Desenvolvimento
+              ISA Journey
             </p>
             <h2
               className="text-white font-black leading-[0.96] tracking-tighter"

@@ -2,17 +2,17 @@
 
 @theme {
   --color-background: #F9FAFB;
-  --color-primary-50: #faf5ff;
-  --color-primary-100: #f3e8ff;
-  --color-primary-200: #e9d5ff;
-  --color-primary-300: #d8b4fe;
-  --color-primary-400: #c084fc;
-  --color-primary-500: #a855f7;
-  --color-primary-600: #5B2F8C; /* Brand Stitch Violet */
-  --color-primary-700: #4a2072;
-  --color-primary-800: #3b165b;
-  --color-primary-900: #2c0d45;
-  --color-primary-950: #1d072e;
+  --color-primary-50: #FFF5F5;
+  --color-primary-100: #FFE5E3;
+  --color-primary-200: #FDCAC7;
+  --color-primary-300: #FA9D98;
+  --color-primary-400: #F5716A;
+  --color-primary-500: #EB5E57;
+  --color-primary-600: #E05751; /* Coral Brand Color */
+  --color-primary-700: #C94640;
+  --color-primary-800: #A83530;
+  --color-primary-900: #872722;
+  --color-primary-950: #541311;
   --color-navy-700: #1a2332;
   --color-navy-800: #111827;
   --color-navy-900: #0f172a;

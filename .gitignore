@@ -15,6 +15,7 @@ server/build/
 *.sqlite
 *.sqlite-journal
 server/*.sqlite
+!server/database.sqlite
 server/*.sqlite-journal
 server/uploads/*
 !server/uploads/.gitkeep

@@ -1,5 +1,6 @@
 import React from 'react';
-import { X, CheckCircle, Lightbulb, FileText, TrendingUp, TrendingDown, Info } from 'lucide-react';
+import { X, CheckCircle, Lightbulb, FileText, TrendingUp, TrendingDown, Info, Sparkles, Calendar } from 'lucide-react';
+import { getDynamicProgressColor } from '../utils/colors';
 
 interface AnalysisReport {
   nome: string;
@@ -7,11 +8,13 @@ interface AnalysisReport {
   departamento: string;
   competencias_exigidas: string[];
   treinamentos_relacionados: string[];
+  pontos_importantes: string[];
   pontos_fortes: string[];
   pontos_de_atencao: string[];
   evidencias: string[];
   score: number;
   classificacao_final: string;
+  previsao: string;
   recomendacoes: string[];
 }
 
@@ -90,73 +93,95 @@ const AnalysisReportModal: React.FC<AnalysisReportModalProps> = ({ isOpen, onClo
               {/* Score Bar */}
               <div className="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
                 <div 
-                  className={`h-full rounded-full transition-all duration-1000 ${getScoreBarColor(report.score)}`} 
-                  style={{ width: `${report.score}%` }}
+                  className="h-full rounded-full transition-all duration-1000" 
+                  style={{ width: `${report.score}%`, backgroundColor: getDynamicProgressColor(report.score) }}
                 ></div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Left Column */}
-                <div className="space-y-8">
-                  {/* Competencies */}
-                  <div className="glass-card p-5 rounded-xl border border-gray-100">
-                    <div className="flex items-center gap-2 mb-4">
-                      <CheckCircle className="w-5 h-5 text-emerald-500" />
-                      <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider">Competências Exigidas</h4>
-                    </div>
-                    <ul className="space-y-2">
-                      {report.competencias_exigidas.map((comp, i) => (
-                        <li key={i} className="text-sm font-medium text-gray-600 flex items-start gap-2">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></span>
-                          {comp}
-                        </li>
-                      ))}
-                    </ul>
+              {/* Pontos Importantes Banner */}
+              {report.pontos_importantes && report.pontos_importantes.length > 0 && (
+                <div className="bg-primary-50/50 border border-primary-100/70 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sparkles className="w-4 h-4 text-primary-600" />
+                    <h4 className="font-black text-xs text-primary-900 uppercase tracking-wider">Destaques & Pontos Importantes</h4>
                   </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {report.pontos_importantes.map((ponto, i) => (
+                      <div key={i} className="bg-white/80 p-3 rounded-lg border border-primary-100/30 text-xs font-medium text-gray-700 leading-relaxed shadow-sm">
+                        {ponto}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-                  {/* Related Trainings */}
-                  <div className="glass-card p-5 rounded-xl border border-gray-100">
-                    <div className="flex items-center gap-2 mb-4">
-                      <FileText className="w-5 h-5 text-primary-500" />
-                      <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider">Treinamentos Realizados</h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Left Column - Cargo, Requisitos e Dados */}
+                <div className="md:col-span-1 space-y-6">
+                  <div className="bg-gray-50/50 p-5 rounded-2xl border border-gray-100/70 space-y-6">
+                    <div>
+                      <h4 className="font-black text-gray-900 text-xs uppercase tracking-wider mb-1">Cargo Vinculado</h4>
+                      <p className="text-sm font-extrabold text-primary-600">{report.cargo}</p>
+                      <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">{report.departamento}</p>
                     </div>
-                    {report.treinamentos_relacionados.length > 0 ? (
+                    
+                    <div className="border-t border-gray-200/50 pt-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <CheckCircle className="w-4 h-4 text-emerald-500" />
+                        <h4 className="font-black text-gray-900 text-[11px] uppercase tracking-wider">Requisitos / Competências</h4>
+                      </div>
                       <ul className="space-y-2">
-                        {report.treinamentos_relacionados.map((treinamento, i) => (
-                          <li key={i} className="text-sm font-medium text-gray-600 flex items-start gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1.5 shrink-0"></span>
-                            {treinamento}
+                        {report.competencias_exigidas.map((comp, i) => (
+                          <li key={i} className="text-xs font-bold text-gray-600 flex items-start gap-2 leading-relaxed">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-1.5 shrink-0"></span>
+                            {comp}
                           </li>
                         ))}
                       </ul>
-                    ) : (
-                      <p className="text-sm text-gray-400 italic">Nenhum treinamento PDI registrado.</p>
-                    )}
-                  </div>
-                  
-                  {/* Evidences */}
-                  <div className="glass-card p-5 rounded-xl border border-gray-100 bg-gray-50/50">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Info className="w-5 h-5 text-indigo-500" />
-                      <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider">Evidências do Gestor</h4>
                     </div>
-                    <ul className="space-y-3">
-                      {report.evidencias.map((ev, i) => (
-                        <li key={i} className="text-sm font-medium text-gray-600 italic border-l-2 border-indigo-200 pl-3">
-                          {ev}
-                        </li>
-                      ))}
-                    </ul>
+
+                    <div className="border-t border-gray-200/50 pt-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <FileText className="w-4 h-4 text-primary-500" />
+                        <h4 className="font-black text-gray-900 text-[11px] uppercase tracking-wider">Treinamentos Realizados</h4>
+                      </div>
+                      {report.treinamentos_relacionados.length > 0 ? (
+                        <ul className="space-y-2">
+                          {report.treinamentos_relacionados.map((treinamento, i) => (
+                            <li key={i} className="text-xs font-bold text-gray-600 flex items-start gap-2 leading-relaxed">
+                              <span className="w-1.5 h-1.5 rounded-full bg-primary-400 mt-1.5 shrink-0"></span>
+                              {treinamento}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-xs text-gray-400 italic">Nenhum treinamento PDI registrado.</p>
+                      )}
+                    </div>
+                    
+                    <div className="border-t border-gray-200/50 pt-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Info className="w-4 h-4 text-indigo-500" />
+                        <h4 className="font-black text-gray-900 text-[11px] uppercase tracking-wider">Evidências do Gestor</h4>
+                      </div>
+                      <ul className="space-y-2">
+                        {report.evidencias.map((ev, i) => (
+                          <li key={i} className="text-xs font-medium text-gray-600 italic border-l-2 border-indigo-200 pl-3 leading-relaxed">
+                            {ev}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
                 </div>
 
-                {/* Right Column */}
-                <div className="space-y-8">
+                {/* Right Column (span-2) - AI Analysis */}
+                <div className="md:col-span-2 space-y-8">
                   {/* Strengths */}
                   <div className="glass-card p-5 rounded-xl border border-emerald-100 bg-emerald-50/30">
                     <div className="flex items-center gap-2 mb-4">
                       <TrendingUp className="w-5 h-5 text-emerald-600" />
-                      <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider">Pontos Fortes</h4>
+                      <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider">Pontos Fortes (Positivos)</h4>
                     </div>
                     <ul className="space-y-2">
                       {report.pontos_fortes.length > 0 ? report.pontos_fortes.map((ponto, i) => (
@@ -174,7 +199,7 @@ const AnalysisReportModal: React.FC<AnalysisReportModalProps> = ({ isOpen, onClo
                   <div className="glass-card p-5 rounded-xl border border-rose-100 bg-rose-50/30">
                     <div className="flex items-center gap-2 mb-4">
                       <TrendingDown className="w-5 h-5 text-rose-600" />
-                      <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider">Pontos de Atenção</h4>
+                      <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider">Pontos de Atenção (Negativos)</h4>
                     </div>
                     <ul className="space-y-2">
                       {report.pontos_de_atencao.length > 0 ? report.pontos_de_atencao.map((ponto, i) => (
@@ -187,6 +212,19 @@ const AnalysisReportModal: React.FC<AnalysisReportModalProps> = ({ isOpen, onClo
                       )}
                     </ul>
                   </div>
+
+                  {/* Previsão Futura */}
+                  {report.previsao && (
+                    <div className="glass-card p-5 rounded-xl border border-blue-100 bg-blue-50/30">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Calendar className="w-5 h-5 text-blue-600" />
+                        <h4 className="font-black text-gray-900 text-sm uppercase tracking-wider">Previsão e Prontidão</h4>
+                      </div>
+                      <p className="text-sm font-bold text-blue-900 leading-relaxed">
+                        {report.previsao}
+                      </p>
+                    </div>
+                  )}
 
                   {/* Recommendations */}
                   <div className="bg-navy-900 p-6 rounded-xl text-white relative overflow-hidden shadow-lg">

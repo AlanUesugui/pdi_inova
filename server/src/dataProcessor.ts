@@ -12,6 +12,13 @@ interface Collaborator {
   cargo: string;
   departamento: string;
   gestor_id: string;
+  data_admissao?: string;
+  status?: string;
+  modalidade_trabalho?: string;
+  email?: string;
+  nivel_cargo?: string;
+  centro_de_custo?: string;
+  tipo_contrato?: string;
 }
 
 interface ManagerEvaluation {
@@ -19,6 +26,15 @@ interface ManagerEvaluation {
   comentarios_soft_skills: string;
   avaliacao_pessoal_texto: string;
   data: string;
+  data_avaliacao?: string;
+  periodo_referencia?: string;
+  nota_desempenho_geral?: string;
+  potencial_crescimento?: string;
+  comentarios_gestor?: string;
+  metas_atingidas?: string;
+  numero_de_feedbacks_dados?: string;
+  colaborador_tem_pdi_ativo?: string;
+  data_ultima_conversa_1_1?: string;
 }
 
 interface PDIResponse {
@@ -28,6 +44,15 @@ interface PDIResponse {
   q2_aplicacao: string;
   q3_desempenho: string;
   q4_eficacia: string;
+  data_resposta?: string;
+  modalidade_treinamento?: string;
+  carga_horaria?: string;
+  provedor_treinamento?: string;
+  custo_treinamento?: string;
+  competencia_desenvolvida?: string;
+  q5_recomendaria?: string;
+  nota_geral_treinamento?: string;
+  aplicou_no_trabalho?: string;
 }
 
 const SCORE_MAP: Record<string, number> = {

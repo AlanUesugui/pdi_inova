@@ -1,6 +1,6 @@
-id_colaborador,treinamento_nome,q1_conhecimento,q2_aplicacao,q3_desempenho,q4_eficacia
-1,Liderança Executiva,Ótimo,Ótimo,Bom,Sim
-2,Arquitetura de Sistemas,Bom,Bom,Bom,Sim
-3,Estratégia de Escala,Ruim,Ruim,Ruim,Não
-4,Gestão de Projetos,Ótimo,Bom,Bom,Sim
-5,Marketing Digital,Bom,Ótimo,Ótimo,Sim
+id_colaborador,treinamento_nome,q1_conhecimento,q2_aplicacao,q3_desempenho,q4_eficacia,data_resposta,modalidade_treinamento,carga_horaria,provedor_treinamento,custo_treinamento,competencia_desenvolvida,q5_recomendaria,nota_geral_treinamento,aplicou_no_trabalho
+1,Liderança Executiva,Ótimo,Ótimo,Bom,Sim,2025-01-12,Online,8h,Treinamento Interno,R$ 0,Melhoria de Performance,Sim,5,Sim
+2,Arquitetura de Sistemas,Bom,Bom,Bom,Sim,2026-05-18,Presencial,40h,Treinamento Interno,R$ 290,Melhoria de Performance,Não,4,Não
+3,Estratégia de Escala,Ruim,Ruim,Ruim,Não,2026-02-08,Híbrido,40h,Coursera,R$ 290,Melhoria de Performance,Não,3,Não
+4,Gestão de Projetos,Ótimo,Bom,Bom,Sim,2025-04-05,Híbrido,40h,Alura,R$ 0,Melhoria de Performance,Sim,5,Sim
+5,Marketing Digital,Bom,Ótimo,Ótimo,Sim,2025-05-29,Presencial,24h,Alura,R$ 290,Melhoria de Performance,Sim,5,Sim
