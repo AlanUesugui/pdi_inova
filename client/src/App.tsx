@@ -3,6 +3,7 @@ import Sidebar from './components/Sidebar';
 import TeamManagement from './components/TeamManagement';
 import RolesManagement from './components/RolesManagement';
 import CareerMap from './components/CareerMap';
+import FeedbackManagement from './components/FeedbackManagement';
 import Login from './components/Login';
 import { getDynamicProgressColor } from './utils/colors';
 import { Search, ChevronRight } from 'lucide-react';
@@ -728,6 +729,8 @@ const App: React.FC = () => {
           <RolesManagement />
         ) : currentView === 'career' ? (
           <CareerMap managerId={user.id} />
+        ) : currentView === 'feedback' ? (
+          <FeedbackManagement managerId={user.id} />
         ) : (
           <TeamManagement search={searchTerm} managerId={user.id} />
         )}

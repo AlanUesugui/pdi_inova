@@ -32,7 +32,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/analyze', async (req, res) => {
   const { managerId } = req.body;
   const db = await getDb();
-  
+
   try {
     if (!managerId) {
       return res.status(400).json({ error: "managerId is required" });
@@ -52,7 +52,7 @@ app.post('/api/analyze', async (req, res) => {
 
     // 3. Fetch training responses
     const responses = await db.all('SELECT * FROM pdi_responses WHERE id_colaborador IN (SELECT id FROM collaborators WHERE gestor_id = ?)', [managerId]);
-    
+
     // Find highlights and attention points
     const sortedCollabs = [...collaborators].map(c => {
       const cPdis = pdis.filter(p => String(p.id_colaborador) === String(c.id));
@@ -90,7 +90,7 @@ Diretriz: Gere um insight profissional, direto, encorajador e acionável sobre o
     if (!aiResult) {
       throw new Error("Resposta da IA vazia.");
     }
-    
+
     return res.json(JSON.parse(aiResult));
   } catch (error) {
     // Dynamic fallback generation based on real data
@@ -140,21 +140,21 @@ app.get('/api/analyze-collaborator/:id', async (req, res) => {
 app.get('/api/team', async (req, res) => {
   const { managerId } = req.query;
   const db = await getDb();
-  
+
   let query = 'SELECT c.*, e.comentarios_soft_skills, e.avaliacao_pessoal_texto, e.data as eval_date FROM collaborators c LEFT JOIN manager_evaluations e ON c.id = e.id_colaborador';
   let params: any[] = [];
-  
+
   if (managerId) {
     query += ' WHERE c.gestor_id = ?';
     params.push(managerId);
   }
-  
+
   const collaborators = await db.all(query, params);
   const pdiResponses = await db.all('SELECT * FROM pdi_responses');
 
   const teamWithHealth = collaborators.map(collab => {
     const pdis = pdiResponses.filter(p => String(p.id_colaborador) === String(collab.id));
-    
+
     const pdiHistory = pdis.map(pdi => {
       const parseScore = (value: string) => {
         if (value === 'Ótimo') return 100;
@@ -173,10 +173,10 @@ app.get('/api/team', async (req, res) => {
       };
     });
 
-    const averageProgress = pdiHistory.length > 0 
-      ? Math.round(pdiHistory.reduce((acc, curr) => acc + curr.score, 0) / pdiHistory.length) 
+    const averageProgress = pdiHistory.length > 0
+      ? Math.round(pdiHistory.reduce((acc, curr) => acc + curr.score, 0) / pdiHistory.length)
       : 0;
-    
+
     return {
       id: String(collab.id),
       name: collab.nome,
@@ -229,7 +229,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
       const rootDir = path.join(process.cwd(), '..');
       const compFile = xlsx.readFile(path.join(rootDir, 'competencias_por_cargo.csv'));
       const competencies: any[] = xlsx.utils.sheet_to_json(compFile.Sheets[compFile.SheetNames[0]!] as xlsx.WorkSheet, { defval: "" });
-      
+
       const teamRoles = collaborators.map(c => c.cargo.toLowerCase());
       const uniqueCompetencies = new Set(
         competencies
@@ -249,10 +249,10 @@ app.get('/api/dashboard-stats', async (req, res) => {
 
     // 4. eNPS, Mood Average, Retention Rate from manager evaluations
     const evals = await db.all('SELECT * FROM manager_evaluations WHERE id_colaborador IN (SELECT id FROM collaborators WHERE gestor_id = ?)', [managerId]);
-    
+
     const ratings = evals.map(e => parseFloat(e.nota_desempenho_geral)).filter(n => !isNaN(n));
-    const moodAvg = ratings.length > 0 
-      ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) 
+    const moodAvg = ratings.length > 0
+      ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
       : "4.2";
 
     const promoters = evals.filter(e => e.potencial_crescimento === 'Alto').length;
@@ -267,7 +267,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
 
     // 5. Training Modalites Completion Rates (from pdi_responses)
     const responses = await db.all('SELECT * FROM pdi_responses WHERE id_colaborador IN (SELECT id FROM collaborators WHERE gestor_id = ?)', [managerId]);
-    
+
     const calculateModalityRate = (names: string[], defaultRate: number) => {
       const filtered = responses.filter(r => names.some(name => r.treinamento_nome.toLowerCase().includes(name)));
       if (filtered.length === 0) return defaultRate;
@@ -310,7 +310,7 @@ app.get('/api/roles', (req, res) => {
     const rootDir = path.join(process.cwd(), '..');
     const compFile = xlsx.readFile(path.join(rootDir, 'competencias_por_cargo.csv'));
     const competencies: any[] = xlsx.utils.sheet_to_json(compFile.Sheets[compFile.SheetNames[0]!] as xlsx.WorkSheet, { defval: "" });
-    
+
     const rolesMap: { [key: string]: any } = {};
     competencies.forEach(c => {
       const roleName = c.cargo.trim();
@@ -328,7 +328,7 @@ app.get('/api/roles', (req, res) => {
         descricao: c.descricao_competencia || ""
       });
     });
-    
+
     res.json(Object.values(rolesMap));
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
@@ -354,19 +354,19 @@ app.get('/api/career-map', async (req, res) => {
     try {
       const f = xlsx.readFile(path.join(rootDir, 'curriculos.xlsx'));
       curriculos = xlsx.utils.sheet_to_json(f.Sheets[f.SheetNames[0]!] as xlsx.WorkSheet, { defval: '' });
-    } catch (_) {}
+    } catch (_) { }
 
     let avaliacoes: any[] = [];
     try {
       const f = xlsx.readFile(path.join(rootDir, 'avaliacoes_gestor.xlsx'));
       avaliacoes = xlsx.utils.sheet_to_json(f.Sheets[f.SheetNames[0]!] as xlsx.WorkSheet, { defval: '' });
-    } catch (_) {}
+    } catch (_) { }
 
     let competencias: any[] = [];
     try {
       const f = xlsx.readFile(path.join(rootDir, 'competencias_por_cargo.csv'));
       competencias = xlsx.utils.sheet_to_json(f.Sheets[f.SheetNames[0]!] as xlsx.WorkSheet, { defval: '' });
-    } catch (_) {}
+    } catch (_) { }
 
     const result = collaborators.map(c => {
       const cv = curriculos.find((r: any) => String(r.id) === String(c.id)) || {};
@@ -434,16 +434,155 @@ app.post('/api/login', async (req, res) => {
   const emailTrimmed = email?.trim();
   const passwordTrimmed = password?.trim();
   const db = await getDb();
-  
+
   console.log(`Login attempt: "${emailTrimmed}"`);
   const user = await db.get('SELECT * FROM users WHERE LOWER(email) = LOWER(?) AND password = ?', [emailTrimmed, passwordTrimmed]);
-  
+
   if (user) {
     console.log(`Login success for: ${emailTrimmed}`);
     res.json({ success: true, user: { email: user.email, name: user.name, id: user.collab_id } });
   } else {
     console.log(`Login failed for: ${emailTrimmed}`);
     res.status(401).json({ success: false, message: 'Credenciais inválidas' });
+  }
+});
+
+// Feedbacks Endpoints
+app.get('/api/feedbacks', async (req, res) => {
+  const { collabId, managerId } = req.query;
+  const db = await getDb();
+  try {
+    let query = 'SELECT * FROM feedbacks';
+    const params: any[] = [];
+    const conditions: string[] = [];
+
+    if (collabId) {
+      conditions.push('id_colaborador = ?');
+      params.push(collabId);
+    }
+    if (managerId) {
+      conditions.push('gestor_id = ?');
+      params.push(managerId);
+    }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
+    }
+    query += ' ORDER BY data DESC';
+
+    const feedbacks = await db.all(query, params);
+    res.json(feedbacks);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+app.post('/api/feedbacks', async (req, res) => {
+  const { id_colaborador, gestor_id, tipo, conteudo } = req.body;
+  const db = await getDb();
+  try {
+    if (!id_colaborador || !gestor_id || !tipo || !conteudo) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+    const data = new Date().toISOString();
+    const result = await db.run(
+      'INSERT INTO feedbacks (id_colaborador, gestor_id, tipo, conteudo, data) VALUES (?, ?, ?, ?, ?)',
+      [id_colaborador, gestor_id, tipo, conteudo, data]
+    );
+
+    // Also update manager_evaluations count of feedbacks given
+    await db.run(
+      `INSERT INTO manager_evaluations (id_colaborador, numero_de_feedbacks_dados) 
+       VALUES (?, 1) 
+       ON CONFLICT(id_colaborador) DO UPDATE SET 
+       numero_de_feedbacks_dados = COALESCE(numero_de_feedbacks_dados, 0) + 1`,
+      [id_colaborador]
+    );
+
+    res.json({ success: true, id: result.lastID, data });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+// --- Meetings Endpoints ---
+app.get('/api/meetings', async (req, res) => {
+  const { collabId, managerId } = req.query;
+  const db = await getDb();
+  try {
+    let query = 'SELECT * FROM meetings';
+    const params: any[] = [];
+    const conditions: string[] = [];
+
+    if (collabId) {
+      conditions.push('id_colaborador = ?');
+      params.push(collabId);
+    }
+    if (managerId) {
+      conditions.push('gestor_id = ?');
+      params.push(managerId);
+    }
+
+    if (conditions.length > 0) {
+      query += ' WHERE ' + conditions.join(' AND ');
+    }
+    query += ' ORDER BY data ASC, hora ASC';
+
+    const meetings = await db.all(query, params);
+    res.json(meetings);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+app.post('/api/meetings', async (req, res) => {
+  const { id_colaborador, gestor_id, data, hora, tipo, observacoes, link } = req.body;
+  const db = await getDb();
+  try {
+    if (!id_colaborador || !gestor_id || !data || !hora || !tipo) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+    const meetingLink = link || `https://meet.google.com/${Math.random().toString(36).substring(2, 5)}-${Math.random().toString(36).substring(2, 6)}-${Math.random().toString(36).substring(2, 5)}`;
+    const result = await db.run(
+      'INSERT INTO meetings (id_colaborador, gestor_id, data, hora, tipo, status, link, observacoes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [id_colaborador, gestor_id, data, hora, tipo, 'Agendado', meetingLink, observacoes || '']
+    );
+
+    // Also update manager_evaluations with last 1:1 date if the scheduled date is soon or if we want to record it
+    if (tipo === '1:1') {
+      await db.run(
+        `INSERT INTO manager_evaluations (id_colaborador, data_ultima_conversa_1_1) 
+         VALUES (?, ?) 
+         ON CONFLICT(id_colaborador) DO UPDATE SET 
+         data_ultima_conversa_1_1 = ?`,
+        [id_colaborador, data, data]
+      );
+    }
+
+    res.json({ success: true, id: result.lastID, link: meetingLink });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+app.patch('/api/meetings/:id', async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body; // 'Realizado' or 'Cancelado'
+  const db = await getDb();
+  try {
+    if (!status) {
+      res.status(400).json({ error: "Status is required" });
+      return;
+    }
+    await db.run(
+      'UPDATE meetings SET status = ? WHERE id = ?',
+      [status, id]
+    );
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
   }
 });
 

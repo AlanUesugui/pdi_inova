@@ -91,7 +91,7 @@ npm run build
 
 A plataforma carrega automaticamente os gestores e seus respectivos colaboradores a partir do banco SQLite pré-configurado. Para testar o login de gestor, utilize as credenciais abaixo:
 
-*   **E-mail**: `eduarda@pdi.com` ou `aline@pdi.com`
+*   **E-mail**: `bruno@pdi.com`
 *   **Senha**: `123456`
 
 ---

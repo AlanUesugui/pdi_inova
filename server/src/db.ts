@@ -92,5 +92,28 @@ export async function initSchema() {
       collab_id TEXT,
       FOREIGN KEY(collab_id) REFERENCES collaborators(id)
     );
+
+    CREATE TABLE IF NOT EXISTS feedbacks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id_colaborador TEXT,
+      gestor_id TEXT,
+      tipo TEXT,
+      conteudo TEXT,
+      data TEXT,
+      FOREIGN KEY(id_colaborador) REFERENCES collaborators(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS meetings (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id_colaborador TEXT,
+      gestor_id TEXT,
+      data TEXT,
+      hora TEXT,
+      tipo TEXT,
+      status TEXT DEFAULT 'Agendado',
+      link TEXT,
+      observacoes TEXT,
+      FOREIGN KEY(id_colaborador) REFERENCES collaborators(id)
+    );
   `);
 }
