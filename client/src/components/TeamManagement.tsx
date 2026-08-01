@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, Zap, ChevronLeft, ChevronRight, Filter, Sparkles } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import AIDrawer from './AIDrawer';
 import TrainingHistoryModal, { type PDITraining } from './TrainingHistoryModal';
 import CollaboratorAnalysisPanel from './CollaboratorAnalysisPanel';
@@ -51,7 +51,7 @@ const TeamManagement: React.FC<{ search: string, managerId: string }> = ({ searc
 
   const fetchTeam = async () => {
     try {
-      const response = await axios.get(`http://localhost:3001/api/team?managerId=${managerId}`);
+      const response = await api.get(`/api/team?managerId=${managerId}`);
       setTeam(response.data);
       setFilteredTeam(response.data);
     } catch (error) {

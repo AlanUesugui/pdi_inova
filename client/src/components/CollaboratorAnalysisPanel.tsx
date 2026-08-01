@@ -4,7 +4,7 @@ import {
   AlertTriangle, CheckCircle2, Calendar, User, Zap, Briefcase
 } from 'lucide-react';
 import { type PDITraining } from './TrainingHistoryModal';
-import axios from 'axios';
+import api from '../utils/api';
 import { getDynamicProgressColor } from '../utils/colors';
 
 interface TeamMember {
@@ -156,7 +156,7 @@ const CollaboratorAnalysisPanel: React.FC<Props> = ({ member, onClose }) => {
     setAnalysis(null);
     setIsLoading(true);
 
-    axios.get('http://localhost:3001/api/roles')
+    api.get('/api/roles')
       .then(res => {
         const roles = res.data;
         const matched = roles.find((r: any) => 
@@ -189,15 +189,15 @@ const CollaboratorAnalysisPanel: React.FC<Props> = ({ member, onClose }) => {
   const today = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
 
   return (
-    <>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 z-40 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200"
+        className="fixed inset-0 bg-gray-900/40 backdrop-blur-sm animate-in fade-in duration-200"
         onClick={onClose}
       />
 
       {/* Panel */}
-      <div className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-4xl flex flex-col bg-white shadow-2xl animate-in slide-in-from-right duration-300">
+      <div className="relative w-full max-w-4xl max-h-[90vh] flex flex-col bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-2xl animate-in zoom-in-95 duration-200 z-10">
 
         {/* Dark Header */}
         <div className="shrink-0 bg-gradient-to-br from-gray-900 via-gray-900 to-indigo-950 px-8 pt-8 pb-6 relative overflow-hidden">
@@ -473,7 +473,7 @@ const CollaboratorAnalysisPanel: React.FC<Props> = ({ member, onClose }) => {
           </div>
         ) : null}
       </div>
-    </>
+    </div>
   );
 };
 

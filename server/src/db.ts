@@ -1,18 +1,81 @@
-import sqlite3 from 'sqlite3';
-import { open, Database } from 'sqlite';
-import path from 'path';
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
 
-let db: Database | null = null;
+dotenv.config();
+
+class PostgresDb {
+  private pool: Pool;
+
+  constructor() {
+    const connectionString = process.env.DATABASE_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is not defined in environment variables.");
+    }
+    this.pool = new Pool({
+      connectionString,
+      ssl: {
+        rejectUnauthorized: false
+      }
+    });
+  }
+
+  private convertSql(sql: string): string {
+    let index = 1;
+    return sql.replace(/\?/g, () => `$${index++}`);
+  }
+
+  async all(sql: string, params: any[] = []): Promise<any[]> {
+    const pgSql = this.convertSql(sql);
+    const result = await this.pool.query(pgSql, params);
+    return result.rows;
+  }
+
+  async get(sql: string, params: any[] = []): Promise<any | undefined> {
+    const pgSql = this.convertSql(sql);
+    const result = await this.pool.query(pgSql, params);
+    return result.rows[0];
+  }
+
+  async run(sql: string, params: any[] = []): Promise<{ lastID?: number | string; changes: number }> {
+    let pgSql = this.convertSql(sql);
+    
+    // Append RETURNING id only for tables that have an 'id' column and need lastID
+    const isInsertWithLastId = /^\s*insert\s+into\s+(feedbacks|meetings)\b/i.test(pgSql);
+    const hasReturning = /returning/i.test(pgSql);
+    
+    if (isInsertWithLastId && !hasReturning) {
+      pgSql += ' RETURNING id';
+    }
+
+    const result = await this.pool.query(pgSql, params);
+    
+    let lastID: any = undefined;
+    if (isInsertWithLastId && result.rows && result.rows.length > 0) {
+      lastID = result.rows[0].id;
+    }
+
+    return {
+      lastID,
+      changes: result.rowCount || 0
+    };
+  }
+
+  async exec(sql: string): Promise<void> {
+    await this.pool.query(sql);
+  }
+
+  async close(): Promise<void> {
+    await this.pool.end();
+  }
+}
+
+let dbInstance: PostgresDb | null = null;
 
 export async function getDb() {
-  if (db) return db;
-  
-  db = await open({
-    filename: path.join(process.cwd(), 'database.sqlite'),
-    driver: sqlite3.Database
-  });
-  
-  return db;
+  if (!dbInstance) {
+    dbInstance = new PostgresDb();
+  }
+  return dbInstance;
 }
 
 export async function initSchema() {
@@ -35,7 +98,7 @@ export async function initSchema() {
     );
 
     CREATE TABLE IF NOT EXISTS pdi_responses (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       id_colaborador TEXT,
       treinamento_nome TEXT,
       q1_conhecimento TEXT,
@@ -94,7 +157,7 @@ export async function initSchema() {
     );
 
     CREATE TABLE IF NOT EXISTS feedbacks (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       id_colaborador TEXT,
       gestor_id TEXT,
       tipo TEXT,
@@ -104,7 +167,7 @@ export async function initSchema() {
     );
 
     CREATE TABLE IF NOT EXISTS meetings (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      id SERIAL PRIMARY KEY,
       id_colaborador TEXT,
       gestor_id TEXT,
       data TEXT,

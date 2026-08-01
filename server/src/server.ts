@@ -11,7 +11,7 @@ import { analyzeCollaborator } from './analyzer';
 import OpenAI from 'openai';
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 3001;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ''

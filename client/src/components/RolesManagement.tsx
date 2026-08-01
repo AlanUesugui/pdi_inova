@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Briefcase, Search, Layers } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 interface Competency {
   competencia: string;
@@ -21,7 +21,7 @@ const RolesManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/roles')
+    api.get('/api/roles')
       .then(res => {
         setRoles(res.data);
         if (res.data.length > 0) {

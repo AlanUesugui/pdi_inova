@@ -30,7 +30,7 @@ Este repositório contém a arquitetura integrada completa da aplicação **Inov
 
 ### Backend (`/server`)
 *   **Node.js + Express** (para APIs REST rápidas e eficientes)
-*   **SQLite** (banco de dados local rápido para persistência de colaboradores e PDIs)
+*   **PostgreSQL (Supabase)** (banco de dados relacional na nuvem para persistência estável)
 *   **TypeScript** (para segurança estática de tipos no backend)
 
 ---
@@ -39,57 +39,89 @@ Este repositório contém a arquitetura integrada completa da aplicação **Inov
 
 Siga os passos abaixo para configurar o repositório em sua máquina:
 
-### 1. Pré-requisitos
-*   [Node.js](https://nodejs.org/) (versão LTS recomendada)
-*   [NPM](https://www.npmjs.com/) ou Yarn
+### 1. Configuração do Banco de Dados (Supabase)
+1. Crie uma conta gratuita no [Supabase](https://supabase.com/).
+2. Crie um novo projeto.
+3. Vá em **Project Settings** > **Database** e copie a **Connection String** (URI de conexão direta do PostgreSQL, exemplo: `postgresql://postgres:senha@db.supabase.co:5432/postgres`).
 
-### 2. Instalação das Dependências
+### 2. Configuração das Variáveis de Ambiente (.env)
 
-Instale as dependências tanto para o servidor quanto para o cliente a partir do diretório raiz:
+Crie os arquivos `.env` nos respectivos diretórios:
 
-```bash
-# Instala as dependências do servidor
-cd server
-npm install
-
-# Instala as dependências do frontend (cliente)
-cd ../client
-npm install
+#### Backend (`/server/.env`)
+```env
+DATABASE_URL=sua_connection_string_do_supabase_aqui
+PORT=3001
+OPENAI_API_KEY=sua_chave_openai_aqui (opcional, para insights automáticos)
 ```
 
-### 3. Executando em Ambiente de Desenvolvimento
+#### Frontend (`/client/.env`)
+```env
+VITE_API_URL=http://localhost:3001
+```
+
+### 3. Instalação das Dependências
+
+Instale as dependências a partir da raiz do projeto:
+```bash
+# Na pasta raiz
+npm install
+npm run install:all
+```
+
+### 4. Inicializando o Banco de Dados (Seeding)
+
+Compile o backend e execute o script de migração e seeding para popular o banco no Supabase com os dados reais e mocks dos CSVs:
+```bash
+cd server
+npm run build
+npm run db:init
+```
+
+### 5. Executando em Ambiente de Desenvolvimento
 
 Para rodar o projeto inteiro simultaneamente (Servidor na porta `3001` e Frontend na porta `5173`):
-
-1.  **Inicie o Servidor Backend**:
-    ```bash
-    cd server
-    npm run dev
-    ```
-
-2.  **Inicie o Cliente Frontend**:
-    ```bash
-    cd client
-    npm run dev
-    ```
+```bash
+# No diretório raiz do projeto
+npm run dev
+```
 
 Acesse o navegador em [http://localhost:5173](http://localhost:5173).
 
-### 4. Compilação para Produção (Build)
+---
 
-Para testar a compilação final e verificar se todos os tipos TypeScript estão estritamente corretos:
+## 🚀 Hospedagem e Deploy (Render + Supabase)
 
-```bash
-# Compilar cliente
-cd client
-npm run build
-```
+### 1. Deploy do Backend no Render (Web Service)
+1. Conecte seu repositório GitHub ao Render.
+2. Crie um novo **Web Service**.
+3. Configure os seguintes campos:
+   * **Root Directory**: `server`
+   * **Build Command**: `npm install && npm run build`
+   * **Start Command**: `npm run start`
+4. Em **Environment Variables**, adicione:
+   * `DATABASE_URL`: *A String de Conexão do Supabase*
+   * `OPENAI_API_KEY`: *Sua chave OpenAI (opcional)*
+5. Conclua a criação do Web Service e aguarde a inicialização. Copie a URL gerada (ex: `https://pdi-inova-backend.onrender.com`).
+
+*(Opcional)*: Para inicializar o banco diretamente em produção na primeira execução, você pode rodar o comando `npm run db:init` no painel de controle (Shell) do Render ou provisoriamente ajustar o **Start Command** para `npm run db:init && npm run start`.
+
+### 2. Deploy do Frontend no Render (Static Site)
+1. Crie um novo **Static Site** no Render.
+2. Conecte ao mesmo repositório GitHub.
+3. Configure os campos:
+   * **Root Directory**: `client`
+   * **Build Command**: `npm install && npm run build`
+   * **Publish Directory**: `dist`
+4. Em **Environment Variables**, adicione:
+   * `VITE_API_URL`: *A URL gerada pelo Web Service do Backend* (ex: `https://pdi-inova-backend.onrender.com`)
+5. Clique em implantar.
 
 ---
 
 ## 🔒 Credenciais de Acesso (Teste)
 
-A plataforma carrega automaticamente os gestores e seus respectivos colaboradores a partir do banco SQLite pré-configurado. Para testar o login de gestor, utilize as credenciais abaixo:
+A plataforma inicializa os logins dos gestores no banco. Utilize as credenciais abaixo para testar:
 
 *   **E-mail**: `bruno@pdi.com`
 *   **Senha**: `123456`
@@ -102,15 +134,18 @@ A plataforma carrega automaticamente os gestores e seus respectivos colaboradore
 ├── client/                     # Código fonte do frontend (React + Vite)
 │   ├── src/
 │   │   ├── components/         # Componentes React (Sidebar, Login, TeamManagement)
+│   │   ├── utils/
+│   │   │   └── api.ts          # Cliente Axios centralizado para consumo da API
 │   │   ├── App.tsx             # Componente de controle principal (Painel Geral)
 │   │   ├── index.css           # Estilizações globais e variáveis de marca
 │   │   └── main.tsx
 │   └── package.json
 │
-├── server/                     # Código fonte do backend (Express + SQLite)
+├── server/                     # Código fonte do backend (Express + PostgreSQL Wrapper)
 │   ├── src/
 │   │   ├── server.ts           # Inicialização do express e rotas da API
-│   │   └── db.ts               # Integração e mapeamento do banco SQLite
+│   │   ├── db.ts               # Wrapper de banco e esquemas do Postgres
+│   │   └── initDb.ts           # Script de migração e seeding de dados (CSV -> Postgres)
 │   ├── data/                   # Arquivos fonte CSV para seed do banco
 │   └── package.json
 │

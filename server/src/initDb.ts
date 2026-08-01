@@ -47,13 +47,12 @@ async function importCsv() {
         collab.nivel_cargo || "", collab.centro_de_custo || "", collab.tipo_contrato || ""
       ]
     );
-
     if (isManager) {
       // Create user login
       const cleanName = collab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim(); 
       const email = `${cleanName.split(' ')[0].toLowerCase()}@pdi.com`.trim();
       await db.run(
-        'INSERT OR REPLACE INTO users (email, password, name, collab_id) VALUES (?, ?, ?, ?)',
+        'INSERT INTO users (email, password, name, collab_id) VALUES (?, ?, ?, ?) ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, name = EXCLUDED.name, collab_id = EXCLUDED.collab_id',
         [email, '123456', collab.nome.trim(), collabId]
       );
       console.log(`- User created: "${email}" (ID: ${collabId})`);

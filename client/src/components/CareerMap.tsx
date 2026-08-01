@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Filter, Sparkles, ChevronRight, Zap, TrendingUp } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 import CareerDetailPanel from './CareerDetailPanel';
 
 export interface CareerTraining {
@@ -300,7 +300,7 @@ const CareerMap: React.FC<{ managerId: string }> = ({ managerId }) => {
   useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get(`http://localhost:3001/api/career-map?managerId=${managerId}`);
+        const res = await api.get(`/api/career-map?managerId=${managerId}`);
         setMembers(res.data);
       } catch {
         setMembers(MOCK_MEMBERS);
