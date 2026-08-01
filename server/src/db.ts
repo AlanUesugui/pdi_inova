@@ -6,18 +6,18 @@ let db: Database | null = null;
 
 export async function getDb() {
   if (db) return db;
-  
+
   db = await open({
     filename: path.join(process.cwd(), 'database.sqlite'),
     driver: sqlite3.Database
   });
-  
+
   return db;
 }
 
 export async function initSchema() {
   const db = await getDb();
-  
+
   await db.exec(`
     CREATE TABLE IF NOT EXISTS collaborators (
       id TEXT PRIMARY KEY,
@@ -93,6 +93,15 @@ export async function initSchema() {
       FOREIGN KEY(collab_id) REFERENCES collaborators(id)
     );
 
+    CREATE TABLE IF NOT EXISTS outlook_tokens (
+      email TEXT PRIMARY KEY,
+      access_token TEXT,
+      refresh_token TEXT,
+      expires_at INTEGER,
+      outlook_email TEXT,
+      FOREIGN KEY(email) REFERENCES users(email)
+    );
+
     CREATE TABLE IF NOT EXISTS feedbacks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       id_colaborador TEXT,
@@ -114,6 +123,17 @@ export async function initSchema() {
       link TEXT,
       observacoes TEXT,
       FOREIGN KEY(id_colaborador) REFERENCES collaborators(id)
+    );
+
+    CREATE TABLE IF NOT EXISTS weekly_report_log (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      manager_email TEXT NOT NULL,
+      manager_id TEXT,
+      sent_at TEXT NOT NULL,
+      issues_count INTEGER DEFAULT 0,
+      collaborators_count INTEGER DEFAULT 0,
+      status TEXT NOT NULL,
+      error_message TEXT
     );
   `);
 }

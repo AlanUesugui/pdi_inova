@@ -9,6 +9,15 @@ import { processPDIData } from './dataProcessor';
 import { getDb, initSchema } from './db';
 import { analyzeCollaborator } from './analyzer';
 import OpenAI from 'openai';
+import {
+  getAuthUrl,
+  exchangeCodeForTokens,
+  getOutlookStatus,
+  disconnectOutlook,
+  getNotifications
+} from './outlook';
+import { startScheduler } from './scheduler';
+import { runWeeklyReportForAllManagers, sendWeeklyReportToManager } from './weeklyReport';
 
 const app = express();
 const port = 3001;
@@ -23,7 +32,10 @@ app.use(express.json());
 const upload = multer({ dest: 'uploads/' });
 
 // Initialize DB
-initSchema().then(() => console.log("Database Schema Ready"));
+initSchema().then(() => {
+  console.log('Database Schema Ready');
+  startScheduler();
+});
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
@@ -595,6 +607,143 @@ app.post('/api/upload', upload.single('report'), (req, res) => {
       message: "Relatório processado com sucesso. 3 novas competências identificadas."
     });
   }, 1500);
+});
+
+// --- Outlook Integration Endpoints ---
+
+app.get('/api/auth/outlook', (req, res) => {
+  const { userEmail } = req.query;
+  if (!userEmail) {
+    res.status(400).json({ error: 'userEmail query parameter is required' });
+    return;
+  }
+  const authUrl = getAuthUrl(userEmail as string);
+  res.json({ authUrl });
+});
+
+app.get('/api/auth/outlook/callback', async (req, res) => {
+  const { code, state } = req.query;
+
+  let userEmail = '';
+
+  if (state) {
+    try {
+      const decodedState = JSON.parse(decodeURIComponent(state as string));
+      userEmail = decodedState.email;
+    } catch (e) {
+      console.error('Error parsing state in callback:', e);
+    }
+  } else if (code && (code as string).includes('_for_')) {
+    const parts = (code as string).split('_for_');
+    userEmail = decodeURIComponent(parts[parts.length - 1] || '');
+  }
+
+  if (!code || !userEmail) {
+    res.status(400).send('<h1>Erro de Autenticação</h1><p>Código de autorização ou email do usuário ausentes.</p>');
+    return;
+  }
+
+  const success = await exchangeCodeForTokens(userEmail, code as string);
+  if (success) {
+    res.redirect(`http://localhost:5173/?outlook_success=true`);
+  } else {
+    res.status(500).send('<h1>Erro de Integração</h1><p>Não foi possível vincular a sua conta do Outlook. Tente novamente mais tarde.</p>');
+  }
+});
+
+app.get('/api/auth/outlook/status', async (req, res) => {
+  const { userEmail } = req.query;
+  if (!userEmail) {
+    res.status(400).json({ error: 'userEmail query parameter is required' });
+    return;
+  }
+
+  try {
+    const status = await getOutlookStatus(userEmail as string);
+    res.json(status);
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+app.post('/api/auth/outlook/disconnect', async (req, res) => {
+  const { userEmail } = req.body;
+  if (!userEmail) {
+    res.status(400).json({ error: 'userEmail is required' });
+    return;
+  }
+
+  try {
+    await disconnectOutlook(userEmail);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+app.get('/api/outlook/notifications', async (req, res) => {
+  const { userEmail } = req.query;
+  if (!userEmail) {
+    res.status(400).json({ error: 'userEmail query parameter is required' });
+    return;
+  }
+
+  try {
+    const notifications = await getNotifications(userEmail as string);
+    res.json(notifications);
+  } catch (error) {
+    res.status(401).json({ error: (error as Error).message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Weekly Report Endpoints
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * POST /api/reports/weekly/trigger
+ * Manually triggers the weekly report for all managers (or a specific manager).
+ * Body (optional): { managerId: string }
+ * Useful for testing without waiting for the Monday cron.
+ */
+app.post('/api/reports/weekly/trigger', async (req, res) => {
+  const { managerId } = req.body;
+  try {
+    if (managerId) {
+      const result = await sendWeeklyReportToManager(managerId);
+      return res.json({ success: true, results: [result] });
+    }
+    const results = await runWeeklyReportForAllManagers();
+    return res.json({ success: true, results });
+  } catch (error) {
+    return res.status(500).json({ error: (error as Error).message });
+  }
+});
+
+/**
+ * GET /api/reports/weekly/logs
+ * Returns the history of weekly report dispatches.
+ * Query params:
+ *   - limit  (default: 50)
+ *   - managerEmail (optional filter)
+ */
+app.get('/api/reports/weekly/logs', async (req, res) => {
+  const { limit = '50', managerEmail } = req.query;
+  const db = await getDb();
+  try {
+    let query = 'SELECT * FROM weekly_report_log';
+    const params: any[] = [];
+    if (managerEmail) {
+      query += ' WHERE manager_email = ?';
+      params.push(managerEmail);
+    }
+    query += ' ORDER BY sent_at DESC LIMIT ?';
+    params.push(parseInt(limit as string, 10));
+    const logs = await db.all(query, params);
+    return res.json(logs);
+  } catch (error) {
+    return res.status(500).json({ error: (error as Error).message });
+  }
 });
 
 app.listen(port, () => {

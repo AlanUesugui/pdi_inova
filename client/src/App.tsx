@@ -6,7 +6,7 @@ import CareerMap from './components/CareerMap';
 import FeedbackManagement from './components/FeedbackManagement';
 import Login from './components/Login';
 import { getDynamicProgressColor } from './utils/colors';
-import { Search, ChevronRight } from 'lucide-react';
+import { Search, ChevronRight, Bell, Mail, Calendar as CalendarIcon, RefreshCw, LogOut } from 'lucide-react';
 import axios from 'axios';
 
 interface RadarChartProps {
@@ -17,9 +17,9 @@ const RadarChart: React.FC<RadarChartProps> = ({ averages }) => {
   const cx = 150;
   const cy = 120;
   const r = 70;
-  
+
   const angles = [-90, -18, 54, 126, 198];
-  
+
   const getPoint = (angle: number, pct: number) => {
     const rad = (angle * Math.PI) / 180;
     const dist = r * pct;
@@ -182,6 +182,16 @@ const App: React.FC = () => {
   const [displayedText, setDisplayedText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [fullTeam, setFullTeam] = useState<any[]>([]);
+
+  // State for Outlook & Notifications
+  const [outlookConnected, setOutlookConnected] = useState(false);
+  const [outlookEmail, setOutlookEmail] = useState('');
+  const [isOutlookMock, setIsOutlookMock] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationsLoading, setNotificationsLoading] = useState(false);
+  const [outlookLoading, setOutlookLoading] = useState(false);
+  const [confirmDisconnect, setConfirmDisconnect] = useState(false);
   const [stats, setStats] = useState<any>({
     activeMembersCount: 24,
     mappedSkillsCount: 148,
@@ -271,6 +281,101 @@ const App: React.FC = () => {
     }
   }, [user]);
 
+  // Check URL query parameters for outlook login success
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('outlook_success') === 'true') {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      console.log("Outlook integration success!");
+      if (user) {
+        checkOutlookStatus();
+      }
+    }
+  }, [user]);
+
+  const checkOutlookStatus = async () => {
+    if (!user) return;
+    try {
+      const res = await axios.get(`http://localhost:3001/api/auth/outlook/status?userEmail=${encodeURIComponent(user.email)}`);
+      setOutlookConnected(res.data.connected);
+      if (res.data.connected) {
+        setOutlookEmail(res.data.outlookEmail);
+        setIsOutlookMock(res.data.isMock);
+        // Load notifications
+        setNotificationsLoading(true);
+        axios.get(`http://localhost:3001/api/outlook/notifications?userEmail=${encodeURIComponent(user.email)}`)
+          .then(r => setNotifications(r.data))
+          .catch(e => console.warn(e))
+          .finally(() => setNotificationsLoading(false));
+      } else {
+        setOutlookEmail('');
+        setNotifications([]);
+      }
+    } catch (e) {
+      console.warn("Failed to check Outlook status", e);
+    }
+  };
+
+  const fetchNotifications = async () => {
+    if (!user) return;
+    setNotificationsLoading(true);
+    try {
+      const res = await axios.get(`http://localhost:3001/api/outlook/notifications?userEmail=${encodeURIComponent(user.email)}`);
+      setNotifications(res.data);
+    } catch (e) {
+      console.warn("Failed to fetch Outlook notifications", e);
+    } finally {
+      setNotificationsLoading(false);
+    }
+  };
+
+  const handleConnectOutlook = async () => {
+    if (!user) return;
+    setOutlookLoading(true);
+    try {
+      const res = await axios.get(`http://localhost:3001/api/auth/outlook?userEmail=${encodeURIComponent(user.email)}`);
+      if (res.data.authUrl) {
+        window.location.href = res.data.authUrl;
+      }
+    } catch (e) {
+      console.warn("Failed to initiate Outlook connection", e);
+      setOutlookLoading(false);
+    }
+  };
+
+  const handleDisconnectOutlook = async () => {
+    if (!user) return;
+    setOutlookLoading(true);
+    setConfirmDisconnect(false);
+    try {
+      await axios.post(`http://localhost:3001/api/auth/outlook/disconnect`, { userEmail: user.email });
+      setOutlookConnected(false);
+      setOutlookEmail('');
+      setNotifications([]);
+      setShowNotifications(false);
+    } catch (e) {
+      console.warn("Failed to disconnect Outlook", e);
+    } finally {
+      setOutlookLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      checkOutlookStatus();
+    }
+  }, [user]);
+
+  // Poll notifications every 60 seconds if connected
+  useEffect(() => {
+    if (user && outlookConnected) {
+      const interval = setInterval(() => {
+        fetchNotifications();
+      }, 60000);
+      return () => clearInterval(interval);
+    }
+  }, [user, outlookConnected]);
+
 
 
   // Calculate team distribution stats
@@ -313,7 +418,7 @@ const App: React.FC = () => {
       member.pdiHistory.forEach((h: any) => {
         const name = (h.treinamento_nome || "").toLowerCase();
         let catIndex = 1; // Default to Tech
-        
+
         if (name.includes("liderança") || name.includes("feedback") || name.includes("gestão situacional")) {
           catIndex = 0; // Liderança
         } else if (name.includes("comunicação") || name.includes("assertiva") || name.includes("empatia")) {
@@ -323,7 +428,7 @@ const App: React.FC = () => {
         } else if (name.includes("negócio") || name.includes("financeiro") || name.includes("vendas") || name.includes("cliente")) {
           catIndex = 4; // Negócio
         }
-        
+
         categoryScores[catIndex] += h.score / 100;
         categoryCounts[catIndex] += 1;
       });
@@ -343,28 +448,224 @@ const App: React.FC = () => {
 
   return (
     <div className="flex min-h-screen bg-gray-50/50">
-      <Sidebar 
-        onGenerateReport={handleGenerateReport} 
+      <Sidebar
+        onGenerateReport={handleGenerateReport}
         currentView={currentView}
         onViewChange={setCurrentView}
         userName={user.name}
       />
-      
+
       <main className="flex-1 ml-64 p-8">
         {/* Header */}
         <header className="flex justify-between items-center mb-8">
           <div className="flex-1 max-w-xl relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-primary-600 transition-colors" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar colaboradores, competências ou trilhas..." 
+              placeholder="Buscar colaboradores, competências ou trilhas..."
               className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-600/10 focus:border-primary-600 transition-all shadow-sm font-medium text-sm"
             />
           </div>
-          
 
+          {/* Outlook integration & Notifications Dropdown */}
+          <div className="flex items-center gap-4 ml-4 relative">
+            {/* Outlook Connection Status Pill */}
+            <button
+              onClick={() => {
+                if (outlookConnected) {
+                  setShowNotifications(true);
+                  setConfirmDisconnect(true);
+                } else {
+                  handleConnectOutlook();
+                }
+              }}
+              disabled={outlookLoading}
+              className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold transition-all active:scale-95 shadow-sm cursor-pointer ${
+                outlookConnected
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-300'
+                  : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+              }`}
+              title={outlookConnected ? `Conectado como ${outlookEmail}. Clique para desconectar.` : 'Conectar ao Microsoft Outlook'}
+            >
+              <div className={`w-2 h-2 rounded-full ${outlookConnected ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
+              <span>{outlookConnected ? 'Outlook Ativo' : 'Sincronizar Outlook'}</span>
+              {outlookLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin ml-1" />}
+            </button>
+
+            {/* Notification Bell with Badge */}
+            <div className="relative">
+              <button
+                onClick={() => {
+                  const next = !showNotifications;
+                  setShowNotifications(next);
+                  if (!next) setConfirmDisconnect(false);
+                }}
+                className={`p-3 rounded-xl border transition-all active:scale-95 shadow-sm relative cursor-pointer ${
+                  showNotifications
+                    ? 'bg-primary-50 border-primary-200 text-primary-600'
+                    : 'bg-white border-gray-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                }`}
+              >
+                <Bell className="w-5 h-5" />
+                {notifications.filter(n => !n.read).length > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-primary-600 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-bounce">
+                    {notifications.filter(n => !n.read).length}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Dropdown Panel (Glassmorphism & animated) */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-3 w-96 bg-white border border-gray-100/90 shadow-2xl rounded-2xl p-4 z-50 text-left overflow-hidden min-h-[250px] flex flex-col justify-between">
+                  <div>
+                    {/* Header */}
+                    <div className="flex justify-between items-center pb-3 border-b border-gray-100 mb-3">
+                      <div>
+                        <h3 className="text-sm font-black text-gray-900">Últimas Notificações</h3>
+                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider mt-0.5">Sincronizado com Outlook</p>
+                      </div>
+                      {outlookConnected && (
+                        <button
+                          onClick={fetchNotifications}
+                          disabled={notificationsLoading}
+                          className="p-1.5 rounded-lg text-gray-400 hover:text-primary-600 hover:bg-primary-50 transition-colors cursor-pointer"
+                          title="Atualizar Notificações"
+                        >
+                          <RefreshCw className={`w-4 h-4 ${notificationsLoading ? 'animate-spin' : ''}`} />
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Notification List */}
+                    <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                      {notificationsLoading ? (
+                        <div className="py-8 text-center flex flex-col items-center justify-center gap-3">
+                          <RefreshCw className="w-8 h-8 text-primary-600 animate-spin" />
+                          <p className="text-xs font-bold text-gray-400">Buscando atualizações...</p>
+                        </div>
+                      ) : !outlookConnected ? (
+                        <div className="py-8 text-center px-4">
+                          <div className="w-12 h-12 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center mx-auto mb-3 text-gray-400">
+                            <Mail className="w-6 h-6" />
+                          </div>
+                          <p className="text-xs font-bold text-gray-600 leading-relaxed mb-4">
+                            Sincronize sua conta do Outlook para ver e-mails de feedback, alertas de PDI e reuniões de 1:1 agendadas.
+                          </p>
+                          <button
+                            onClick={handleConnectOutlook}
+                            className="w-full bg-primary-600 hover:bg-primary-700 text-white font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95 shadow-md shadow-primary-600/10 text-xs cursor-pointer"
+                          >
+                            Conectar Microsoft Outlook
+                          </button>
+                        </div>
+                      ) : notifications.length === 0 ? (
+                        <div className="py-8 text-center text-gray-400">
+                          <p className="text-xs font-bold">Nenhuma notificação recente encontrada no Outlook.</p>
+                        </div>
+                      ) : (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            onClick={() => {
+                              setNotifications(prev =>
+                                prev.map(n => n.id === notif.id ? { ...n, read: true } : n)
+                              );
+                              window.open(notif.link, '_blank');
+                            }}
+                            className={`p-3 rounded-xl border transition-all cursor-pointer hover:bg-gray-50 flex items-start gap-3 relative overflow-hidden group ${
+                              notif.read ? 'bg-white border-gray-100' : 'bg-primary-50/20 border-primary-100/50'
+                            }`}
+                          >
+                            {!notif.read && (
+                              <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary-600" />
+                            )}
+
+                            <div className={`p-2 rounded-lg shrink-0 ${
+                              notif.type === 'calendar'
+                                ? 'bg-indigo-50 border border-indigo-100 text-indigo-600'
+                                : 'bg-primary-50 border border-primary-100 text-primary-600'
+                            }`}>
+                              {notif.type === 'calendar' ? (
+                                <CalendarIcon className="w-4 h-4" />
+                              ) : (
+                                <Mail className="w-4 h-4" />
+                              )}
+                            </div>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex justify-between items-start gap-1">
+                                <span className={`text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${
+                                  notif.type === 'calendar'
+                                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-100/50'
+                                    : 'bg-primary-50 text-primary-700 border border-primary-100/50'
+                                }`}>
+                                  {notif.category}
+                                </span>
+                                <span className="text-[10px] text-gray-400 font-bold">
+                                  {new Date(notif.date).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
+                                </span>
+                              </div>
+                              <h4 className="text-xs font-black text-gray-900 truncate mt-1 group-hover:text-primary-600 transition-colors">
+                                {notif.subject}
+                              </h4>
+                              <p className="text-[10px] text-gray-500 font-bold truncate mt-0.5">
+                                {notif.sender}
+                              </p>
+                              <p className="text-[10px] text-gray-400 line-clamp-2 mt-1 leading-relaxed font-medium">
+                                {notif.snippet}
+                              </p>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {outlookConnected && (
+                    <div className="pt-3 border-t border-gray-100 mt-3 text-[10px] text-gray-400 font-bold">
+                      {confirmDisconnect ? (
+                        <div className="flex flex-col gap-2">
+                          <p className="text-gray-600 font-bold text-[11px] text-center">Deseja desconectar o Outlook?</p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => setConfirmDisconnect(false)}
+                              className="flex-1 py-1.5 px-3 rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors cursor-pointer text-[11px] font-bold"
+                            >
+                              Cancelar
+                            </button>
+                            <button
+                              onClick={handleDisconnectOutlook}
+                              disabled={outlookLoading}
+                              className="flex-1 py-1.5 px-3 rounded-lg bg-red-500 hover:bg-red-600 text-white transition-colors cursor-pointer text-[11px] font-bold flex items-center justify-center gap-1 disabled:opacity-60"
+                            >
+                              {outlookLoading ? <RefreshCw className="w-3 h-3 animate-spin" /> : <LogOut className="w-3 h-3" />}
+                              {outlookLoading ? 'Desconectando...' : 'Confirmar'}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex justify-between items-center">
+                          <span className="truncate max-w-[180px]" title={outlookEmail}>
+                            Conectado: {outlookEmail}
+                          </span>
+                          <button
+                            onClick={() => setConfirmDisconnect(true)}
+                            disabled={outlookLoading}
+                            className="text-red-500 hover:text-red-600 transition-colors flex items-center gap-1 hover:underline cursor-pointer disabled:opacity-60"
+                          >
+                            <LogOut className="w-3 h-3" />
+                            Desconectar
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </header>
 
         {currentView === 'dashboard' ? (
@@ -402,7 +703,7 @@ const App: React.FC = () => {
                   </div>
                 </div>
                 <div className="pt-4 border-t border-gray-100/50 mt-4">
-                  <button 
+                  <button
                     onClick={handleGenerateReport}
                     className="w-full flex items-center justify-between text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50/50 hover:bg-primary-50 border border-primary-100/50 px-4 py-3 rounded-xl transition-all"
                   >
@@ -423,7 +724,7 @@ const App: React.FC = () => {
                     Mapeamento Ativo
                   </span>
                 </div>
-                
+
                 <RadarChart averages={radarAverages} />
               </div>
             </div>
@@ -529,7 +830,7 @@ const App: React.FC = () => {
 
             {/* Bottom Row: Dashboard de Dados Gerais dos Colaboradores */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-              
+
               {/* Card 1: Distribuição de Saúde / Risco (AI Health) */}
               <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
                 <div>
@@ -539,50 +840,50 @@ const App: React.FC = () => {
                       <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">Indicador de engajamento e risco de desvio no PDI</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-center py-6 relative">
                     <svg className="w-36 h-36 transform -rotate-90">
                       {/* Base Track */}
                       <circle cx="72" cy="72" r="54" fill="transparent" stroke="#F3F4F6" strokeWidth="12" />
-                      
+
                       {/* Arc 1: Healthy */}
-                      <circle 
-                        cx="72" 
-                        cy="72" 
-                        r="54" 
-                        fill="transparent" 
-                        stroke="#10B981" 
-                        strokeWidth="12" 
+                      <circle
+                        cx="72"
+                        cy="72"
+                        r="54"
+                        fill="transparent"
+                        stroke="#10B981"
+                        strokeWidth="12"
                         strokeDasharray={`${2 * Math.PI * 54}`}
                         strokeDashoffset={`${2 * Math.PI * 54 * (1 - (healthyCount / totalCollabs))}`}
                         className="transition-all duration-1000 ease-out"
                       />
-                      
+
                       {/* Arc 2: Attention */}
                       {attentionCount > 0 && (
-                        <circle 
-                          cx="72" 
-                          cy="72" 
-                          r="54" 
-                          fill="transparent" 
-                          stroke="#F59E0B" 
-                          strokeWidth="12" 
+                        <circle
+                          cx="72"
+                          cy="72"
+                          r="54"
+                          fill="transparent"
+                          stroke="#F59E0B"
+                          strokeWidth="12"
                           strokeDasharray={`${2 * Math.PI * 54}`}
                           strokeDashoffset={`${2 * Math.PI * 54 * (1 - (attentionCount / totalCollabs))}`}
                           style={{ transform: `rotate(${(healthyCount / totalCollabs) * 360}deg)`, transformOrigin: '72px 72px' }}
                           className="transition-all duration-1000 ease-out"
                         />
                       )}
-                      
+
                       {/* Arc 3: Risk */}
                       {riskCount > 0 && (
-                        <circle 
-                          cx="72" 
-                          cy="72" 
-                          r="54" 
-                          fill="transparent" 
-                          stroke="#EF4444" 
-                          strokeWidth="12" 
+                        <circle
+                          cx="72"
+                          cy="72"
+                          r="54"
+                          fill="transparent"
+                          stroke="#EF4444"
+                          strokeWidth="12"
                           strokeDasharray={`${2 * Math.PI * 54}`}
                           strokeDashoffset={`${2 * Math.PI * 54 * (1 - (riskCount / totalCollabs))}`}
                           style={{ transform: `rotate(${((healthyCount + attentionCount) / totalCollabs) * 360}deg)`, transformOrigin: '72px 72px' }}
@@ -590,14 +891,14 @@ const App: React.FC = () => {
                         />
                       )}
                     </svg>
-                    
+
                     <div className="absolute flex flex-col items-center justify-center">
                       <span className="text-2xl font-black text-gray-900">{fullTeam.length}</span>
                       <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros</span>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2 mt-4 pt-4 border-t border-gray-50">
                   <div className="flex justify-between items-center text-xs font-bold">
                     <div className="flex items-center gap-2 text-emerald-600">
@@ -702,8 +1003,8 @@ const App: React.FC = () => {
                           <span className="text-gray-500">{count} ({Math.round((count / totalCollabs) * 100)}%)</span>
                         </div>
                         <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full rounded-full transition-all duration-1000 ease-out" 
+                          <div
+                            className="h-full rounded-full transition-all duration-1000 ease-out"
                             style={{ width: `${(count / totalCollabs) * 100}%`, backgroundColor: getDynamicProgressColor((count / totalCollabs) * 100) }}
                           ></div>
                         </div>
@@ -713,7 +1014,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="pt-4 border-t border-gray-50 mt-4">
-                  <button 
+                  <button
                     onClick={() => setCurrentView('team')}
                     className="w-full flex items-center justify-between text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50/50 hover:bg-primary-50 border border-primary-100/50 px-4 py-3 rounded-xl transition-all"
                   >
