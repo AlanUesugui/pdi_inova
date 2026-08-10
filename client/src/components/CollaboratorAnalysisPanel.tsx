@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   X, Sparkles, TrendingUp, Target, Lightbulb,
-  AlertTriangle, CheckCircle2, Calendar, User, Zap, Briefcase, HelpCircle,
-  Info, Layers, MessageSquare, Plus, Edit3, Save, FileText, Database, ArrowRight,
-  BarChart2, PieChart, Activity
+  AlertTriangle, CheckCircle2, User, Zap, HelpCircle,
+  Info, Layers, Plus, Edit3, Save, Database, ArrowRight,
+  BarChart2
 } from 'lucide-react';
 import { type PDITraining } from './TrainingHistoryModal';
 import api from '../utils/api';
@@ -422,10 +422,6 @@ const getScoreColor = (score: number) => {
 const CollaboratorAnalysisPanel: React.FC<Props> = ({ member, onClose, onNavigateToCareer, initialOpenValidation }) => {
   const [analysisData, setAnalysisData] = useState<PDIAnalysis | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [roleRequirements, setRoleRequirements] = useState<any[]>([]);
-
-  // Methodological Modal state ("Como a análise funciona?")
-  const [isMethodologyOpen, setIsMethodologyOpen] = useState(false);
 
   // Traceability Modal state ("Como chegamos a essa conclusão?")
   const [explainModalOpen, setExplainModalOpen] = useState(false);
@@ -458,7 +454,6 @@ const CollaboratorAnalysisPanel: React.FC<Props> = ({ member, onClose, onNavigat
   useEffect(() => {
     if (!member) {
       setAnalysisData(null);
-      setRoleRequirements([]);
       setEditablePlan([]);
       return;
     }
@@ -473,7 +468,6 @@ const CollaboratorAnalysisPanel: React.FC<Props> = ({ member, onClose, onNavigat
           r.name.toLowerCase().includes(member.role.toLowerCase())
         );
         const reqs = matched ? matched.competencies : [];
-        setRoleRequirements(reqs);
 
         const data = generateFullPDIAnalysis(member, reqs);
         setAnalysisData(data);

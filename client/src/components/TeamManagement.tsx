@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Eye, Zap, Sparkles, Users, CheckCircle2, Clock, AlertTriangle, Briefcase, ChevronRight, ArrowLeft, BarChart2, PieChart, Target, TrendingUp } from 'lucide-react';
+import { Eye, Sparkles, Users, CheckCircle2, Clock, AlertTriangle, Briefcase, ChevronRight, ArrowLeft, BarChart2, PieChart, Target } from 'lucide-react';
 import api from '../utils/api';
 import AIDrawer from './AIDrawer';
 import TrainingHistoryModal, { type PDITraining } from './TrainingHistoryModal';
@@ -40,9 +40,6 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
   const [alignmentFilter, setAlignmentFilter] = useState<AlignmentFilter>(null);
   const [selectedRoleFilter, setSelectedRoleFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<ProcessStatusFilter>('all');
-
-  // Toast Notification State
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Individual PDI Drawer State
   const [analysisMember, setAnalysisMember] = useState<TeamMember | null>(null);
@@ -200,11 +197,6 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
     }
   };
 
-  const handleValidateMilestone = (name: string, pdiGoal: string) => {
-    setToastMessage(`Marco de PDI "${pdiGoal}" de ${name} validado com sucesso!`);
-    setTimeout(() => setToastMessage(null), 4000);
-  };
-
   // Hover Card Handlers
   const handleNodeMouseEnter = (member: TeamMember, event: React.MouseEvent<HTMLElement>) => {
     if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
@@ -291,6 +283,7 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
       <CollaboratorAnalysisPanel
         member={analysisMember}
         onClose={() => setAnalysisMember(null)}
+        onNavigateToCareer={onNavigateToCareer}
       />
 
       {/* Floating Hover Card */}
@@ -301,14 +294,6 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
         onMouseEnter={() => { if (hideTimerRef.current) clearTimeout(hideTimerRef.current); }}
         onMouseLeave={handleNodeMouseLeave}
       />
-
-      {/* Validation Toast Notification */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-navy-900 text-white py-3 px-6 rounded-2xl shadow-2xl flex items-center gap-3 border border-white/10 animate-in slide-in-from-bottom-5 duration-300">
-          <Zap className="w-5 h-5 text-yellow-400 fill-current animate-pulse" />
-          <p className="text-xs font-bold">{toastMessage}</p>
-        </div>
-      )}
 
       {/* Header section */}
       <div className="flex justify-between items-end">

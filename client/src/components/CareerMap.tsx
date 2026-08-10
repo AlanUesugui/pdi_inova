@@ -727,7 +727,6 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
               filteredMembers.map((m) => {
                 const prontidaoInfo = parseProntidao(m.nivel_prontidao);
                 const hiddenTalents = computeHiddenTalent(m);
-                const isStrategic = /alto/i.test(m.potencial_crescimento) && (/agora|6 meses|imediata/i.test(m.nivel_prontidao) || /sim|sucessor/i.test(m.mapa_sucessao));
                 const isHighLossRisk = /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida);
 
                 return (
