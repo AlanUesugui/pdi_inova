@@ -19,7 +19,15 @@ const Sidebar: React.FC<SidebarProps> = ({ onGenerateReport, currentView, onView
             className={currentView === 'dashboard' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
           >
             <LayoutDashboard className="w-5 h-5 mr-3 shrink-0" />
-            Dashboard
+            Início
+          </button>
+
+          <button
+            onClick={() => onViewChange('feedback')}
+            className={currentView === 'feedback' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
+          >
+            <MessageSquare className="w-5 h-5 mr-3 shrink-0" />
+            Feedback e 1:1
           </button>
 
           <button
@@ -27,7 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onGenerateReport, currentView, onView
             className={currentView === 'team' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
           >
             <Target className="w-5 h-5 mr-3 shrink-0" />
-            Organograma
+            PDI
           </button>
 
           <button
@@ -39,11 +47,11 @@ const Sidebar: React.FC<SidebarProps> = ({ onGenerateReport, currentView, onView
           </button>
 
           <button
-            onClick={() => onViewChange('feedback')}
-            className={currentView === 'feedback' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
+            onClick={() => onViewChange('roles')}
+            className={currentView === 'roles' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
           >
-            <MessageSquare className="w-5 h-5 mr-3 shrink-0" />
-            Feedback e 1:1
+            <Briefcase className="w-5 h-5 mr-3 shrink-0" />
+            Cargos
           </button>
 
           <button className="sidebar-link w-full text-left opacity-60 cursor-not-allowed">

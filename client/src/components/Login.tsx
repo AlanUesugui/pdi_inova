@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ArrowUpRight, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-import axios from 'axios';
+import api from '../utils/api';
 
 interface LoginProps {
   onLoginSuccess: (user: any) => void;
@@ -295,7 +295,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     setIsLoading(true);
     setError('');
     try {
-      const response = await axios.post('http://localhost:3001/api/login', { email, password });
+      const response = await api.post('/api/login', { email, password });
       if (response.data.success) {
         onLoginSuccess(response.data.user);
       }

@@ -19,6 +19,7 @@ interface Collaborator {
   nivel_cargo?: string;
   centro_de_custo?: string;
   tipo_contrato?: string;
+  superior_imediato?: string;
 }
 
 interface ManagerEvaluation {
