@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Filter, Sparkles, ChevronRight, Zap, TrendingUp } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Sparkles, ChevronRight, Zap, TrendingUp, ShieldAlert, Target, ShieldCheck, AlertTriangle, ArrowLeft, Briefcase, Users } from 'lucide-react';
 import api from '../utils/api';
 import CareerDetailPanel from './CareerDetailPanel';
+import CollaboratorHoverCard, { type HoverCardData } from './CollaboratorHoverCard';
 
 export interface CareerTraining {
   nome: string;
@@ -25,6 +26,7 @@ export interface CareerMember {
   nome: string;
   cargo: string;
   departamento: string;
+  superior_imediato?: string;
   nivel_cargo: string;
   data_admissao: string;
   avatar: string;
@@ -56,7 +58,9 @@ export interface CareerMember {
 export interface HiddenTalentSignal {
   tipo: string;
   descricao: string;
-  dado: string;
+  evidencias: string[];
+  interpretacao: string;
+  confianca: 'Alta' | 'Média' | 'Baixa';
 }
 
 export interface HiddenTalentResult {
@@ -64,6 +68,11 @@ export interface HiddenTalentResult {
   signals: HiddenTalentSignal[];
   suggestion: string;
   potentialAreas: string[];
+  classificationName: string;
+  reasons: string[];
+  confirmations: string[];
+  confidence: 'Alta' | 'Moderada' | 'Limitada' | 'Sem evidência suficiente';
+  evidencesCount: number;
 }
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
@@ -78,13 +87,27 @@ export const parseProntidao = (raw: string) => {
   return { label, bg: 'bg-gray-100', border: 'border-gray-200', text: 'text-gray-500' };
 };
 
-export const parseShortLabel = (raw: string): string => raw?.split(' - ')[0] || raw || '—';
+export const parseShortLabel = (raw: string): string => raw?.split(' - ')[0] || raw || 'Não avaliado';
 
 export const computeHiddenTalent = (m: CareerMember): HiddenTalentResult => {
   const signals: HiddenTalentSignal[] = [];
-  const requiredNames = m.competencias_exigidas.map(c => c.competencia.toLowerCase());
+  const capacityEvidences: string[] = [];
 
-  // Signal 1: Extra technical skills not in required list
+  // Ev 1: High Readiness
+  const isReadySoon = /agora|6 meses|imediata/i.test(m.nivel_prontidao);
+  if (isReadySoon) {
+    capacityEvidences.push(`Prontidão estimada de curto prazo: ${parseShortLabel(m.nivel_prontidao)}`);
+  }
+
+  // Ev 2: High Performance
+  const perfNum = parseFloat(m.nota_desempenho);
+  const isHighPerformance = (!isNaN(perfNum) && perfNum >= 4.0) || /alto|excelente|supera/i.test(m.nota_desempenho);
+  if (isHighPerformance) {
+    capacityEvidences.push(`Desempenho elevado registrado: ${m.nota_desempenho}`);
+  }
+
+  // Ev 3: Skills declared above current requirements
+  const requiredNames = (m.competencias_exigidas || []).map(c => c.competencia.toLowerCase());
   const declaredSkills = [m.competencia_tecnica_1, m.competencia_tecnica_2, m.competencia_tecnica_3].filter(Boolean) as string[];
   const extraSkills = declaredSkills.filter(skill =>
     skill && !requiredNames.some(req =>
@@ -92,416 +115,710 @@ export const computeHiddenTalent = (m: CareerMember): HiddenTalentResult => {
     )
   );
   if (extraSkills.length > 0) {
+    capacityEvidences.push(`Competência técnica adicional não exigida: "${extraSkills[0]}"`);
+  }
+
+  // Ev 4: Training effectiveness
+  const hasEffectiveTrainings = (m.treinamentos || []).filter(t => t.eficacia === 'Sim').length >= 2;
+  if (hasEffectiveTrainings) {
+    capacityEvidences.push(`${m.treinamentos.filter(t => t.eficacia === 'Sim').length} treinamentos com eficácia comprovada`);
+  }
+
+  // Ev 5: Manager feedback favorable
+  const isManagerFavorable = !!m.comentarios_gestor && /excelente|destaque|promissor|supera|evolução|crescimento|ótimo|alta capacidade|liderança|pronto/i.test(m.comentarios_gestor);
+  if (isManagerFavorable) {
+    capacityEvidences.push(`Avaliação do gestor favorável: "${m.comentarios_gestor.length > 40 ? m.comentarios_gestor.substring(0, 40) + '...' : m.comentarios_gestor}"`);
+  }
+
+  // Critério B: Potencial relevante
+  const isHighPotential = /alto/i.test(m.potencial_crescimento);
+
+  // Critério C: Desalinhamento com o reconhecimento atual (Não mapeado na sucessão)
+  const isUnmapped = (!m.mapa_sucessao || /não/i.test(m.mapa_sucessao)) && (!m.designacao_sucessao || /nenhum|não/i.test(m.designacao_sucessao) || m.designacao_sucessao.trim() === '');
+
+  // Critério D & E: Relevância & Evidências independentes (pelo menos duas)
+  const isUnmappedTalent = isHighPotential && isUnmapped && capacityEvidences.length >= 2;
+
+  // Hierarquia de Rótulos
+  let classificationName = 'Sem classificação especial';
+  let hasTalent = false;
+
+  const isSuccessor = /sim|sucessor/i.test(m.mapa_sucessao) || (m.designacao_sucessao && m.designacao_sucessao.trim() !== '' && !/não|nenhum/i.test(m.designacao_sucessao));
+  
+  const isRecognizedTalent = !isSuccessor && isHighPotential && (isReadySoon || (m.mapa_sucessao && !/não/i.test(m.mapa_sucessao)));
+
+  const isPotentialDevelopment = !isSuccessor && !isRecognizedTalent && !isUnmappedTalent && (isHighPotential || /médio|medio/i.test(m.potencial_crescimento) || isReadySoon || (!isNaN(perfNum) && perfNum >= 3.0));
+
+  const isAlternativeTrajectory = !isSuccessor && !isRecognizedTalent && !isUnmappedTalent && !isPotentialDevelopment && (extraSkills.length > 0 || hasEffectiveTrainings);
+
+  if (isSuccessor) {
+    classificationName = 'Sucessor formal';
+  } else if (isRecognizedTalent) {
+    classificationName = 'Talento reconhecido';
+  } else if (isUnmappedTalent) {
+    classificationName = 'Possível talento não mapeado';
+    hasTalent = true;
+  } else if (isPotentialDevelopment) {
+    classificationName = 'Potencial de desenvolvimento';
+  } else if (isAlternativeTrajectory) {
+    classificationName = 'Trajetória alternativa';
+  }
+
+  // Populate signals if they have unmapped talent or alternative trajectory to preserve structure
+  if (isUnmappedTalent) {
     signals.push({
-      tipo: 'Competência técnica adicional',
-      descricao: `Possui "${extraSkills[0]}" declarado no currículo — competência não exigida para o cargo atual.`,
-      dado: extraSkills[0],
+      tipo: 'Possível talento não mapeado',
+      descricao: 'Demonstra alto potencial e prontidão ou desempenho elevado, porém não consta no planejamento sucessório.',
+      evidencias: capacityEvidences,
+      interpretacao: 'Os dados disponíveis apresentam sinais consistentes de capacidade para atuação em maior nível de complexidade, porém esse potencial ainda não aparece refletido no planejamento sucessório atual.',
+      confianca: capacityEvidences.length >= 4 ? 'Alta' : 'Média'
+    });
+  } else if (isAlternativeTrajectory) {
+    signals.push({
+      tipo: 'Possível trajetória alternativa',
+      descricao: 'Demonstra aderência técnica ou qualificações extras para outros contextos.',
+      evidencias: capacityEvidences.length > 0 ? capacityEvidences : ['Histórico profissional/formação compatível'],
+      interpretacao: 'Identificada possibilidade de trilha técnica (Especialista) ou mobilidade entre departamentos.',
+      confianca: 'Média'
     });
   }
-
-  // Signal 2: Good trainings outside role scope
-  const coreWords = m.cargo.toLowerCase().split(' ').filter(w => w.length > 3);
-  const goodOutside = m.treinamentos.filter(t => {
-    const isOutside = !coreWords.some(w => t.nome.toLowerCase().includes(w));
-    const isGood = ['Ótimo', 'Bom'].includes(t.conhecimento) || ['Ótimo', 'Bom'].includes(t.aplicacao);
-    return isOutside && isGood;
-  });
-  if (goodOutside.length > 0) {
-    const t = goodOutside[0]!;
-    signals.push({
-      tipo: 'Treinamento fora do escopo com bom desempenho',
-      descricao: `"${t.nome}" avaliado com conhecimento "${t.conhecimento}" e aplicação "${t.aplicacao}" — área diferente do escopo principal do cargo.`,
-      dado: t.nome,
-    });
-  }
-
-  // Signal 3: High fit cultural + advanced prontidão
-  const highFit = m.fit_cultural?.toLowerCase().includes('alto');
-  const advancedProntidao = /agora|6 meses/i.test(m.nivel_prontidao);
-  if (highFit && advancedProntidao) {
-    signals.push({
-      tipo: 'Prontidão e fit cultural altos',
-      descricao: `Fit cultural "${parseShortLabel(m.fit_cultural)}" aliado ao nível de prontidão "${parseShortLabel(m.nivel_prontidao)}" indica capacidade de absorver novos desafios rapidamente.`,
-      dado: parseShortLabel(m.nivel_prontidao),
-    });
-  }
-
-  // Signal 4: Behavioral competencies suggest broader roles
-  const leadershipKw = ['liderança', 'comunicação', 'influência', 'estratégia', 'equipe', 'gestão', 'visão'];
-  const behav = [m.competencia_comportamental, m.competencia_comportamental_2].filter(Boolean).join(' ').toLowerCase();
-  const leaderKw = leadershipKw.find(kw => behav.includes(kw));
-  if (leaderKw) {
-    const rawBehav = m.competencia_comportamental || m.competencia_comportamental_2 || leaderKw;
-    signals.push({
-      tipo: 'Competência comportamental de liderança',
-      descricao: `"${rawBehav}" é frequentemente associada a perfis de gestão ou liderança técnica, além do escopo do cargo atual.`,
-      dado: rawBehav,
-    });
-  }
-
-  // Signal 5: Education in different area from current role
-  if (m.curso_formacao && m.instituicao) {
-    const cargoLower = m.cargo.toLowerCase();
-    const formacaoLower = m.curso_formacao.toLowerCase();
-    const sameArea = ['engenharia', 'análise', 'análise', 'gestão', 'sistemas', 'computação', 'tecnologia']
-      .some(a => cargoLower.includes(a) && formacaoLower.includes(a));
-    if (!sameArea) {
-      signals.push({
-        tipo: 'Formação acadêmica em área diferente',
-        descricao: `Formação em ${m.curso_formacao} (${m.instituicao}) oferece perspectiva multidisciplinar que pode ser diferencial em funções que exigem visão mais ampla.`,
-        dado: `${m.curso_formacao} — ${m.instituicao}`,
-      });
-    }
-  }
-
-  const hasTalent = signals.length >= 2;
 
   const potentialAreas: string[] = [];
-  if (signals.some(s => s.tipo.includes('comportamental') || s.tipo.includes('liderança'))) potentialAreas.push('Liderança Técnica');
-  if (signals.some(s => s.tipo.includes('treinamento'))) potentialAreas.push('Gestão de Projetos');
-  if (signals.some(s => s.tipo.includes('formação'))) potentialAreas.push('Papéis Multidisciplinares');
-  if (signals.some(s => s.tipo.includes('prontidão'))) potentialAreas.push('Expansão de Responsabilidades');
-  if (potentialAreas.length === 0 && hasTalent) potentialAreas.push('Desafios além do cargo atual');
+  if (extraSkills.length > 0) potentialAreas.push('Arquitetura & Especialização');
+  if (isHighPotential) potentialAreas.push('Liderança & Sucessão');
 
-  const firstName = m.nome.split(' ')[0];
-  const areas = potentialAreas.slice(0, 2).join(' ou ');
-  const suggestion = hasTalent
-    ? `${firstName} demonstra características compatíveis com papéis que vão além do cargo atual. ${signals[0]?.descricao || ''} Vale explorar uma conversa de desenvolvimento sobre ${areas}.`
-    : '';
+  const confirmations = [
+    'Avaliação específica de competências de liderança/complexidade superior',
+    'Conversa de alinhamento de carreira e interesse para novas posições',
+    'Validação prática de prontidão no cargo atual'
+  ];
 
-  return { hasTalent, signals, suggestion, potentialAreas };
+  let confidence: 'Alta' | 'Moderada' | 'Limitada' | 'Sem evidência suficiente' = 'Sem evidência suficiente';
+  if (capacityEvidences.length >= 4) {
+    confidence = 'Alta';
+  } else if (capacityEvidences.length >= 2) {
+    confidence = 'Moderada';
+  } else if (capacityEvidences.length === 1) {
+    confidence = 'Limitada';
+  }
+
+  return {
+    hasTalent,
+    signals,
+    suggestion: isUnmappedTalent
+      ? `A análise identificou uma combinação incomum entre prontidão elevada, desempenho favorável e aderência às competências de uma posição superior, apesar de o colaborador ainda não estar formalmente identificado no mapa de sucessão.`
+      : (isRecognizedTalent ? 'Perfil de talento reconhecido pela organização.' : 'Perfil alinhado à trajetória atual ou com potencial de desenvolvimento padrão.'),
+    potentialAreas: potentialAreas.length > 0 ? potentialAreas : ['Desenvolvimento no Cargo'],
+    classificationName,
+    reasons: capacityEvidences,
+    confirmations,
+    confidence,
+    evidencesCount: capacityEvidences.length
+  };
 };
 
-// ─── Mock data (fallback when server is offline) ──────────────────────────────
-
-const MOCK_MEMBERS: CareerMember[] = [
-  {
-    id: '1', nome: 'Jane Doe', cargo: 'Principal Product Designer', departamento: 'Design',
-    nivel_cargo: 'Sênior', data_admissao: '2019-09-04', avatar: 'https://i.pravatar.cc/150?u=jane',
-    nivel_escolaridade: 'Superior Completo', curso_formacao: 'Psicologia', instituicao: 'USP',
-    idioma: 'Inglês', nivel_idioma: 'Avançado', anos_experiencia: 9,
-    competencia_tecnica_1: 'Figma', competencia_tecnica_2: 'UX Research', competencia_tecnica_3: 'Dados',
-    competencia_comportamental: 'Liderança Natural', competencia_comportamental_2: 'Comunicação',
-    certificacoes: 'Google UX Certificate',
-    fit_cultural: 'Alto - Vive e dissemina os valores', mapa_sucessao: 'Sim - Sucessora para Head de Design',
-    nivel_prontidao: 'Pronta em 6 meses - Pequenas lacunas a desenvolver',
-    risco_perda: 'Alto - Sinais claros de prospecção', impacto_saida: 'Crítico',
-    designacao_sucessao: 'Não - Sem sucessor mapeado', potencial_crescimento: 'Alto',
-    nota_desempenho: '5', comentarios_gestor: 'Excelente comunicação e liderança natural.',
-    treinamentos: [
-      { nome: 'Liderança Executiva', conhecimento: 'Ótimo', aplicacao: 'Ótimo', desempenho: 'Bom', eficacia: 'Sim', data: '2025-01-12', carga_horaria: '8h', provedor: 'Interno' },
-      { nome: 'Estratégia de Produto', conhecimento: 'Bom', aplicacao: 'Bom', desempenho: 'Bom', eficacia: 'Sim', data: '2025-06-10', carga_horaria: '16h', provedor: 'Coursera' },
-    ],
-    competencias_exigidas: [
-      { competencia: 'Figma', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'UX Research', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'Prototipagem', tipo: 'Técnica', nivel: 'Intermediário' },
-      { competencia: 'Comunicação', tipo: 'Comportamental', nivel: 'Avançado' },
-    ],
-  },
-  {
-    id: '2', nome: 'Marcus Reed', cargo: 'Senior Engineering Lead', departamento: 'Engineering',
-    nivel_cargo: 'Sênior', data_admissao: '2020-08-23', avatar: 'https://i.pravatar.cc/150?u=marcus',
-    nivel_escolaridade: 'Pós-Graduação', curso_formacao: 'Ciência da Computação', instituicao: 'ITA',
-    idioma: 'Inglês', nivel_idioma: 'Fluente', anos_experiencia: 12,
-    competencia_tecnica_1: 'React', competencia_tecnica_2: 'Node.js', competencia_tecnica_3: 'Kubernetes',
-    competencia_comportamental: 'Trabalho em Equipe', competencia_comportamental_2: 'Mentoria',
-    certificacoes: 'AWS Solutions Architect',
-    fit_cultural: 'Alto - Alinhado com os valores', mapa_sucessao: 'Sim - Sucessor para CTO',
-    nivel_prontidao: 'Pronto Agora - Pode assumir novas responsabilidades',
-    risco_perda: 'Médio', impacto_saida: 'Alto',
-    designacao_sucessao: 'Sim', potencial_crescimento: 'Alto',
-    nota_desempenho: '5', comentarios_gestor: 'Ótimo tecnicamente, referência no time.',
-    treinamentos: [
-      { nome: 'Arquitetura de Sistemas', conhecimento: 'Bom', aplicacao: 'Bom', desempenho: 'Bom', eficacia: 'Sim', data: '2026-05-18', carga_horaria: '40h', provedor: 'Interno' },
-      { nome: 'Gestão de Pessoas', conhecimento: 'Ótimo', aplicacao: 'Ótimo', desempenho: 'Bom', eficacia: 'Sim', data: '2025-09-01', carga_horaria: '20h', provedor: 'LinkedIn Learning' },
-    ],
-    competencias_exigidas: [
-      { competencia: 'React', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'Node.js', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'Arquitetura de Software', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'Liderança', tipo: 'Comportamental', nivel: 'Avançado' },
-    ],
-  },
-  {
-    id: '3', nome: 'Sarah Chen', cargo: 'Full Stack Architect', departamento: 'Engineering',
-    nivel_cargo: 'Pleno', data_admissao: '2021-05-28', avatar: 'https://i.pravatar.cc/150?u=sarah',
-    nivel_escolaridade: 'Superior Completo', curso_formacao: 'Marketing Digital', instituicao: 'ESPM',
-    idioma: 'Inglês', nivel_idioma: 'Intermediário', anos_experiencia: 7,
-    competencia_tecnica_1: 'Python', competencia_tecnica_2: 'SQL', competencia_tecnica_3: 'Análise de Dados',
-    competencia_comportamental: 'Resolução de Problemas', competencia_comportamental_2: 'Proatividade',
-    certificacoes: '',
-    fit_cultural: 'Médio - Alinhado parcialmente', mapa_sucessao: 'Não mapeado',
-    nivel_prontidao: 'Em Desenvolvimento - Necessita mais 1-2 anos',
-    risco_perda: 'Baixo', impacto_saida: 'Médio',
-    designacao_sucessao: 'Não', potencial_crescimento: 'Médio',
-    nota_desempenho: '4', comentarios_gestor: 'Muito reservada, precisa de mais proatividade.',
-    treinamentos: [
-      { nome: 'Estratégia de Escala', conhecimento: 'Ruim', aplicacao: 'Ruim', desempenho: 'Ruim', eficacia: 'Não', data: '2026-02-08', carga_horaria: '40h', provedor: 'Coursera' },
-      { nome: 'Fundamentos de Data Science', conhecimento: 'Ótimo', aplicacao: 'Bom', desempenho: 'Bom', eficacia: 'Sim', data: '2025-11-15', carga_horaria: '24h', provedor: 'Alura' },
-    ],
-    competencias_exigidas: [
-      { competencia: 'JavaScript', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'Arquitetura de APIs', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'DevOps', tipo: 'Técnica', nivel: 'Intermediário' },
-      { competencia: 'Resolução de Problemas', tipo: 'Comportamental', nivel: 'Avançado' },
-    ],
-  },
-  {
-    id: '4', nome: 'Thomas Klein', cargo: 'Operations Manager', departamento: 'Operations',
-    nivel_cargo: 'Pleno', data_admissao: '2024-12-31', avatar: 'https://i.pravatar.cc/150?u=thomas',
-    nivel_escolaridade: 'Superior Completo', curso_formacao: 'Administração', instituicao: 'FGV',
-    idioma: 'Espanhol', nivel_idioma: 'Fluente', anos_experiencia: 5,
-    competencia_tecnica_1: 'Excel Avançado', competencia_tecnica_2: 'Power BI', competencia_tecnica_3: '',
-    competencia_comportamental: 'Gestão de Conflitos', competencia_comportamental_2: 'Organização',
-    certificacoes: 'PMP',
-    fit_cultural: 'Alto - Foco total em processos', mapa_sucessao: 'Não mapeado',
-    nivel_prontidao: 'Pronto em 6 meses - Pequenas lacunas',
-    risco_perda: 'Baixo', impacto_saida: 'Alto',
-    designacao_sucessao: 'Não', potencial_crescimento: 'Baixo',
-    nota_desempenho: '4', comentarios_gestor: 'Líder operacional eficiente.',
-    treinamentos: [
-      { nome: 'Gestão de Projetos', conhecimento: 'Ótimo', aplicacao: 'Bom', desempenho: 'Bom', eficacia: 'Sim', data: '2025-04-05', carga_horaria: '40h', provedor: 'Alura' },
-      { nome: 'Liderança Estratégica', conhecimento: 'Bom', aplicacao: 'Ótimo', desempenho: 'Bom', eficacia: 'Sim', data: '2025-08-20', carga_horaria: '16h', provedor: 'Interno' },
-    ],
-    competencias_exigidas: [
-      { competencia: 'Excel Avançado', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'Gestão de Processos', tipo: 'Técnica', nivel: 'Avançado' },
-      { competencia: 'Gestão de Conflitos', tipo: 'Comportamental', nivel: 'Intermediário' },
-    ],
-  },
-];
-
-// ─── Prontidão badge colors ────────────────────────────────────────────────────
-
-const DEPT_COLORS: Record<string, string> = {
-  design: 'bg-purple-50 text-purple-700 border-purple-100',
-  engineering: 'bg-blue-50 text-blue-700 border-blue-100',
-  operations: 'bg-amber-50 text-amber-700 border-amber-100',
-  marketing: 'bg-pink-50 text-pink-700 border-pink-100',
-  financeiro: 'bg-emerald-50 text-emerald-700 border-emerald-100',
-};
-
-const deptColor = (dept: string) =>
-  DEPT_COLORS[dept.toLowerCase()] || 'bg-gray-100 text-gray-600 border-gray-200';
-
-// ─── Component ────────────────────────────────────────────────────────────────
-
-const CareerMap: React.FC<{ managerId: string }> = ({ managerId }) => {
+const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, managerId }) => {
   const [members, setMembers] = useState<CareerMember[]>([]);
-  const [filtered, setFiltered] = useState<CareerMember[]>([]);
-  const [selected, setSelected] = useState<CareerMember | null>(null);
+  const [filteredMembers, setFilteredMembers] = useState<CareerMember[]>([]);
+  const [selectedMember, setSelectedMember] = useState<CareerMember | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [filterDept, setFilterDept] = useState('');
-  const [filterProntidao, setFilterProntidao] = useState('');
-  const [filterTalento, setFilterTalento] = useState(false);
+  // Filters State
+  const [filterCategory, setFilterCategory] = useState<string | null>(null);
+  const [filterRole, setRoleFilter] = useState<string | null>(null);
+
+  // Hover Card State
+  const [hoverData, setHoverData] = useState<HoverCardData | null>(null);
+  const [anchorRect, setAnchorRect] = useState<DOMRect | null>(null);
+  const [isHoverVisible, setIsHoverVisible] = useState(false);
+  const hideTimerRef = useRef<any>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await api.get(`/api/career-map?managerId=${managerId}`);
-        setMembers(res.data);
-      } catch {
-        setMembers(MOCK_MEMBERS);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
+    fetchCareerMap();
   }, [managerId]);
 
-  useEffect(() => {
-    let result = members;
-    if (filterDept) result = result.filter(m => m.departamento.toLowerCase() === filterDept.toLowerCase());
-    if (filterProntidao) result = result.filter(m => m.nivel_prontidao.toLowerCase().includes(filterProntidao.toLowerCase()));
-    if (filterTalento) result = result.filter(m => computeHiddenTalent(m).hasTalent);
-    setFiltered(result);
-  }, [members, filterDept, filterProntidao, filterTalento]);
+  const fetchCareerMap = async () => {
+    setIsLoading(true);
+    try {
+      const response = await api.get(`/api/career-map?managerId=${managerId}`);
+      setMembers(response.data);
+      setFilteredMembers(response.data);
+    } catch (error) {
+      console.error("Failed to fetch career map data", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  const departments = [...new Set(members.map(m => m.departamento))].filter(Boolean);
+  useEffect(() => {
+    let result = members.filter(m =>
+      m.nome.toLowerCase().includes(search.toLowerCase()) ||
+      m.cargo.toLowerCase().includes(search.toLowerCase()) ||
+      m.departamento.toLowerCase().includes(search.toLowerCase()) ||
+      (m.curso_formacao && m.curso_formacao.toLowerCase().includes(search.toLowerCase())) ||
+      (m.competencia_tecnica_1 && m.competencia_tecnica_1.toLowerCase().includes(search.toLowerCase()))
+    );
+
+    if (filterCategory === 'successors') {
+      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Sucessor formal');
+    } else if (filterCategory === 'strategic_talents') {
+      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Talento reconhecido');
+    } else if (filterCategory === 'high_potential') {
+      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Potencial de desenvolvimento');
+    } else if (filterCategory === 'hidden_talents') {
+      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Possível talento não mapeado');
+    } else if (filterCategory === 'high_risk') {
+      result = result.filter(m => /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida));
+    } else if (filterCategory === 'all') {
+      // no filter
+    }
+
+    if (filterRole && filterRole !== 'ALL') {
+      result = result.filter(m => m.cargo === filterRole);
+    }
+
+    setFilteredMembers(result);
+  }, [search, members, filterCategory, filterRole]);
+
+  // Methodology Modal State
+  const [isMethodologyOpen, setIsMethodologyOpen] = useState(false);
+
+  // Hover Card Handlers
+  const handleCardMouseEnter = (m: CareerMember, event: React.MouseEvent<HTMLElement>) => {
+    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
+    const rect = event.currentTarget.getBoundingClientRect();
+    setAnchorRect(rect);
+    setHoverData({
+      id: m.id,
+      name: m.nome,
+      role: m.cargo,
+      department: m.departamento,
+      superior_imediato: m.superior_imediato || 'Gestor Logado',
+      pdiAverage: 80,
+      alignmentScore: 85,
+      evaluationStatus: parseShortLabel(m.nivel_prontidao),
+      goalsCount: m.competencias_exigidas?.length || 3,
+      actionsCount: m.treinamentos?.length || 2,
+      avatar: m.avatar
+    });
+    setIsHoverVisible(true);
+  };
+
+  const handleCardMouseLeave = () => {
+    hideTimerRef.current = setTimeout(() => {
+      setIsHoverVisible(false);
+    }, 150);
+  };
+
+  // Team Aggregation Metrics
+  const totalTeam = members.length;
+  const strategicTalents = members.filter(m => computeHiddenTalent(m).classificationName === 'Talento reconhecido').length;
+  const successorsCount = members.filter(m => computeHiddenTalent(m).classificationName === 'Sucessor formal').length;
+  const highPotentialCount = members.filter(m => computeHiddenTalent(m).classificationName === 'Potencial de desenvolvimento').length;
+  const hiddenTalentsCount = members.filter(m => computeHiddenTalent(m).classificationName === 'Possível talento não mapeado').length;
+  const highRiskCount = members.filter(m => /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida)).length;
+
+
+  // Check 9-box matrix data availability
+  const membersWithPerformanceAndPotential = members.filter(m => m.nota_desempenho && m.potencial_crescimento);
+  const isNineBoxAvailable = membersWithPerformanceAndPotential.length >= 2;
+
+  // Filter members by category
+  const membersInSelectedCategory = React.useMemo(() => {
+    if (!filterCategory) return [];
+    let result = members;
+    if (filterCategory === 'successors') {
+      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Sucessor formal');
+    } else if (filterCategory === 'strategic_talents') {
+      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Talento reconhecido');
+    } else if (filterCategory === 'high_potential') {
+      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Potencial de desenvolvimento');
+    } else if (filterCategory === 'hidden_talents') {
+      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Possível talento não mapeado');
+    } else if (filterCategory === 'high_risk') {
+      result = result.filter(m => /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida));
+    } else if (filterCategory === 'all') {
+      result = members;
+    }
+    return result;
+  }, [members, filterCategory]);
+
+  const rolesInSelectedCategory = React.useMemo(() => {
+    if (!filterCategory) return [];
+    const groups: { [key: string]: CareerMember[] } = {};
+    membersInSelectedCategory.forEach(m => {
+      const role = m.cargo || 'Não Definido';
+      if (!groups[role]) groups[role] = [];
+      groups[role].push(m);
+    });
+    return Object.keys(groups).map(roleName => ({
+      roleName,
+      members: groups[roleName]
+    })).sort((a, b) => b.members.length - a.members.length);
+  }, [membersInSelectedCategory, filterCategory]);
+
+  const getCategoryName = (cat: string | null) => {
+    if (cat === 'strategic_talents') return '🌟 Talentos Reconhecidos';
+    if (cat === 'successors') return '👑 Sucessores';
+    if (cat === 'high_potential') return '📈 Potencial de Desenvolvimento';
+    if (cat === 'hidden_talents') return '🔎 Possíveis Talentos Não Mapeados';
+    if (cat === 'high_risk') return '⚠️ Alto Risco';
+    if (cat === 'all') return 'Toda a Equipe';
+    return '';
+  };
+
+  const handleCategoryClick = (cat: string) => {
+    setFilterCategory(filterCategory === cat ? null : cat);
+    setRoleFilter(null);
+  };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
-      <CareerDetailPanel member={selected} onClose={() => setSelected(null)} />
+    <div className="space-y-8 animate-in fade-in duration-500 relative">
+      {/* Detail Drawer */}
+      <CareerDetailPanel
+        member={selectedMember}
+        onClose={() => setSelectedMember(null)}
+      />
 
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">Mapa de Carreira</h1>
-        <p className="text-gray-500 mt-2 text-sm font-medium">
-          Visualize o potencial de desenvolvimento individual e identifique talentos ocultos no seu time.
-        </p>
-      </div>
+      {/* Floating Hover Card */}
+      <CollaboratorHoverCard
+        data={hoverData}
+        anchorRect={anchorRect}
+        isVisible={isHoverVisible}
+        onMouseEnter={() => { if (hideTimerRef.current) clearTimeout(hideTimerRef.current); }}
+        onMouseLeave={handleCardMouseLeave}
+      />
 
-      {/* Filters */}
-      <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2 text-xs font-bold text-gray-400">
-          <Filter className="w-3.5 h-3.5" />
-          Filtros
-        </div>
-        <div className="w-px h-5 bg-gray-200" />
-
-        {/* Department filter */}
-        <select
-          value={filterDept}
-          onChange={e => setFilterDept(e.target.value)}
-          className="text-xs font-bold border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-600/10 focus:border-primary-600 transition-all"
-        >
-          <option value="">Todos os Departamentos</option>
-          {departments.map(d => <option key={d} value={d}>{d}</option>)}
-        </select>
-
-        {/* Prontidão filter */}
-        <select
-          value={filterProntidao}
-          onChange={e => setFilterProntidao(e.target.value)}
-          className="text-xs font-bold border border-gray-200 rounded-xl px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-600/10 focus:border-primary-600 transition-all"
-        >
-          <option value="">Qualquer Prontidão</option>
-          <option value="agora">Pronto Agora</option>
-          <option value="6 meses">Em 6 meses</option>
-          <option value="1-2 anos">Em 1-2 anos</option>
-          <option value="desenvolviment">Em Desenvolvimento</option>
-        </select>
-
-        {/* Talent alert toggle */}
-        <button
-          onClick={() => setFilterTalento(!filterTalento)}
-          className={`flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition-all ${
-            filterTalento
-              ? 'bg-amber-50 border-amber-200 text-amber-700'
-              : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
-          }`}
-        >
-          <Zap className={`w-3.5 h-3.5 ${filterTalento ? 'fill-amber-400 text-amber-400' : ''}`} />
-          Talento Oculto Identificado
-        </button>
-
-        <span className="ml-auto text-xs text-gray-400 font-bold">
-          {filtered.length} colaborador{filtered.length !== 1 ? 'es' : ''}
-        </span>
-      </div>
-
-      {/* Team Grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="bg-white border border-gray-100 rounded-2xl p-6 space-y-4 animate-pulse">
+      {/* Methodology Modal */}
+      {isMethodologyOpen && (
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-navy-950/65 backdrop-blur-sm animate-in fade-in duration-200 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 max-w-2xl w-full p-6 space-y-5 animate-in zoom-in-95 text-xs">
+            <div className="flex justify-between items-start border-b border-gray-100 pb-4">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gray-200 rounded-xl" />
-                <div className="space-y-2 flex-1">
-                  <div className="h-3 bg-gray-200 rounded w-2/3" />
-                  <div className="h-2.5 bg-gray-100 rounded w-1/2" />
+                <div className="w-10 h-10 rounded-2xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center font-black">
+                  <Sparkles className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-gray-900">Como funciona a Inteligência de Carreira?</h3>
+                  <span className="text-[10px] text-gray-400 font-bold">Metodologia de Rastreabilidade e Auditoria</span>
                 </div>
               </div>
-              <div className="h-2 bg-gray-100 rounded" />
-              <div className="h-8 bg-gray-100 rounded-xl" />
+              <button onClick={() => setIsMethodologyOpen(false)} className="p-2 rounded-xl text-gray-400 hover:text-gray-700">✕</button>
             </div>
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="py-20 text-center text-gray-400">
-          <TrendingUp className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p className="font-bold text-sm">Nenhum colaborador encontrado com os filtros aplicados.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filtered.map(m => {
-            const prontidao = parseProntidao(m.nivel_prontidao);
-            const talent = computeHiddenTalent(m);
-            const fitLabel = parseShortLabel(m.fit_cultural);
-            const potLabel = m.potencial_crescimento || '—';
-            const initials = m.nome.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
-            return (
-              <div
-                key={m.id}
-                className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col gap-4 hover:shadow-lg transition-all duration-300 group"
-              >
-                {/* Card header */}
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl overflow-hidden bg-primary-100 border border-primary-100 shrink-0 flex items-center justify-center">
-                      <img
-                        src={m.avatar}
-                        alt={m.nome}
-                        className="w-full h-full object-cover"
-                        onError={e => {
-                          (e.target as HTMLImageElement).style.display = 'none';
-                          (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-primary-600 font-black text-sm">${initials}</span>`;
-                        }}
-                      />
-                    </div>
-                    <div>
-                      <h3 className="font-extrabold text-gray-900 text-sm leading-snug">{m.nome}</h3>
-                      <p className="text-gray-400 text-xs font-medium mt-0.5">{m.cargo}</p>
-                    </div>
-                  </div>
-                  {talent.hasTalent && (
-                    <div title="Talento Oculto Identificado pela IA" className="shrink-0">
-                      <span className="flex items-center gap-1 text-[9px] font-black bg-amber-50 border border-amber-200 text-amber-600 px-2 py-1 rounded-full">
-                        <Zap className="w-2.5 h-2.5 fill-amber-400" />
-                        Talento
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Department */}
-                <span className={`self-start text-[9px] font-black px-2.5 py-1 rounded-full border uppercase tracking-wider ${deptColor(m.departamento)}`}>
-                  {m.departamento}
-                </span>
-
-                {/* Key metrics */}
-                <div className="space-y-2 border-t border-gray-50 pt-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400 font-bold">Prontidão</span>
-                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full border ${prontidao.bg} ${prontidao.border} ${prontidao.text}`}>
-                      {prontidao.label}
-                    </span>
-                  </div>
-                  {m.fit_cultural && (
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-400 font-bold">Fit Cultural</span>
-                      <span className={`text-[10px] font-bold text-gray-600`}>{fitLabel}</span>
-                    </div>
-                  )}
-                  {m.potencial_crescimento && (
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-400 font-bold">Potencial</span>
-                      <span className={`text-[10px] font-bold ${potLabel === 'Alto' ? 'text-emerald-600' : potLabel === 'Baixo' ? 'text-rose-500' : 'text-amber-600'}`}>
-                        {potLabel}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* CTA */}
-                <button
-                  onClick={() => setSelected(m)}
-                  className="mt-auto flex items-center justify-between w-full px-4 py-2.5 bg-gray-50 hover:bg-primary-50 border border-gray-100 hover:border-primary-100 rounded-xl text-xs font-bold text-gray-600 hover:text-primary-600 transition-all active:scale-95"
-                >
-                  Ver Perfil de Carreira
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+            <div className="space-y-3 leading-relaxed text-gray-600 font-medium">
+              <p>
+                As análises da aba <strong>Carreira</strong> utilizam os dados estruturados cadastrados na plataforma (como avaliações de gestor, prontidão, competências requeridas, histórico de treinamentos e sucessão) para identificar padrões de potencial e produzir <strong>leituras profundas de carreira</strong>.
+              </p>
+              <div className="bg-purple-50/60 p-4 rounded-2xl border border-purple-100 space-y-2 text-purple-950 font-bold">
+                <span className="text-[10px] uppercase tracking-wider block text-purple-700">Estrutura de Explicabilidade:</span>
+                <p className="text-[11px]">CONCLUSÃO → EVIDÊNCIAS → TRADUÇÃO GERENCIAL → LIMITAÇÕES → AÇÃO NO PDI</p>
               </div>
-            );
-          })}
+              <ul className="space-y-1.5 list-disc pl-4 text-[11px]">
+                <li><strong>Análises com evidências parciais:</strong> A ausência de um campo específico (ex: desempenho) não invalida os demais sinais observados. A IA gera uma interpretação útil classificada como <em>Confiança Moderada</em>, apontando explicitamente as ressalvas.</li>
+                <li><strong>Apoio técnico à decisão:</strong> As leituras orientam o diálogo entre gestor e liderado, sem automatizar promoções ou movimentações.</li>
+                <li><strong>Rastreabilidade total:</strong> Cada indicador possui o botão <em>"Como chegamos a essa conclusão?"</em> com a matriz de impacto dos fatos observados.</li>
+              </ul>
+            </div>
+
+            <div className="pt-3 border-t border-gray-100 flex justify-end">
+              <button
+                onClick={() => setIsMethodologyOpen(false)}
+                className="bg-purple-600 hover:bg-purple-700 text-white font-extrabold px-5 py-2.5 rounded-xl shadow-md text-xs"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Insight banner */}
-      {!isLoading && filtered.length > 0 && (
-        <div className="bg-gradient-to-r from-gray-900 to-indigo-950 rounded-2xl p-6 flex items-center gap-5 shadow-lg">
-          <div className="w-10 h-10 bg-purple-500/20 border border-purple-400/20 rounded-xl flex items-center justify-center shrink-0">
-            <Sparkles className="w-5 h-5 text-purple-400" />
-          </div>
+      {/* Header section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+        <div>
+          <h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+            Inteligência de Carreira e Talentos
+            <span className="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-bold border border-purple-200">
+              Gestão de Potencial
+            </span>
+          </h1>
+          <p className="text-gray-500 mt-2 text-sm font-medium max-w-3xl">
+            Análise estruturada do perfil profissional, mapa de sucessão, alinhamento de competências, talentos ocultos e trilhas de evolução da sua equipe.
+          </p>
+        </div>
+      </div>
+
+      {/* Disclaimer Geral */}
+      <div className="bg-gradient-to-r from-purple-50/90 via-primary-50/40 to-white border border-purple-100 shadow-sm p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="text-xs space-y-1">
+          <span className="font-extrabold text-purple-900 flex items-center gap-1.5 text-xs">
+            <Sparkles className="w-4 h-4 text-purple-600" />
+            Sobre esta análise de inteligência
+          </span>
+          <p className="text-gray-600 font-medium max-w-3xl leading-relaxed text-[11px]">
+            As análises são geradas a partir dos dados disponíveis na plataforma. A IA identifica padrões e possíveis caminhos de desenvolvimento como apoio à decisão do gestor, sem automatizar promoções ou movimentações.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setIsMethodologyOpen(true)}
+          className="bg-white hover:bg-purple-50 border border-purple-200 text-purple-700 font-extrabold text-xs py-2 px-3.5 rounded-xl transition-all shadow-sm active:scale-95 shrink-0"
+        >
+          Como essa análise funciona?
+        </button>
+      </div>
+
+      {/* Matriz cards */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
+        <div
+          onClick={() => handleCategoryClick('strategic_talents')}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+            filterCategory === 'strategic_talents' ? 'bg-purple-600 text-white border-purple-700 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-purple-200'
+          }`}
+        >
           <div>
-            <p className="text-white text-sm font-black">
-              {filtered.filter(m => computeHiddenTalent(m).hasTalent).length} colaborador(es) com potencial não explorado identificado pela IA
+            <div className="flex items-center justify-between">
+              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'strategic_talents' ? 'text-purple-100' : 'text-gray-400'}`}>
+                Talentos Reconhecidos
+              </span>
+              <Sparkles className={`w-4 h-4 ${filterCategory === 'strategic_talents' ? 'text-yellow-300' : 'text-purple-600'}`} />
+            </div>
+            <span className="text-2xl font-black block mt-2">{strategicTalents}</span>
+          </div>
+          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'strategic_talents' ? 'text-purple-200' : 'text-gray-400'}`}>
+            Potencial já identificado
+          </span>
+        </div>
+
+        <div
+          onClick={() => handleCategoryClick('successors')}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+            filterCategory === 'successors' ? 'bg-emerald-600 text-white border-emerald-700 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-emerald-200'
+          }`}
+        >
+          <div>
+            <div className="flex items-center justify-between">
+              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'successors' ? 'text-emerald-100' : 'text-gray-400'}`}>
+                Sucessores
+              </span>
+              <ShieldCheck className={`w-4 h-4 ${filterCategory === 'successors' ? 'text-white' : 'text-emerald-600'}`} />
+            </div>
+            <span className="text-2xl font-black block mt-2">{successorsCount}</span>
+          </div>
+          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'successors' ? 'text-emerald-200' : 'text-gray-400'}`}>
+            Mapeados para sucessão
+          </span>
+        </div>
+
+        <div
+          onClick={() => handleCategoryClick('high_potential')}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+            filterCategory === 'high_potential' ? 'bg-blue-600 text-white border-blue-700 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-blue-200'
+          }`}
+        >
+          <div>
+            <div className="flex items-center justify-between">
+              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'high_potential' ? 'text-blue-100' : 'text-gray-400'}`}>
+                Potencial de Desenvolvimento
+              </span>
+              <TrendingUp className={`w-4 h-4 ${filterCategory === 'high_potential' ? 'text-white' : 'text-blue-600'}`} />
+            </div>
+            <span className="text-2xl font-black block mt-2">{highPotentialCount}</span>
+          </div>
+          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'high_potential' ? 'text-blue-200' : 'text-gray-400'}`}>
+            Perspectiva de evolução
+          </span>
+        </div>
+
+        <div
+          onClick={() => handleCategoryClick('hidden_talents')}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+            filterCategory === 'hidden_talents' ? 'bg-amber-500 text-white border-amber-600 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-amber-200'
+          }`}
+        >
+          <div>
+            <div className="flex items-center justify-between">
+              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'hidden_talents' ? 'text-amber-100' : 'text-gray-400'}`}>
+                Possíveis talentos não mapeados
+              </span>
+              <Zap className={`w-4 h-4 ${filterCategory === 'hidden_talents' ? 'text-yellow-200' : 'text-amber-500'}`} />
+            </div>
+            <span className="text-2xl font-black block mt-2">{hiddenTalentsCount}</span>
+          </div>
+          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'hidden_talents' ? 'text-amber-100' : 'text-gray-400'}`}>
+            Oportunidade de investigação
+          </span>
+        </div>
+
+        <div
+          onClick={() => handleCategoryClick('high_risk')}
+          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+            filterCategory === 'high_risk' ? 'bg-rose-600 text-white border-rose-700 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-rose-200'
+          }`}
+        >
+          <div>
+            <div className="flex items-center justify-between">
+              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'high_risk' ? 'text-rose-100' : 'text-gray-400'}`}>
+                Risco Elevado
+              </span>
+              <ShieldAlert className={`w-4 h-4 ${filterCategory === 'high_risk' ? 'text-white' : 'text-rose-600'}`} />
+            </div>
+            <span className="text-2xl font-black block mt-2">{highRiskCount}</span>
+          </div>
+          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'high_risk' ? 'text-rose-200' : 'text-gray-400'}`}>
+            Risco de perda + Impacto
+          </span>
+        </div>
+      </div>
+
+      {/* ── 2. CAMADA 1: OVERVIEW INICIAL (SEM CATEGORIA SELECIONADA) ───────────────── */}
+      {filterCategory === null ? (
+        <div className="space-y-6">
+          {/* Matriz 9-Box */}
+          <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Target className="w-5 h-5 text-purple-600" />
+                <h3 className="text-sm font-extrabold text-gray-900">Matriz Potencial × Desempenho (9-Box)</h3>
+              </div>
+              {!isNineBoxAvailable && (
+                <span className="text-[11px] font-extrabold bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full flex items-center gap-1.5">
+                  <AlertTriangle className="w-3.5 h-3.5" />
+                  Matriz indisponível — dados insuficientes
+                </span>
+              )}
+            </div>
+
+            {isNineBoxAvailable ? (
+              <div className="grid grid-cols-3 gap-3 pt-2 text-center text-xs">
+                <div className="bg-purple-50 p-3 rounded-xl border border-purple-100">
+                  <span className="font-extrabold text-purple-700 block text-[11px]">Enigma / Desenvolver</span>
+                  <span className="text-gray-500 text-[10px]">Alto Potencial · Desempenho Baixo</span>
+                </div>
+                <div className="bg-purple-100 p-3 rounded-xl border border-purple-200">
+                  <span className="font-extrabold text-purple-800 block text-[11px]">Forte Desempenho</span>
+                  <span className="text-purple-700 text-[10px]">Alto Potencial · Desempenho Médio</span>
+                </div>
+                <div className="bg-emerald-100 p-3 rounded-xl border border-emerald-300 shadow-sm">
+                  <span className="font-black text-emerald-800 block text-[11px]">🌟 TALENTOS ESTRATÉGICOS</span>
+                  <span className="text-emerald-700 text-[10px]">Alto Potencial · Alto Desempenho</span>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-gray-400 font-medium">
+                Para habilitar o mapeamento 9-Box completo, certifique-se de que a planilha de avaliações contenha a avaliação de desempenho e potencial preenchidas para os liderados.
+              </p>
+            )}
+          </div>
+
+          {/* Call to Action card */}
+          <div className="bg-gray-50/50 border border-dashed border-gray-200 p-10 rounded-3xl text-center space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center mx-auto">
+              <Users className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-extrabold text-gray-900">Selecione uma categoria para explorar a equipe</h3>
+            <p className="text-gray-500 text-xs font-medium max-w-md mx-auto leading-relaxed">
+              Clique em qualquer um dos 5 cards de inteligência acima para detalhar os cargos e os liderados associados a essa classificação de talento.
             </p>
-            <p className="text-gray-400 text-xs mt-0.5">
-              Clique em "Ver Perfil de Carreira" para ver a análise detalhada com evidências e sugestões.
-            </p>
+            <button
+              onClick={() => { setFilterCategory('all'); setRoleFilter(null); }}
+              className="mt-2 inline-flex items-center gap-2 text-xs font-extrabold text-purple-600 bg-white border border-purple-200 px-4 py-2.5 rounded-xl hover:bg-purple-50 transition-all shadow-sm active:scale-95"
+            >
+              <span>Ou visualizar toda a equipe ({totalTeam} colaboradores)</span>
+            </button>
+          </div>
+        </div>
+
+      /* ── 3. CAMADA 2: CATEGORIA SELECIONADA -> DIVISÃO POR CARGO ────────────────── */
+      ) : filterCategory !== null && filterRole === null ? (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="flex justify-between items-center bg-white border border-gray-100 p-4 rounded-xl shadow-sm">
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setFilterCategory(null)}
+                className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all text-xs font-bold flex items-center gap-1.5"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Voltar ao Overview
+              </button>
+              <span className="text-xs font-black text-gray-950 uppercase tracking-wider">
+                Grupo: {getCategoryName(filterCategory)}
+              </span>
+            </div>
+
+            <button
+              onClick={() => setRoleFilter('ALL')}
+              className="text-xs font-extrabold text-purple-600 hover:text-purple-700 bg-purple-50 hover:bg-purple-100 px-3.5 py-2 rounded-xl transition-all"
+            >
+              Ver todos do grupo ({membersInSelectedCategory.length}) →
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {rolesInSelectedCategory.map(roleItem => (
+              <div
+                key={roleItem.roleName}
+                className="bg-white border border-gray-100 shadow-md hover:shadow-xl rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 group hover:-translate-y-0.5"
+              >
+                <div>
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center font-black shrink-0">
+                        <Briefcase className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <h4 className="text-base font-extrabold text-gray-900 group-hover:text-purple-600 transition-colors leading-snug">
+                          {roleItem.roleName}
+                        </h4>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                          Cargo na categoria
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100 flex justify-between items-center text-xs my-4">
+                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Colaboradores</span>
+                    <span className="text-sm font-black text-gray-900">{roleItem.members.length}</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setRoleFilter(roleItem.roleName)}
+                  className="w-full mt-2 flex items-center justify-between bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white font-extrabold text-xs py-2.5 px-4 rounded-xl border border-purple-100 transition-all active:scale-95 group-hover:bg-purple-600 group-hover:text-white"
+                >
+                  <span>Ver Pessoas em {roleItem.roleName}</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+      /* ── 4. CAMADA 3: CARGO SELECIONADO -> LISTA DE COLABORADORES ────────────────── */
+      ) : (
+        <div className="space-y-6 animate-in fade-in duration-300">
+          <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setRoleFilter(null)}
+                className="px-3.5 py-2 rounded-xl text-xs font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all border border-gray-200 flex items-center gap-1.5"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Voltar aos Cargos
+              </button>
+              <span className="text-xs font-black text-gray-900 bg-purple-50 border border-purple-100 px-3 py-1 rounded-full">
+                Grupo: {getCategoryName(filterCategory)}
+              </span>
+              <span className="text-xs font-black text-gray-900 bg-gray-50 border border-gray-200 px-3 py-1 rounded-full">
+                Cargo: {filterRole === 'ALL' ? 'Todos os Cargos' : filterRole}
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {isLoading ? (
+              <div className="col-span-full py-16 text-center text-gray-400 font-bold">Carregando mapa de carreiras da equipe...</div>
+            ) : filteredMembers.length === 0 ? (
+              <div className="col-span-full py-16 text-center text-gray-400 font-bold bg-white rounded-2xl border border-gray-100">
+                Nenhum colaborador encontrado para os filtros selecionados.
+              </div>
+            ) : (
+              filteredMembers.map((m) => {
+                const prontidaoInfo = parseProntidao(m.nivel_prontidao);
+                const hiddenTalents = computeHiddenTalent(m);
+                const isStrategic = /alto/i.test(m.potencial_crescimento) && (/agora|6 meses|imediata/i.test(m.nivel_prontidao) || /sim|sucessor/i.test(m.mapa_sucessao));
+                const isHighLossRisk = /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida);
+
+                return (
+                  <div
+                    key={m.id}
+                    onMouseEnter={(e) => handleCardMouseEnter(m, e)}
+                    onMouseLeave={handleCardMouseLeave}
+                    onClick={() => setSelectedMember(m)}
+                    className="bg-white border border-gray-100 hover:border-purple-300 shadow-md hover:shadow-xl rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 cursor-pointer group hover:-translate-y-0.5 relative"
+                  >
+                    <div>
+                      {/* Badges Bar */}
+                      <div className="flex flex-wrap gap-1.5 mb-3">
+                        {hiddenTalents.classificationName === 'Sucessor formal' && (
+                          <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 uppercase tracking-wider">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                            Sucessor Identificado
+                          </span>
+                        )}
+
+                        {hiddenTalents.classificationName === 'Talento reconhecido' && (
+                          <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1 uppercase tracking-wider">
+                            <Sparkles className="w-3.5 h-3.5 text-yellow-500 fill-current" />
+                            Talento Reconhecido
+                          </span>
+                        )}
+
+                        {hiddenTalents.classificationName === 'Possível talento não mapeado' && (
+                          <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1 uppercase tracking-wider">
+                            <Zap className="w-3.5 h-3.5 text-amber-500 fill-current" />
+                            Talento Não Mapeado
+                          </span>
+                        )}
+
+                        {isHighLossRisk && (
+                          <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1 uppercase tracking-wider">
+                            <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
+                            Prioridade Retenção
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Collaborator info */}
+                      <div className="flex items-start gap-3.5 mb-4">
+                        <div className="w-12 h-12 rounded-xl overflow-hidden border border-gray-100 bg-gray-100 shrink-0 group-hover:ring-2 ring-purple-500 transition-all">
+                          <img src={m.avatar} alt={m.nome} className="w-full h-full object-cover" />
+                        </div>
+                        <div>
+                          <h3 className="font-extrabold text-gray-900 text-base leading-snug group-hover:text-purple-600 transition-colors">
+                            {m.nome}
+                          </h3>
+                          <p className="text-gray-400 text-xs font-medium">{m.cargo}</p>
+                          <span className="text-[10px] text-gray-400 font-bold block mt-0.5">{m.departamento}</span>
+                        </div>
+                      </div>
+
+                      {/* Career Metrics Grid */}
+                      <div className="grid grid-cols-2 gap-2 my-4 bg-gray-50/80 p-3 rounded-xl border border-gray-100 text-xs">
+                        <div>
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Potencial</span>
+                          <span className="font-extrabold text-gray-800">{m.potencial_crescimento || 'Não avaliado'}</span>
+                        </div>
+
+                        <div>
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Prontidão</span>
+                          <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded border inline-block mt-0.5 ${prontidaoInfo.bg} ${prontidaoInfo.text} ${prontidaoInfo.border}`}>
+                            {prontidaoInfo.label}
+                          </span>
+                        </div>
+
+                        <div className="pt-2 border-t border-gray-100">
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Sucessão</span>
+                          <span className="font-extrabold text-gray-800">{parseShortLabel(m.mapa_sucessao)}</span>
+                        </div>
+
+                        <div className="pt-2 border-t border-gray-100">
+                          <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Risco de Perda</span>
+                          <span className="font-extrabold text-gray-800">{parseShortLabel(m.risco_perda)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Action Button */}
+                    <div className="pt-3 border-t border-gray-50 flex items-center justify-between text-xs font-extrabold text-purple-600 group-hover:text-purple-700">
+                      <span>Abrir Inteligência de Carreira</span>
+                      <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
       )}

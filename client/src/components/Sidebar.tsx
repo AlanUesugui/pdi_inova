@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Target, TrendingUp, MessageSquare, Sparkles, Settings, Briefcase } from 'lucide-react';
+import { LayoutDashboard, Target, TrendingUp, MessageSquare, Sparkles, Settings } from 'lucide-react';
 
 interface SidebarProps {
   onGenerateReport: () => void;
@@ -44,14 +44,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onGenerateReport, currentView, onView
           >
             <TrendingUp className="w-5 h-5 mr-3 shrink-0" />
             Carreira
-          </button>
-
-          <button
-            onClick={() => onViewChange('roles')}
-            className={currentView === 'roles' ? 'sidebar-link-active w-full text-left' : 'sidebar-link w-full text-left'}
-          >
-            <Briefcase className="w-5 h-5 mr-3 shrink-0" />
-            Cargos
           </button>
 
           <button className="sidebar-link w-full text-left opacity-60 cursor-not-allowed">

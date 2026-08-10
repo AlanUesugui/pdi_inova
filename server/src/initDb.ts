@@ -40,11 +40,12 @@ async function importCsv() {
     const status = isManager ? 'Gestor' : 'Colaborador';
 
     await db.run(
-      'INSERT INTO collaborators (id, nome, cargo, departamento, gestor_id, status, data_admissao, modalidade_trabalho, email, nivel_cargo, centro_de_custo, tipo_contrato) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO collaborators (id, nome, cargo, departamento, gestor_id, status, data_admissao, modalidade_trabalho, email, nivel_cargo, centro_de_custo, tipo_contrato, superior_imediato) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET superior_imediato = EXCLUDED.superior_imediato, gestor_id = EXCLUDED.gestor_id',
       [
         collabId, collab.nome, collab.cargo, collab.departamento, collab.gestor_id, status,
         collab.data_admissao || "", collab.modalidade_trabalho || "", collab.email || "",
-        collab.nivel_cargo || "", collab.centro_de_custo || "", collab.tipo_contrato || ""
+        collab.nivel_cargo || "", collab.centro_de_custo || "", collab.tipo_contrato || "",
+        collab.superior_imediato || null
       ]
     );
     if (isManager) {

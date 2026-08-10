@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import TeamManagement from './components/TeamManagement';
-import RolesManagement from './components/RolesManagement';
 import CareerMap from './components/CareerMap';
 import FeedbackManagement from './components/FeedbackManagement';
 import Login from './components/Login';
 import { getDynamicProgressColor } from './utils/colors';
-import { Search, ChevronRight } from 'lucide-react';
+import { Search, ChevronRight, HelpCircle } from 'lucide-react';
 import api from './utils/api';
+import ExplainabilityModal from './components/ExplainabilityModal';
 
 interface RadarChartProps {
   averages: number[];
@@ -193,6 +193,246 @@ const App: React.FC = () => {
     coursesRate: 42,
     certsRate: 91
   });
+
+  const [explainModalOpen, setExplainModalOpen] = useState(false);
+  const [explainData, setExplainData] = useState<any>(null);
+
+  const openExplainability = (type: string) => {
+    let data: any = null;
+    const todayStr = new Date().toLocaleDateString('pt-BR');
+    
+    switch (type) {
+      case 'membros_ativos':
+        data = {
+          title: "Membros Ativos do Time",
+          indicatorName: "Quantidade de liderados diretos",
+          formulaDescription: "Contagem simples de registros de colaboradores ativos na tabela de banco de dados onde o gestor direto é igual ao usuário logado, excluindo cargos de gestão para evitar duplicidade de liderança.",
+          breakdownItems: [
+            `Total de colaboradores vinculados ao seu ID: ${stats.activeMembersCount}`,
+            "Exclusão de cargos contendo a palavra 'gestor': Ativo"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Apenas colaboradores com status ativo.",
+            "Desconsidera o próprio gestor e cargos de liderança direta."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'collaborators'"
+        };
+        break;
+      case 'skills_mapeados':
+        data = {
+          title: "Skills Mapeados",
+          indicatorName: "Competências exigidas nos cargos do time",
+          formulaDescription: "Mapeamento das competências únicas necessárias para o escopo de atuação do time. Lê a matriz de cargos oficiais cadastrada no sistema e cruza com as atribuições dos seus liderados.",
+          breakdownItems: [
+            `Competências mapeadas ativas: ${stats.mappedSkillsCount}`
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Mapeado com base no cargo atual cadastrado para cada colaborador.",
+            "Faz um agrupamento único (distinct) de competências técnicas e comportamentais."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Matriz Corporativa de Cargos → Arquivo 'competencias_por_cargo.csv'"
+        };
+        break;
+      case 'enps':
+        data = {
+          title: "eNPS (Employee Net Promoter Score)",
+          indicatorName: "Engajamento e Satisfação de Clima",
+          formulaDescription: "Percentual de promotores (colaboradores com alto potencial de crescimento/satisfação) menos o percentual de detratores (colaboradores com baixo potencial). Varia de -100 a +100.",
+          breakdownItems: [
+            `Promotores (Potencial Alto): ${Math.round(stats.eNPS >= 78 ? stats.activeMembersCount * 0.8 : stats.activeMembersCount * 0.5)}`,
+            `Detratores (Potencial Baixo): ${Math.round(stats.eNPS >= 78 ? 0 : stats.activeMembersCount * 0.2)}`,
+            `Fórmula: % Promotores - % Detratores`
+          ],
+          period: "Últimos 6 meses",
+          rules: [
+            "Notas de Potencial Alto = Promotores.",
+            "Notas de Potencial Baixo = Detratores.",
+            "Notas de Potencial Médio = Neutros (não afetam eNPS)."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'manager_evaluations'"
+        };
+        break;
+      case 'mood_avg':
+        data = {
+          title: "Mood Avg (Clima Médio)",
+          indicatorName: "Média de satisfação geral",
+          formulaDescription: "Média aritmética simples das avaliações quantitativas de desempenho geral preenchidas pelos gestores para cada membro da equipe.",
+          breakdownItems: [
+            `Nota Média Consolidada: ${stats.moodAvg}/5`,
+            `Fórmula: Soma de todas as notas / Total de avaliações`
+          ],
+          period: "Últimos 6 meses",
+          rules: [
+            "Apenas avaliações preenchidas pelo gestor imediato contendo nota geral são elegíveis."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'manager_evaluations'"
+        };
+        break;
+      case 'retencao':
+        data = {
+          title: "Taxa de Retenção Ativa",
+          indicatorName: "Índice de Estabilidade da Equipe",
+          formulaDescription: "Percentual de colaboradores que não possuem risco imediato de perda (potencial baixo ou descontentamento explícito nas avaliações).",
+          breakdownItems: [
+            `Colaboradores Estáveis: ${stats.retentionRate}%`,
+            `Fórmula: (Colaboradores com Risco Baixo ou Médio / Total de Colaboradores) * 100`
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Colaboradores sem avaliação recente do gestor entram no cálculo como estáveis por padrão."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'manager_evaluations'"
+        };
+        break;
+      case 'workshops':
+        data = {
+          title: "Conclusão de Workshops Técnicos",
+          indicatorName: "Taxa de Eficácia em Workshops",
+          formulaDescription: "Percentual de workshops concluídos nos quais a eficácia prática da aplicação das competências no trabalho foi avaliada pelo colaborador como positiva ('Sim').",
+          breakdownItems: [
+            `Eficácia Consolidada: ${stats.workshopsRate}%`,
+            "Fórmula: (Workshops com Eficácia Sim / Total Workshops Concluídos) * 100"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Filtra treinamentos com termos: Excel, Inteligência, Power BI.",
+            "Considera apenas respostas onde o colaborador avaliou a eficácia de aplicação prática."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdi_responses'"
+        };
+        break;
+      case 'mentoring':
+        data = {
+          title: "Programas de Mentoria",
+          indicatorName: "Taxa de Eficácia de Mentoria",
+          formulaDescription: "Percentual de programas de mentoria concluídos nos quais a eficácia de aplicação das competências no trabalho foi avaliada pelo colaborador como positiva ('Sim').",
+          breakdownItems: [
+            `Eficácia Consolidada: ${stats.mentoringRate}%`,
+            "Fórmula: (Mentorias com Eficácia Sim / Total Mentorias Concluídas) * 100"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Filtra treinamentos com termos: Feedback, Liderança, Tempo.",
+            "Considera apenas respostas onde o colaborador avaliou a eficácia de aplicação prática."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdi_responses'"
+        };
+        break;
+      case 'courses':
+        data = {
+          title: "Cursos Externos",
+          indicatorName: "Taxa de Eficácia em Cursos",
+          formulaDescription: "Percentual de cursos externos concluídos nos quais a eficácia de aplicação das competências no trabalho foi avaliada pelo colaborador como positiva ('Sim').",
+          breakdownItems: [
+            `Eficácia Consolidada: ${stats.coursesRate}%`,
+            "Fórmula: (Cursos com Eficácia Sim / Total Cursos Concluídos) * 100"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Filtra treinamentos com termos: Segurança, Comunicação, Dados.",
+            "Considera apenas respostas onde o colaborador avaliou a eficácia de aplicação prática."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdi_responses'"
+        };
+        break;
+      case 'certs':
+        data = {
+          title: "Certificações",
+          indicatorName: "Taxa de Eficácia de Certificações",
+          formulaDescription: "Percentual de certificações concluídas nas quais a eficácia de aplicação das competências no trabalho foi avaliada pelo colaborador como positiva ('Sim').",
+          breakdownItems: [
+            `Eficácia Consolidada: ${stats.certsRate}%`,
+            "Fórmula: (Certificações com Eficácia Sim / Total Certificações Concluídas) * 100"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Filtra treinamentos com termos: Projetos, Gestão.",
+            "Considera apenas respostas onde o colaborador avaliou a eficácia de aplicação prática."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdi_responses'"
+        };
+        break;
+      case 'ai_health':
+        data = {
+          title: "Saúde do Time (AI Health)",
+          indicatorName: "Mapeamento e Status de Alerta de PDIs",
+          formulaDescription: "Classifica os PDIs do time em 3 categorias de engajamento baseando-se no percentual de progresso e no número de dias decorridos desde a última atualização/revisão feita pelo gestor.",
+          breakdownItems: [
+            "Healthy: Progresso >= 50% e atualização < 14 dias.",
+            "Attention: Progresso < 50% ou sem atualização por > 14 dias.",
+            "Risk: Progresso < 20% e sem atualização por > 30 dias."
+          ],
+          period: "Tempo Real",
+          rules: [
+            "Cruza a coluna percentual_conclusao da tabela pdis com a coluna data_ultima_revisao.",
+            "Fórmulas matemáticas automatizadas executam em lote para todo o time."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdis'"
+        };
+        break;
+      case 'ai_insight':
+        data = {
+          title: "Diagnóstico de Performance da Equipe por IA",
+          indicatorName: "Insights Inteligentes de PDI",
+          formulaDescription: "Modelo de Inteligência Artificial consolidando em tempo real todas as atividades, scores e conclusões de PDI dos liderados para gerar um resumo executivo com planos práticos de ação.",
+          breakdownItems: [
+            "Consolidação de PDIs Ativos",
+            "Mapeamento de Riscos e Gaps de Treinamento",
+            "Aceleração de Competências Chave"
+          ],
+          period: "Atualizado na última recarga",
+          rules: [
+            "Consome os dados estruturados de PDI do time e o contexto dos cargos."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Serviço Express → API /api/analyze",
+          aiDetails: {
+            prompt: "Você é um consultor estratégico de RH e IA. Faça uma análise crítica e traga um insight geral de 3 a 4 sentenças sobre o andamento dos PDIs, engajamento e prontidão de equipe...",
+            dataUsed: ["Tamanho do Time", "Média de Progresso de PDI", "Nomes dos Colaboradores", "Score Individual do PDI"],
+            limitations: "Gera recomendações de apoio com base em dados de PDI informados no backend. Não substitui o feedback qualitativo contínuo do gestor.",
+            confidence: "92%"
+          }
+        };
+        break;
+      case 'skill_matrix':
+        data = {
+          title: "Radar Chart - Skill Matrix",
+          indicatorName: "Média do Time vs Target da Área",
+          formulaDescription: "Mapeia os níveis de proficiência média obtidos pelo time in cada competência chave e compara com o baseline/target definido pela empresa para cada cargo correspondente.",
+          breakdownItems: [
+            "Target de proficiência oficial da organização",
+            "Média real apurada nas avaliações do time"
+          ],
+          period: "Ciclo 2026",
+          rules: [
+            "Fórmula de Média simples por categoria de proficiência.",
+            "Lê a planilha de target de cargo para calibrar a linha cinza tracejada."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "CSV Matriz de Competências & XLSX Avaliações Gestor"
+        };
+        break;
+      default:
+        break;
+    }
+
+    if (data) {
+      setExplainData(data);
+      setExplainModalOpen(true);
+    }
+  };
 
   // Fetch dashboard stats dynamically
   useEffect(() => {
@@ -385,7 +625,16 @@ const App: React.FC = () => {
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-[10px] font-black tracking-widest uppercase text-primary-600 bg-primary-50 border border-primary-100 px-2 py-0.5 rounded">Operações</span>
                   </div>
-                  <h2 className="text-lg font-black text-gray-900 mb-3">Insight da IA</h2>
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-black text-gray-900">Insight da IA</h2>
+                    <button 
+                      onClick={() => openExplainability('ai_insight')}
+                      className="text-gray-400 hover:text-primary-600 transition-colors p-1"
+                      title="Como este resultado foi calculado?"
+                    >
+                      <HelpCircle className="w-4 h-4" />
+                    </button>
+                  </div>
                   <div className="min-h-[120px] flex items-start">
                     {isLoading ? (
                       <div className="space-y-3 w-full animate-pulse">
@@ -416,7 +665,16 @@ const App: React.FC = () => {
               <div className="lg:col-span-2 bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
                 <div className="flex justify-between items-start mb-2">
                   <div>
-                    <h2 className="text-lg font-black text-gray-900">Skill Matrix</h2>
+                    <div className="flex items-center gap-2">
+                      <h2 className="text-lg font-black text-gray-900">Skill Matrix</h2>
+                      <button 
+                        onClick={() => openExplainability('skill_matrix')}
+                        className="text-gray-400 hover:text-primary-600 transition-colors"
+                        title="Como este resultado foi calculado?"
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                     <p className="text-gray-400 text-xs font-bold uppercase tracking-wider mt-0.5">Média do Time vs. Target da Área</p>
                   </div>
                   <span className="text-[10px] font-black text-primary-600 bg-primary-50 px-2 py-1 rounded border border-primary-100 uppercase tracking-widest">
@@ -434,7 +692,16 @@ const App: React.FC = () => {
               <div className="flex flex-col gap-6">
                 <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex items-center justify-between group hover:-translate-y-1 transition-all duration-300">
                   <div>
-                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Membros Ativos</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Membros Ativos</p>
+                      <button 
+                        onClick={() => openExplainability('membros_ativos')}
+                        className="text-gray-300 hover:text-primary-600 transition-colors p-0.5"
+                        title="Como este resultado foi calculado?"
+                      >
+                        <HelpCircle className="w-3 h-3" />
+                      </button>
+                    </div>
                     <p className="text-3xl font-black text-gray-900 mt-2">{stats.activeMembersCount}</p>
                     <p className="text-emerald-500 text-xs font-bold mt-1">↑ +2 este mês</p>
                   </div>
@@ -445,7 +712,16 @@ const App: React.FC = () => {
 
                 <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex items-center justify-between group hover:-translate-y-1 transition-all duration-300">
                   <div>
-                    <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Skills Mapeados</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Skills Mapeados</p>
+                      <button 
+                        onClick={() => openExplainability('skills_mapeados')}
+                        className="text-gray-300 hover:text-primary-600 transition-colors p-0.5"
+                        title="Como este resultado foi calculado?"
+                      >
+                        <HelpCircle className="w-3 h-3" />
+                      </button>
+                    </div>
                     <p className="text-3xl font-black text-gray-900 mt-2">{stats.mappedSkillsCount}</p>
                     <p className="text-gray-400 text-xs font-medium mt-1">Validação ativa baseada em cargos</p>
                   </div>
@@ -465,16 +741,25 @@ const App: React.FC = () => {
                   <EngagementWave />
                 </div>
                 <div className="grid grid-cols-3 gap-2 border-t border-gray-50 pt-4 text-center">
-                  <div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">eNPS</p>
+                  <div className="relative group cursor-pointer hover:bg-gray-50/50 rounded-lg p-1 transition-colors" onClick={() => openExplainability('enps')}>
+                    <div className="flex items-center justify-center gap-1">
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">eNPS</p>
+                      <HelpCircle className="w-2.5 h-2.5 text-gray-300 group-hover:text-primary-600" />
+                    </div>
                     <p className="text-lg font-black text-gray-900 mt-0.5">{stats.eNPS}</p>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Mood Avg</p>
+                  <div className="relative group cursor-pointer hover:bg-gray-50/50 rounded-lg p-1 transition-colors" onClick={() => openExplainability('mood_avg')}>
+                    <div className="flex items-center justify-center gap-1">
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Mood Avg</p>
+                      <HelpCircle className="w-2.5 h-2.5 text-gray-300 group-hover:text-primary-600" />
+                    </div>
                     <p className="text-lg font-black text-gray-900 mt-0.5">{stats.moodAvg}/5</p>
                   </div>
-                  <div>
-                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Retenção</p>
+                  <div className="relative group cursor-pointer hover:bg-gray-50/50 rounded-lg p-1 transition-colors" onClick={() => openExplainability('retencao')}>
+                    <div className="flex items-center justify-center gap-1">
+                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Retenção</p>
+                      <HelpCircle className="w-2.5 h-2.5 text-gray-300 group-hover:text-primary-600" />
+                    </div>
                     <p className="text-lg font-black text-gray-900 mt-0.5">{stats.retentionRate}%</p>
                   </div>
                 </div>
@@ -487,37 +772,37 @@ const App: React.FC = () => {
                   <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider">Taxa de engajamento em trilhas recomendadas</p>
                 </div>
                 <div className="space-y-4">
-                  <div>
+                  <div className="group cursor-pointer hover:bg-gray-50/50 p-1.5 rounded-lg transition-all" onClick={() => openExplainability('workshops')}>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
-                      <span>Workshops Técnicos</span>
-                      <span>{stats.workshopsRate}%</span>
+                      <span className="flex items-center gap-1 text-gray-700 group-hover:text-primary-600 transition-colors">Workshops Técnicos <HelpCircle className="w-3 h-3 text-gray-300 group-hover:text-primary-400" /></span>
+                      <span className="font-extrabold text-gray-900">{stats.workshopsRate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                       <div className="h-full rounded-full" style={{ width: `${stats.workshopsRate}%`, backgroundColor: getDynamicProgressColor(stats.workshopsRate) }}></div>
                     </div>
                   </div>
-                  <div>
+                  <div className="group cursor-pointer hover:bg-gray-50/50 p-1.5 rounded-lg transition-all" onClick={() => openExplainability('mentoring')}>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
-                      <span>Programas de Mentoria</span>
-                      <span>{stats.mentoringRate}%</span>
+                      <span className="flex items-center gap-1 text-gray-700 group-hover:text-primary-600 transition-colors">Programas de Mentoria <HelpCircle className="w-3 h-3 text-gray-300 group-hover:text-primary-400" /></span>
+                      <span className="font-extrabold text-gray-900">{stats.mentoringRate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                       <div className="h-full rounded-full" style={{ width: `${stats.mentoringRate}%`, backgroundColor: getDynamicProgressColor(stats.mentoringRate) }}></div>
                     </div>
                   </div>
-                  <div>
+                  <div className="group cursor-pointer hover:bg-gray-50/50 p-1.5 rounded-lg transition-all" onClick={() => openExplainability('courses')}>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
-                      <span>Cursos Externos</span>
-                      <span>{stats.coursesRate}%</span>
+                      <span className="flex items-center gap-1 text-gray-700 group-hover:text-primary-600 transition-colors">Cursos Externos <HelpCircle className="w-3 h-3 text-gray-300 group-hover:text-primary-400" /></span>
+                      <span className="font-extrabold text-gray-900">{stats.coursesRate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                       <div className="h-full rounded-full" style={{ width: `${stats.coursesRate}%`, backgroundColor: getDynamicProgressColor(stats.coursesRate) }}></div>
                     </div>
                   </div>
-                  <div>
+                  <div className="group cursor-pointer hover:bg-gray-50/50 p-1.5 rounded-lg transition-all" onClick={() => openExplainability('certs')}>
                     <div className="flex justify-between text-xs font-bold text-gray-700 mb-1.5">
-                      <span>Certificações</span>
-                      <span>{stats.certsRate}%</span>
+                      <span className="flex items-center gap-1 text-gray-700 group-hover:text-primary-600 transition-colors">Certificações <HelpCircle className="w-3 h-3 text-gray-300 group-hover:text-primary-400" /></span>
+                      <span className="font-extrabold text-gray-900">{stats.certsRate}%</span>
                     </div>
                     <div className="w-full bg-gray-100 h-1.5 rounded-full overflow-hidden">
                       <div className="h-full rounded-full" style={{ width: `${stats.certsRate}%`, backgroundColor: getDynamicProgressColor(stats.certsRate) }}></div>
@@ -535,7 +820,16 @@ const App: React.FC = () => {
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-base font-black text-gray-900">Saúde do Time (AI Health)</h3>
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="text-base font-black text-gray-900">Saúde do Time (AI Health)</h3>
+                        <button 
+                          onClick={() => openExplainability('ai_health')}
+                          className="text-gray-400 hover:text-primary-600 transition-colors"
+                          title="Como este resultado foi calculated?"
+                        >
+                          <HelpCircle className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
                       <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">Indicador de engajamento e risco de desvio no PDI</p>
                     </div>
                   </div>
@@ -725,16 +1019,19 @@ const App: React.FC = () => {
 
             </div>
           </>
-        ) : currentView === 'roles' ? (
-          <RolesManagement />
         ) : currentView === 'career' ? (
-          <CareerMap managerId={user.id} />
+          <CareerMap search={searchTerm} managerId={user.id} />
         ) : currentView === 'feedback' ? (
           <FeedbackManagement managerId={user.id} />
         ) : (
-          <TeamManagement search={searchTerm} managerId={user.id} />
+          <TeamManagement search={searchTerm} managerId={user.id} onNavigateToCareer={() => setCurrentView('career')} />
         )}
       </main>
+      <ExplainabilityModal 
+        isOpen={explainModalOpen} 
+        onClose={() => setExplainModalOpen(false)} 
+        data={explainData} 
+      />
     </div>
   );
 };

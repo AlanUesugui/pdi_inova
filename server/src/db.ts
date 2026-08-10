@@ -94,8 +94,11 @@ export async function initSchema() {
       email TEXT,
       nivel_cargo TEXT,
       centro_de_custo TEXT,
-      tipo_contrato TEXT
+      tipo_contrato TEXT,
+      superior_imediato TEXT
     );
+
+    ALTER TABLE collaborators ADD COLUMN IF NOT EXISTS superior_imediato TEXT;
 
     CREATE TABLE IF NOT EXISTS pdi_responses (
       id SERIAL PRIMARY KEY,

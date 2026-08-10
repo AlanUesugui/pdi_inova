@@ -1,3 +1,4 @@
+import { getDb } from './db';
 import * as fs from 'fs';
 import * as csv from 'csv-parse/sync';
 import * as path from 'path';
@@ -66,40 +67,43 @@ interface Colaborador {
 }
 
 export const analyzeCollaborator = async (collaboratorId: string) => {
-  const rootDir = path.join(__dirname, '../../');
-  
-  // Lê os arquivos CSV
-  const parseCSV = (filename: string): any[] => {
-    const filePath = path.join(rootDir, filename);
-    const content = fs.readFileSync(filePath, 'utf-8');
-    return csv.parse(content, { columns: true, skip_empty_lines: true });
-  };
+  const db = await getDb();
 
-  const colaboradores = parseCSV('colaboradores.csv') as Colaborador[];
-  const competencias = parseCSV('competencias_por_cargo.csv') as Competencia[];
-  const pdiRespostas = parseCSV('pdi_respostas.csv') as PDIResponse[];
-  const avaliacoes = parseCSV('avaliacoes_gestor.csv') as AvaliacaoGestor[];
-
-  const colaborador = colaboradores.find(c => String(c.id) === String(collaboratorId));
-  if (!colaborador) {
+  // Fetch collaborator from database
+  const collaborator = await db.get('SELECT * FROM collaborators WHERE id = ?', [collaboratorId]) as Colaborador | undefined;
+  if (!collaborator) {
     throw new Error('Colaborador não encontrado');
   }
 
-  if (!colaborador.gestor_id || colaborador.cargo.toLowerCase().includes('gestor')) {
+  if (!collaborator.gestor_id || collaborator.cargo.toLowerCase().includes('gestor')) {
     throw new Error('A análise deve ser feita apenas para colaboradores, não gestores.');
   }
 
-  // Filtra dados relacionados
-  const competenciasCargo = competencias.filter(c => c.cargo.toLowerCase() === colaborador.cargo.toLowerCase());
-  const treinamentos = pdiRespostas.filter(p => String(p.id_colaborador) === String(collaboratorId));
-  const feedbacks = avaliacoes.filter(a => String(a.id_colaborador) === String(collaboratorId));
+  // Load static competencies from CSV
+  let competencies: Competencia[] = [];
+  try {
+    const rootDir = path.join(process.cwd(), '..');
+    const compFilePath = path.join(rootDir, 'competencias_por_cargo.csv');
+    if (fs.existsSync(compFilePath)) {
+      const content = fs.readFileSync(compFilePath, 'utf-8');
+      competencies = csv.parse(content, { columns: true, skip_empty_lines: true });
+    }
+  } catch (e) {
+    console.error("Error reading competencies CSV in analyzer", e);
+  }
+  const competenciasCargo = competencies.filter(c => c.cargo.toLowerCase() === collaborator.cargo.toLowerCase());
+
+  // Fetch PDI responses, evaluations and new feedbacks from database
+  const treinamentos = await db.all('SELECT * FROM pdi_responses WHERE id_colaborador = ?', [collaboratorId]) as PDIResponse[];
+  const feedbacks = await db.all('SELECT * FROM manager_evaluations WHERE id_colaborador = ?', [collaboratorId]) as AvaliacaoGestor[];
+  const newFeedbacks = await db.all('SELECT * FROM feedbacks WHERE id_colaborador = ?', [collaboratorId]);
 
   const prompt = `Você é um especialista em Recursos Humanos responsável por cruzar as competências exigidas pelo cargo com o perfil atual de um colaborador. Analise se ele atende aos requisitos do cargo atual.
  
 **Colaborador:**
-- Nome: ${colaborador.nome}
-- Cargo: ${colaborador.cargo}
-- Departamento: ${colaborador.departamento}
+- Nome: ${collaborator.nome}
+- Cargo: ${collaborator.cargo}
+- Departamento: ${collaborator.departamento}
  
 **Competências Exigidas para o Cargo:**
 ${competenciasCargo.map(c => `- ${c.competencia} (Tipo: ${c.tipo}, Nível Necessário: ${c.nivel_necessario})`).join('\n')}
@@ -108,7 +112,10 @@ ${competenciasCargo.map(c => `- ${c.competencia} (Tipo: ${c.tipo}, Nível Necess
 ${treinamentos.map(t => `- Nome: ${t.treinamento_nome} | Conhecimento: ${t.q1_conhecimento} | Aplicação: ${t.q2_aplicacao} | Desempenho: ${t.q3_desempenho} | Eficácia (Sim/Não): ${t.q4_eficacia}`).join('\n') || "Nenhum treinamento realizado."}
  
 **Avaliação do Gestor e Comentários:**
-${feedbacks.map(f => `- Data: ${f.data} | Soft Skills: ${f.comentarios_soft_skills} | Avaliação Texto: ${f.avaliacao_pessoal_texto}`).join('\n') || "Nenhuma avaliação encontrada."}
+${feedbacks.map(f => `- Data: ${f.data || f.data_avaliacao || ''} | Soft Skills: ${f.comentarios_soft_skills} | Avaliação Texto: ${f.avaliacao_pessoal_texto}`).join('\n') || "Nenhuma avaliação de ciclo encontrada."}
+
+**Novos Feedbacks Registrados:**
+${newFeedbacks.map(f => `- Data: ${f.data} | Tipo: ${f.tipo} | Conteúdo: ${f.conteudo}`).join('\n') || "Nenhum feedback adicional."}
  
 **Regras da Análise:**
 1. Cruzar as competências exigidas com os treinamentos, respostas de avaliação e avaliação do gestor.
@@ -123,9 +130,9 @@ ${feedbacks.map(f => `- Data: ${f.data} | Soft Skills: ${f.comentarios_soft_skil
  
 Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a seguinte estrutura, sem nenhum texto adicional fora do JSON:
 {
-  "nome": "${colaborador.nome}",
-  "cargo": "${colaborador.cargo}",
-  "departamento": "${colaborador.departamento}",
+  "nome": "${collaborator.nome}",
+  "cargo": "${collaborator.cargo}",
+  "departamento": "${collaborator.departamento}",
   "competencias_exigidas": ["array de strings das competencias formatadas de forma legível (ex: Nome da Competencia (Tipo - Nivel))"],
   "treinamentos_relacionados": ["array de strings apenas com os nomes dos treinamentos"],
   "pontos_importantes": ["array de strings detalhando pontos e destaques importantes do colaborador e do seu momento"],
@@ -157,16 +164,30 @@ Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a s
     
     return JSON.parse(aiResult);
   } catch (error) {
-    console.log("Usando fallback de geração dinâmica para:", colaborador.nome);
+    console.log("Usando fallback de geração dinâmica para:", collaborator.nome);
 
     // Calcular um score dinâmico com base nos treinamentos e feedbacks
     let scoreBase = 70;
     if (treinamentos.length > 0) {
-      const eficazes = treinamentos.filter(t => t.q4_eficacia.toLowerCase() === 'sim').length;
-      scoreBase += (eficazes / treinamentos.length) * 15;
+      const parseScoreValue = (value: string) => {
+        if (value === 'Ótimo') return 100;
+        if (value === 'Bom') return 70;
+        if (value === 'Ruim') return 30;
+        return 50;
+      };
+      const sumScores = treinamentos.reduce((acc, t) => {
+        const score = (parseScoreValue(t.q1_conhecimento) + parseScoreValue(t.q2_aplicacao) + parseScoreValue(t.q3_desempenho)) / 3;
+        return acc + score;
+      }, 0);
+      scoreBase = sumScores / treinamentos.length;
     }
-    if (feedbacks.length > 0) {
-      const text = feedbacks.map(f => f.comentarios_soft_skills + " " + f.avaliacao_pessoal_texto).join(" ").toLowerCase();
+    
+    if (feedbacks.length > 0 || newFeedbacks.length > 0) {
+      const text = [
+        ...feedbacks.map(f => f.comentarios_soft_skills + " " + f.avaliacao_pessoal_texto),
+        ...newFeedbacks.map(f => f.conteudo)
+      ].join(" ").toLowerCase();
+
       if (text.includes("excelente") || text.includes("otimo") || text.includes("destaque") || text.includes("muito bom")) {
         scoreBase += 10;
       }
@@ -181,12 +202,11 @@ Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a s
     else if (score >= 70) classificacao_final = "Boa aderência ao cargo";
     else if (score < 50) classificacao_final = "Baixa aderência ao cargo";
 
-    // Criar arrays dinâmicos baseados nas informações reais
     const competencias_exigidas = competenciasCargo.map(c => `${c.competencia} (${c.tipo} - ${c.nivel_necessario})`);
     const treinamentos_relacionados = treinamentos.map(t => t.treinamento_nome);
     
     const pontos_importantes = [
-      `Colaborador atua na área de ${colaborador.departamento} como ${colaborador.cargo}.`,
+      `Colaborador atua na área de ${collaborator.departamento} como ${collaborator.cargo}.`,
       treinamentos.length > 0 
         ? `Já concluiu ${treinamentos.length} treinamentos listados no PDI, demonstrando proatividade.` 
         : `Ainda não possui treinamentos registrados neste ciclo de PDI.`,
@@ -195,9 +215,9 @@ Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a s
         : `Sem avaliações recentes do gestor registradas no sistema.`
     ];
 
-    const pontos_fortes = [];
-    const pontos_de_atencao = [];
-    const evidencias = [];
+    const pontos_fortes: string[] = [];
+    const pontos_de_atencao: string[] = [];
+    const evidencias: string[] = [];
 
     if (feedbacks.length > 0) {
       feedbacks.forEach(f => {
@@ -206,7 +226,6 @@ Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a s
       });
 
       const fullFeedbackText = feedbacks.map(f => f.avaliacao_pessoal_texto + " " + f.comentarios_soft_skills).join(" ");
-      // Extrair frases positivas/negativas aproximadas
       const sentences = fullFeedbackText.split(/[.!?]/);
       sentences.forEach(s => {
         const clean = s.trim();
@@ -216,6 +235,18 @@ Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a s
           if (pontos_fortes.length < 3) pontos_fortes.push(clean);
         } else if (low.includes("atencao") || low.includes("melhorar") || low.includes("desafio") || low.includes("gargalo") || low.includes("dificuldade") || low.includes("falha") || low.includes("falta") || low.includes("precisa")) {
           if (pontos_de_atencao.length < 3) pontos_de_atencao.push(clean);
+        }
+      });
+    }
+
+    if (newFeedbacks.length > 0) {
+      newFeedbacks.forEach(f => {
+        evidencias.push(`[Feedback ${f.tipo}] ${f.conteudo}`);
+        const low = f.conteudo.toLowerCase();
+        if (low.includes("bom") || low.includes("parabéns") || low.includes("excelente") || low.includes("ótimo") || low.includes("evolução")) {
+          if (pontos_fortes.length < 3) pontos_fortes.push(f.conteudo);
+        } else if (low.includes("melhorar") || low.includes("atenção") || low.includes("atraso") || low.includes("dificuldade")) {
+          if (pontos_de_atencao.length < 3) pontos_de_atencao.push(f.conteudo);
         }
       });
     }
@@ -273,9 +304,9 @@ Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a s
     }
 
     return {
-      nome: colaborador.nome,
-      cargo: colaborador.cargo,
-      departamento: colaborador.departamento,
+      nome: collaborator.nome,
+      cargo: collaborator.cargo,
+      departamento: collaborator.departamento,
       competencias_exigidas,
       treinamentos_relacionados,
       pontos_importantes,
@@ -289,3 +320,4 @@ Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a s
     };
   }
 };
+

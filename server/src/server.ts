@@ -39,7 +39,7 @@ app.post('/api/analyze', async (req, res) => {
     }
 
     // 1. Fetch team members
-    const collaborators = await db.all('SELECT * FROM collaborators WHERE gestor_id = ? AND LOWER(cargo) NOT LIKE "%gestor%"', [managerId]);
+    const collaborators = await db.all('SELECT * FROM collaborators WHERE gestor_id = ? AND LOWER(cargo) NOT LIKE \'%gestor%\'', [managerId]);
     if (collaborators.length === 0) {
       return res.json({ insight: "Seu time ainda não possui colaboradores liderados cadastrados para geração de insights de PDI." });
     }
@@ -95,7 +95,7 @@ Diretriz: Gere um insight profissional, direto, encorajador e acionável sobre o
   } catch (error) {
     // Dynamic fallback generation based on real data
     try {
-      const collaborators = await db.all('SELECT * FROM collaborators WHERE gestor_id = ? AND LOWER(cargo) NOT LIKE "%gestor%"', [managerId]);
+      const collaborators = await db.all('SELECT * FROM collaborators WHERE gestor_id = ? AND LOWER(cargo) NOT LIKE \'%gestor%\'', [managerId]);
       const pdis = await db.all('SELECT * FROM pdis WHERE id_colaborador IN (SELECT id FROM collaborators WHERE gestor_id = ?)', [managerId]);
       const avgProgress = pdis.length > 0
         ? Math.round(pdis.reduce((acc, curr) => acc + (parseFloat(curr.percentual_conclusao) || 0), 0) / pdis.length)
@@ -181,6 +181,8 @@ app.get('/api/team', async (req, res) => {
       id: String(collab.id),
       name: collab.nome,
       role: collab.cargo,
+      department: collab.departamento || '',
+      superior_imediato: collab.superior_imediato || '',
       level: collab.cargo.toUpperCase(), // Fallback
       pdiHistory: pdiHistory,
       pdiAverage: averageProgress,
@@ -220,7 +222,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
     const db = await getDb();
 
     // 1. Team Size (only active members, i.e. excluding manager themselves if role includes gestor)
-    const collaborators = await db.all('SELECT * FROM collaborators WHERE gestor_id = ? AND LOWER(cargo) NOT LIKE "%gestor%"', [managerId]);
+    const collaborators = await db.all('SELECT * FROM collaborators WHERE gestor_id = ? AND LOWER(cargo) NOT LIKE \'%gestor%\'', [managerId]);
     const activeMembersCount = collaborators.length;
 
     // 2. Skills Mapeados (distinct competencies expected for the team roles)
@@ -242,7 +244,7 @@ app.get('/api/dashboard-stats', async (req, res) => {
     }
 
     // 3. Average PDI Progress
-    const pdis = await db.all('SELECT percentual_conclusao FROM pdis WHERE gestor_responsavel = ?', [managerId]);
+    const pdis = await db.all('SELECT p.percentual_conclusao FROM pdis p JOIN collaborators c ON p.id_colaborador = c.id WHERE c.gestor_id = ?', [managerId]);
     const averagePDIProgress = pdis.length > 0
       ? Math.round(pdis.reduce((acc, curr) => acc + (parseFloat(curr.percentual_conclusao) || 0), 0) / pdis.length)
       : 72;
@@ -341,7 +343,7 @@ app.get('/api/career-map', async (req, res) => {
     const db = await getDb();
     const rootDir = path.join(process.cwd(), '..');
 
-    let query = 'SELECT * FROM collaborators WHERE LOWER(cargo) NOT LIKE "%gestor%"';
+    let query = 'SELECT * FROM collaborators WHERE LOWER(cargo) NOT LIKE \'%gestor%\'';
     const params: any[] = [];
     if (managerId) {
       query += ' AND gestor_id = ?';
@@ -381,6 +383,7 @@ app.get('/api/career-map', async (req, res) => {
         nome: c.nome,
         cargo: c.cargo,
         departamento: c.departamento,
+        superior_imediato: c.superior_imediato || '',
         nivel_cargo: c.nivel_cargo || '',
         data_admissao: c.data_admissao || '',
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(c.nome)}&background=random&color=fff`,
