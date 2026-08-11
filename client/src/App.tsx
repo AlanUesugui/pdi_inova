@@ -5,9 +5,10 @@ import CareerMap from './components/CareerMap';
 import FeedbackManagement from './components/FeedbackManagement';
 import Login from './components/Login';
 import { getDynamicProgressColor } from './utils/colors';
-import { Search, ChevronRight, HelpCircle } from 'lucide-react';
+import { Search, ChevronRight, HelpCircle, Compass } from 'lucide-react';
 import api from './utils/api';
 import ExplainabilityModal from './components/ExplainabilityModal';
+import OnboardingTour from './components/OnboardingTour';
 
 interface RadarChartProps {
   averages: number[];
@@ -196,6 +197,30 @@ const App: React.FC = () => {
 
   const [explainModalOpen, setExplainModalOpen] = useState(false);
   const [explainData, setExplainData] = useState<any>(null);
+
+  // Onboarding Tour State
+  const [isTourOpen, setIsTourOpen] = useState(false);
+
+  // Trigger tour on first login for user
+  useEffect(() => {
+    if (user) {
+      const tourKey = `isa_tour_completed_${user.id}`;
+      const hasCompleted = localStorage.getItem(tourKey);
+      if (!hasCompleted) {
+        // Automatically open tour for first-time login
+        const timer = setTimeout(() => {
+          setIsTourOpen(true);
+        }, 600);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [user]);
+
+  const handleCompleteTour = () => {
+    if (user) {
+      localStorage.setItem(`isa_tour_completed_${user.id}`, 'true');
+    }
+  };
 
   const openExplainability = (type: string) => {
     let data: any = null;
@@ -603,14 +628,21 @@ const App: React.FC = () => {
               className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-600/10 focus:border-primary-600 transition-all shadow-sm font-medium text-sm"
             />
           </div>
-          
 
+          <button
+            onClick={() => setIsTourOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 text-[#1E4382] rounded-xl text-xs font-black shadow-xs transition-all active:scale-95 ml-4 shrink-0"
+            title="Iniciar o Tour Guiado do Gestor"
+          >
+            <Compass className="w-4 h-4 text-[#1E4382]" />
+            <span>Tour Guiado ISA</span>
+          </button>
         </header>
 
         {currentView === 'dashboard' ? (
           <>
             {/* Title Block */}
-            <div className="mb-8 flex justify-between items-end">
+            <div id="tour-dashboard-section" className="mb-8 flex justify-between items-end">
               <div>
                 <h1 className="text-3xl font-black text-gray-900 tracking-tight">Indicadores e Evolução do Time</h1>
                 <p className="text-gray-500 mt-2 text-sm font-medium">Visão analítica de performance, engajamento e desenvolvimento contínuo.</p>
@@ -620,7 +652,7 @@ const App: React.FC = () => {
             {/* Top Row: AI Insight + Radar Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* Insight da IA */}
-              <div className="ai-card flex flex-col justify-between">
+              <div id="tour-card-ai-insight" className="ai-card flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-[10px] font-black tracking-widest uppercase text-primary-600 bg-primary-50 border border-primary-100 px-2 py-0.5 rounded">Operações</span>
@@ -662,7 +694,7 @@ const App: React.FC = () => {
               </div>
 
               {/* Skill Matrix */}
-              <div className="lg:col-span-2 bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
+              <div id="tour-card-skill-matrix" className="lg:col-span-2 bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <div className="flex items-center gap-2">
@@ -689,7 +721,7 @@ const App: React.FC = () => {
             {/* Second Row: KPI Cards + Sentiment + Course Progress */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* Stats column */}
-              <div className="flex flex-col gap-6">
+              <div id="tour-card-team-stats" className="flex flex-col gap-6">
                 <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex items-center justify-between group hover:-translate-y-1 transition-all duration-300">
                   <div>
                     <div className="flex items-center gap-1.5">
@@ -816,7 +848,7 @@ const App: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               
               {/* Card 1: Distribuição de Saúde / Risco (AI Health) */}
-              <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
+              <div id="tour-card-ai-health" className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <div>
@@ -1031,6 +1063,13 @@ const App: React.FC = () => {
         isOpen={explainModalOpen} 
         onClose={() => setExplainModalOpen(false)} 
         data={explainData} 
+      />
+      <OnboardingTour
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onComplete={handleCompleteTour}
+        currentView={currentView}
+        onViewChange={setCurrentView}
       />
     </div>
   );

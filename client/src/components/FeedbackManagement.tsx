@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
   MessageSquare, Calendar, Plus, Check, X, Sparkles, Clock,
   User, CheckCircle2, AlertCircle, ThumbsUp, ArrowUpRight, Link as LinkIcon,
-  Target
+  Target, AlertTriangle, ArrowLeft
 } from 'lucide-react';
 import api from '../utils/api';
+import HierarchicalRoleOrgChart from './HierarchicalRoleOrgChart';
 
 interface Collaborator {
   id: string;
@@ -117,17 +118,60 @@ const generateAnalysis = (m: Collaborator): Analysis => {
 
 const FeedbackManagement: React.FC<{ managerId: string }> = ({ managerId }) => {
   const [collaborators, setCollaborators] = useState<Collaborator[]>([]);
-  const [searchCollab, setSearchCollab] = useState('');
   const [selectedCollab, setSelectedCollab] = useState<Collaborator | null>(null);
   const [isCollabLoading, setIsCollabLoading] = useState(false);
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [meetings, setMeetings] = useState<Meeting[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+
+  // PDI Progress Filter State for Left Column Dashboard
+  const [pdiProgressFilter, setPdiProgressFilter] = useState<'high' | 'medium' | 'low' | null>(null);
+  const [selectedRoleFilter, setSelectedRoleFilter] = useState<string | null>(null);
 
   // New Feedback Form State
   const [newFeedbackContent, setNewFeedbackContent] = useState('');
   const [newFeedbackType, setNewFeedbackType] = useState<'Positivo' | 'Desenvolvimento' | 'Construtivo'>('Positivo');
   const [isSendingFeedback, setIsSendingFeedback] = useState(false);
+
+  // Helper for categorizing PDI % progress
+  const getPdiCategory = (avg: number): 'high' | 'medium' | 'low' => {
+    if (avg >= 75) return 'high';
+    if (avg >= 50) return 'medium';
+    return 'low';
+  };
+
+  const highPdiCollabs = collaborators.filter(c => getPdiCategory(c.pdiAverage) === 'high');
+  const mediumPdiCollabs = collaborators.filter(c => getPdiCategory(c.pdiAverage) === 'medium');
+  const lowPdiCollabs = collaborators.filter(c => getPdiCategory(c.pdiAverage) === 'low');
+
+  // Filtered members in selected category group
+  const membersInSelectedCategory = React.useMemo(() => {
+    if (!pdiProgressFilter) return [];
+    return collaborators.filter(c => getPdiCategory(c.pdiAverage) === pdiProgressFilter);
+  }, [collaborators, pdiProgressFilter]);
+
+  // Grouped roles with average PDI progress
+  const rolesInSelectedCategory = React.useMemo(() => {
+    if (!pdiProgressFilter) return [];
+    const groups: { [key: string]: { roleName: string; members: Collaborator[]; avgProgress: number } } = {};
+    membersInSelectedCategory.forEach(c => {
+      const rName = c.role || 'Não Definido';
+      if (!groups[rName]) {
+        groups[rName] = { roleName: rName, members: [], avgProgress: 0 };
+      }
+      groups[rName].members.push(c);
+    });
+
+    Object.values(groups).forEach(item => {
+      const sum = item.members.reduce((acc, curr) => acc + (curr.pdiAverage || 0), 0);
+      item.avgProgress = Math.round(sum / item.members.length);
+    });
+
+    return Object.values(groups);
+  }, [membersInSelectedCategory, pdiProgressFilter]);
+
+  const handleFilterClick = (cat: 'high' | 'medium' | 'low') => {
+    setPdiProgressFilter(pdiProgressFilter === cat ? null : cat);
+  };
 
   // New Meeting Form State
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -155,15 +199,12 @@ const FeedbackManagement: React.FC<{ managerId: string }> = ({ managerId }) => {
 
   const fetchCollaborators = async () => {
     try {
-      setIsLoading(true);
       const response = await api.get(`/api/team?managerId=${managerId}`);
       // Filter out manager from selection
       const filtered = response.data.filter((c: any) => !c.role.toLowerCase().includes('gestor'));
       setCollaborators(filtered);
     } catch (error) {
       console.error("Failed to load collaborators", error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -190,6 +231,9 @@ const FeedbackManagement: React.FC<{ managerId: string }> = ({ managerId }) => {
       setIsCollabLoading(false);
     }
   };
+
+  // Helper trigger
+  if (false as boolean) { handleOpenCollabDetail(collaborators[0]); }
 
   const handleSendFeedback = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -285,22 +329,6 @@ const FeedbackManagement: React.FC<{ managerId: string }> = ({ managerId }) => {
     }
   };
 
-  const getHealthBadge = (health: string) => {
-    switch (health) {
-      case 'Healthy':
-        return { text: "No Caminho", class: "bg-emerald-50 text-emerald-600 border-emerald-100" };
-      case 'Attention':
-        return { text: "Atenção", class: "bg-amber-50 text-amber-600 border-amber-100" };
-      default:
-        return { text: "Em Risco", class: "bg-rose-50 text-rose-600 border-rose-100" };
-    }
-  };
-
-  const filteredCollaborators = collaborators.filter(c =>
-    c.name.toLowerCase().includes(searchCollab.toLowerCase()) ||
-    c.role.toLowerCase().includes(searchCollab.toLowerCase())
-  );
-
   return (
     <div className="space-y-8 animate-in fade-in duration-500 relative">
       {/* Toast Notification */}
@@ -312,7 +340,7 @@ const FeedbackManagement: React.FC<{ managerId: string }> = ({ managerId }) => {
       )}
 
       {/* Header View */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+      <div id="tour-feedback-section" className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900 tracking-tight">Feedbacks e 1:1</h1>
           <p className="text-gray-500 mt-2 text-sm font-medium">Gerencie e envie feedbacks para o seu time e acompanhe os próximos encontros.</p>
@@ -320,63 +348,368 @@ const FeedbackManagement: React.FC<{ managerId: string }> = ({ managerId }) => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column (span 2): Collaborators List */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-              <h3 className="text-base font-black text-gray-900 flex items-center gap-2">
-                <User className="w-5 h-5 text-primary-600" />
-                Membros do Time
-              </h3>
-              <input
-                type="text"
-                value={searchCollab}
-                onChange={(e) => setSearchCollab(e.target.value)}
-                placeholder="Buscar por nome ou cargo..."
-                className="px-4 py-2 text-xs bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-600/10 focus:border-primary-600 font-medium w-full sm:w-64"
+        {/* Left Column (span 2): Independently scrollable container for Donut + Hierarchical Org Chart */}
+        <div className="lg:col-span-2 space-y-6 max-h-[calc(100vh-140px)] overflow-y-auto pr-1">
+          {/* Micro-Dashboard: Donut Chart + Pill Toggles */}
+          <div id="tour-feedback-donut-card" className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 space-y-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-50 pb-4">
+              <div>
+                <h3 className="text-lg font-black text-gray-900 flex items-center gap-2">
+                  <User className="w-5 h-5 text-[#1E4382]" />
+                  Acompanhamento de Progresso do PDI da Equipe
+                </h3>
+                <p className="text-gray-400 text-xs font-medium mt-0.5">
+                  Filtre a estrutura do time por % de progresso do PDI para agendar reuniões 1:1.
+                </p>
+              </div>
+              <span className="text-xs font-bold text-[#1E4382] bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100 self-start sm:self-auto">
+                💡 Gestão de 1:1
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-2">
+              {/* Centered Donut Chart Visual (5 cols) */}
+              <div className="lg:col-span-5 flex flex-col items-center justify-center relative py-2">
+                <div className="relative w-60 h-60 flex items-center justify-center">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                    {/* Background Ring */}
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="38"
+                      stroke="#f3f4f6"
+                      strokeWidth="12"
+                      fill="transparent"
+                    />
+
+                    {/* Proportional Slices */}
+                    {(() => {
+                      const strokeWidth = 12;
+                      const radius = 38;
+                      const circumference = 2 * Math.PI * radius; // ~238.76
+
+                      const countHigh = highPdiCollabs.length;
+                      const countMed = mediumPdiCollabs.length;
+                      const countLow = lowPdiCollabs.length;
+                      const totalSum = countHigh + countMed + countLow || collaborators.length || 1;
+
+                      const pctHigh = countHigh / totalSum;
+                      const pctMed = countMed / totalSum;
+                      const pctLow = countLow / totalSum;
+
+                      const gap = totalSum > 0 ? 1.5 : 0;
+                      const lenHigh = Math.max(0, pctHigh * circumference - gap);
+                      const lenMed = Math.max(0, pctMed * circumference - gap);
+                      const lenLow = Math.max(0, pctLow * circumference - gap);
+
+                      const offHigh = 0;
+                      const offMed = -(pctHigh * circumference);
+                      const offLow = -((pctHigh + pctMed) * circumference);
+
+                      const isHighSelected = pdiProgressFilter === 'high';
+                      const isMedSelected = pdiProgressFilter === 'medium';
+                      const isLowSelected = pdiProgressFilter === 'low';
+                      const noSelection = pdiProgressFilter === null;
+
+                      return (
+                        <>
+                          {/* Segment 1: High (Green >=75%) */}
+                          {lenHigh > 0 && (
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r={radius}
+                              stroke="#10b981"
+                              strokeWidth={isHighSelected ? strokeWidth + 2 : strokeWidth}
+                              strokeDasharray={`${lenHigh} ${circumference - lenHigh}`}
+                              strokeDashoffset={offHigh}
+                              fill="transparent"
+                              className={`transition-all duration-500 cursor-pointer ${
+                                isHighSelected ? 'drop-shadow-[0_0_12px_rgba(16,185,129,0.5)] opacity-100' : noSelection ? 'opacity-90 hover:opacity-100' : 'opacity-40 hover:opacity-80'
+                              }`}
+                              onClick={() => handleFilterClick('high')}
+                            />
+                          )}
+
+                          {/* Segment 2: Medium (Orange/Amber 50-74%) */}
+                          {lenMed > 0 && (
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r={radius}
+                              stroke="#f59e0b"
+                              strokeWidth={isMedSelected ? strokeWidth + 2 : strokeWidth}
+                              strokeDasharray={`${lenMed} ${circumference - lenMed}`}
+                              strokeDashoffset={offMed}
+                              fill="transparent"
+                              className={`transition-all duration-500 cursor-pointer ${
+                                isMedSelected ? 'drop-shadow-[0_0_12px_rgba(245,158,11,0.5)] opacity-100' : noSelection ? 'opacity-90 hover:opacity-100' : 'opacity-40 hover:opacity-80'
+                              }`}
+                              onClick={() => handleFilterClick('medium')}
+                            />
+                          )}
+
+                          {/* Segment 3: Low (Red <50%) */}
+                          {lenLow > 0 && (
+                            <circle
+                              cx="50"
+                              cy="50"
+                              r={radius}
+                              stroke="#ef4444"
+                              strokeWidth={isLowSelected ? strokeWidth + 2 : strokeWidth}
+                              strokeDasharray={`${lenLow} ${circumference - lenLow}`}
+                              strokeDashoffset={offLow}
+                              fill="transparent"
+                              className={`transition-all duration-500 cursor-pointer ${
+                                isLowSelected ? 'drop-shadow-[0_0_12px_rgba(239,68,68,0.5)] opacity-100' : noSelection ? 'opacity-90 hover:opacity-100' : 'opacity-40 hover:opacity-80'
+                              }`}
+                              onClick={() => handleFilterClick('low')}
+                            />
+                          )}
+                        </>
+                      );
+                    })()}
+                  </svg>
+
+                  {/* Center Label */}
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-2">
+                    <span className="text-4xl font-black text-gray-900 tracking-tight leading-none">
+                      {collaborators.length}
+                    </span>
+                    <span className="text-[10px] font-bold text-gray-400 mt-1 max-w-[110px] leading-tight">
+                      Membros do Time
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Interactive Pill Toggles (7 cols - Vertical Stack) */}
+              <div className="lg:col-span-7 space-y-3">
+                {/* Pill 1: Avançado / No Prazo (Green) */}
+                <div
+                  onClick={() => handleFilterClick('high')}
+                  className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
+                    pdiProgressFilter === 'high'
+                      ? 'bg-emerald-50/90 border-emerald-300 shadow-[0_4px_20px_rgba(16,185,129,0.18)] scale-[1.01]'
+                      : 'bg-emerald-50/30 hover:bg-emerald-50/70 border-emerald-100 text-gray-700 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-700 flex items-center justify-center font-black shrink-0">
+                      <CheckCircle2 className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-emerald-950 uppercase tracking-wider">
+                          AVANÇADO / NO PRAZO
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-semibold text-emerald-700 block mt-0.5">
+                        Progresso do PDI &ge; 75%
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-base font-black text-emerald-900 bg-emerald-100/80 px-2.5 py-0.5 rounded-full shrink-0">
+                    {highPdiCollabs.length}
+                  </span>
+                </div>
+
+                {/* Pill 2: Em Andamento / Atenção (Orange/Amber) */}
+                <div
+                  onClick={() => handleFilterClick('medium')}
+                  className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
+                    pdiProgressFilter === 'medium'
+                      ? 'bg-amber-50/90 border-amber-300 shadow-[0_4px_20px_rgba(245,158,11,0.18)] scale-[1.01]'
+                      : 'bg-amber-50/30 hover:bg-amber-50/70 border-amber-100 text-gray-700 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center font-black shrink-0">
+                      <AlertTriangle className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-amber-950 uppercase tracking-wider">
+                          EM ANDAMENTO / ATENÇÃO
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-semibold text-amber-700 block mt-0.5">
+                        Progresso do PDI entre 50% e 74%
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-base font-black text-amber-900 bg-amber-100/80 px-2.5 py-0.5 rounded-full shrink-0">
+                    {mediumPdiCollabs.length}
+                  </span>
+                </div>
+
+                {/* Pill 3: Baixo Engajamento / Crítico (Red) */}
+                <div
+                  onClick={() => handleFilterClick('low')}
+                  className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
+                    pdiProgressFilter === 'low'
+                      ? 'bg-rose-50/90 border-rose-300 shadow-[0_4px_20px_rgba(239,68,68,0.18)] scale-[1.01]'
+                      : 'bg-rose-50/30 hover:bg-rose-50/70 border-rose-100 text-gray-700 hover:shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-rose-100 border border-rose-200 text-rose-700 flex items-center justify-center font-black shrink-0">
+                      <AlertCircle className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-black text-rose-950 uppercase tracking-wider">
+                          BAIXO ENGAJAMENTO / CRÍTICO
+                        </span>
+                      </div>
+                      <span className="text-[11px] font-semibold text-rose-700 block mt-0.5">
+                        Progresso do PDI &lt; 50%
+                      </span>
+                    </div>
+                  </div>
+                  <span className="text-base font-black text-rose-900 bg-rose-100/80 px-2.5 py-0.5 rounded-full shrink-0">
+                    {lowPdiCollabs.length}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Hierarchical Role Org-Chart Visualizer Layer */}
+          {pdiProgressFilter === null ? (
+            <div className="bg-gradient-to-r from-blue-50/80 via-indigo-50/40 to-white border border-blue-100/80 p-8 rounded-2xl text-center space-y-3 shadow-sm animate-in fade-in duration-300">
+              <div className="w-12 h-12 rounded-2xl bg-white border border-blue-100 text-[#1E4382] flex items-center justify-center mx-auto shadow-sm">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-extrabold text-gray-900">Selecione uma faixa de PDI no gráfico acima</h3>
+              <p className="text-gray-500 text-xs font-medium max-w-md mx-auto leading-relaxed">
+                Clique em 🟢 <strong>Avançado</strong>, 🟡 <strong>Em Andamento</strong> ou 🔴 <strong>Crítico</strong> no micro-dashboard para explorar os cargos e colaboradores.
+              </p>
+              <button
+                onClick={() => setPdiProgressFilter('high')}
+                className="mt-2 inline-flex items-center gap-2 text-xs font-extrabold text-[#1E4382] bg-white border border-blue-200 px-4 py-2.5 rounded-xl hover:bg-blue-50 transition-all shadow-sm active:scale-95"
+              >
+                <span>Explorar grupo Avançado ({highPdiCollabs.length} pessoas)</span>
+              </button>
+            </div>
+
+          /* Layer 2: Role Selection inside PDI Group */
+          ) : pdiProgressFilter !== null && selectedRoleFilter === null ? (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              {/* Header Bar */}
+              <div className="flex justify-between items-center bg-white border border-gray-100 p-4 rounded-xl shadow-sm">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setPdiProgressFilter(null)}
+                    className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-all text-xs font-bold flex items-center gap-1.5"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Voltar ao Visão Geral
+                  </button>
+                  <span className="text-xs font-black text-gray-950 uppercase tracking-wider">
+                    Faixa PDI: {pdiProgressFilter === 'high' ? '🟢 Avançado (>=75%)' : pdiProgressFilter === 'medium' ? '🟡 Em Andamento (50-74%)' : '🔴 Crítico (<50%)'}
+                  </span>
+                </div>
+
+                <button
+                  onClick={() => setSelectedRoleFilter('ALL')}
+                  className="text-xs font-extrabold text-[#1E4382] hover:underline bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100"
+                >
+                  Ver todos os colaboradores da faixa ({membersInSelectedCategory.length}) →
+                </button>
+              </div>
+
+              {/* Hierarchy Tree Visualizer */}
+              <HierarchicalRoleOrgChart
+                rolesData={rolesInSelectedCategory.map(r => ({
+                  roleName: r.roleName,
+                  members: r.members as any,
+                  avgProgress: r.avgProgress,
+                  levelRank: 0
+                }))}
+                metricsLabel="MÉDIA DE PDI"
+                actionColorTheme="blue"
+                actionLabelGenerator={(rName) => `Ver Pessoas em ${rName}`}
+                onSelectRole={(rName) => setSelectedRoleFilter(rName)}
               />
             </div>
 
-            {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[1, 2, 3, 4].map(n => (
-                  <div key={n} className="h-32 bg-gray-100 animate-pulse rounded-2xl"></div>
-                ))}
-              </div>
-            ) : filteredCollaborators.length === 0 ? (
-              <p className="text-gray-400 text-sm font-medium text-center py-8">Nenhum colaborador encontrado.</p>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {filteredCollaborators.map(c => (
-                  <div
-                    key={c.id}
-                    onClick={() => handleOpenCollabDetail(c)}
-                    className="bg-white border border-gray-100 hover:border-primary-200 hover:shadow-md rounded-2xl p-5 shadow-sm transition-all duration-200 cursor-pointer flex flex-col justify-between group active:scale-[0.98]"
+          /* Layer 3: Selected Role -> Collaborators List with Feedback / 1:1 Action Buttons */
+          ) : (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="bg-white border border-gray-100 shadow-sm p-4 rounded-2xl flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setSelectedRoleFilter(null)}
+                    className="px-3.5 py-2 rounded-xl text-xs font-bold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all border border-gray-200 flex items-center gap-1.5"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl overflow-hidden bg-gray-50 border-2 border-white shadow-sm shrink-0">
-                        <img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
-                      </div>
-                      <div className="min-w-0">
-                        <h4 className="font-black text-gray-900 text-sm group-hover:text-primary-600 transition-colors truncate">{c.name}</h4>
-                        <p className="text-gray-500 text-xs font-semibold mt-0.5 truncate">{c.role}</p>
-                      </div>
-                    </div>
+                    <ArrowLeft className="w-4 h-4" />
+                    Voltar aos Cargos
+                  </button>
+                  <span className="text-xs font-black text-[#1E4382] bg-blue-50 border border-blue-100 px-3 py-1.5 rounded-xl">
+                    Cargo: {selectedRoleFilter === 'ALL' ? 'Todos os Cargos' : selectedRoleFilter}
+                  </span>
+                </div>
 
-                    <div className="mt-4 pt-3.5 border-t border-gray-50 flex items-center justify-between">
-                      <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-0.5 border rounded ${getHealthBadge(c.aiHealth).class}`}>
-                        {getHealthBadge(c.aiHealth).text}
-                      </span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-bold text-gray-400">PDI:</span>
-                        <span className="text-xs font-black text-gray-700">{c.pdiAverage}%</span>
+                <span className="text-xs font-bold text-gray-400">
+                  {membersInSelectedCategory.filter(c => selectedRoleFilter === 'ALL' || c.role === selectedRoleFilter).length} pessoa(s)
+                </span>
+              </div>
+
+              {/* Collaborator Cards Grid inside Role */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {membersInSelectedCategory
+                  .filter(c => selectedRoleFilter === 'ALL' || c.role === selectedRoleFilter)
+                  .map(c => (
+                    <div
+                      key={c.id}
+                      className="bg-white border border-gray-100 hover:border-blue-200 shadow-md rounded-2xl p-5 transition-all duration-200 flex flex-col justify-between group"
+                    >
+                      <div>
+                        <div
+                          onClick={() => handleOpenCollabDetail(c)}
+                          className="flex items-center gap-4 cursor-pointer"
+                        >
+                          <div className="w-12 h-12 rounded-2xl overflow-hidden bg-gray-50 border-2 border-white shadow-sm shrink-0 group-hover:ring-2 ring-[#1E4382] transition-all">
+                            <img src={c.avatar} alt={c.name} className="w-full h-full object-cover" />
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-black text-gray-900 text-sm group-hover:text-[#1E4382] transition-colors truncate">{c.name}</h4>
+                            <p className="text-gray-500 text-xs font-semibold mt-0.5 truncate">{c.role}</p>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 pt-3 border-t border-gray-50 flex items-center justify-between text-xs">
+                          <span className="text-[10px] font-bold text-gray-400">Progresso do PDI:</span>
+                          <span className="font-black text-[#1E4382] bg-blue-50 px-2 py-0.5 rounded border border-blue-100">{c.pdiAverage}%</span>
+                        </div>
+                      </div>
+
+                      {/* Action Footer Buttons */}
+                      <div className="mt-4 pt-3 border-t border-gray-100 grid grid-cols-2 gap-2">
+                        <button
+                          onClick={() => handleOpenCollabDetail(c)}
+                          className="w-full flex items-center justify-center gap-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 font-extrabold text-xs py-2 px-3 rounded-xl transition-all active:scale-95"
+                        >
+                          <MessageSquare className="w-3.5 h-3.5" />
+                          <span>Feedback</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelectedMeetingCollabId(c.id);
+                            setShowScheduleModal(true);
+                          }}
+                          className="w-full flex items-center justify-center gap-1.5 bg-[#1E4382] hover:bg-blue-900 text-white font-extrabold text-xs py-2 px-3 rounded-xl shadow-sm transition-all active:scale-95"
+                        >
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>Agendar 1:1</span>
+                        </button>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Right Column: Meetings */}
