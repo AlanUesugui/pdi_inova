@@ -9,9 +9,12 @@ import { processPDIData } from './dataProcessor';
 import { getDb, initSchema } from './db';
 import { analyzeCollaborator } from './analyzer';
 import OpenAI from 'openai';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 const app = express();
 const port = process.env.PORT || 3001;
+const JWT_SECRET = process.env.JWT_SECRET || 'inova_skill_jwt_secret_key_2026_super_secure';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ''
@@ -436,17 +439,75 @@ app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
   const emailTrimmed = email?.trim();
   const passwordTrimmed = password?.trim();
+
+  if (!emailTrimmed || !passwordTrimmed) {
+    return res.status(400).json({ success: false, message: 'E-mail e senha são obrigatórios.' });
+  }
+
   const db = await getDb();
 
   console.log(`Login attempt: "${emailTrimmed}"`);
-  const user = await db.get('SELECT * FROM users WHERE LOWER(email) = LOWER(?) AND password = ?', [emailTrimmed, passwordTrimmed]);
+  const user = await db.get('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', [emailTrimmed]);
 
-  if (user) {
+  if (!user) {
+    console.log(`Login failed (user not found): ${emailTrimmed}`);
+    return res.status(401).json({ success: false, message: 'Credenciais inválidas' });
+  }
+
+  // Check password with bcrypt (supports both hashed and plaintext fallback for backwards compatibility)
+  const isMatch = await bcrypt.compare(passwordTrimmed, user.password).catch(() => false);
+  const isPlaintextMatch = user.password === passwordTrimmed;
+
+  if (isMatch || isPlaintextMatch) {
     console.log(`Login success for: ${emailTrimmed}`);
-    res.json({ success: true, user: { email: user.email, name: user.name, id: user.collab_id } });
+    const token = jwt.sign(
+      { email: user.email, name: user.name, id: String(user.collab_id) },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    return res.json({
+      success: true,
+      token,
+      user: {
+        email: user.email,
+        name: user.name,
+        id: String(user.collab_id)
+      }
+    });
   } else {
-    console.log(`Login failed for: ${emailTrimmed}`);
-    res.status(401).json({ success: false, message: 'Credenciais inválidas' });
+    console.log(`Login failed (invalid password): ${emailTrimmed}`);
+    return res.status(401).json({ success: false, message: 'Credenciais inválidas' });
+  }
+});
+
+app.get('/api/me', async (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ success: false, message: 'Token não fornecido' });
+  }
+
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { email: string; name: string; id: string };
+    const db = await getDb();
+    const user = await db.get('SELECT * FROM users WHERE LOWER(email) = LOWER(?)', [decoded.email]);
+
+    if (!user) {
+      return res.status(401).json({ success: false, message: 'Usuário não encontrado' });
+    }
+
+    return res.json({
+      success: true,
+      user: {
+        email: user.email,
+        name: user.name,
+        id: String(user.collab_id)
+      }
+    });
+  } catch (error) {
+    return res.status(401).json({ success: false, message: 'Sessão inválida ou expirada' });
   }
 });
 
