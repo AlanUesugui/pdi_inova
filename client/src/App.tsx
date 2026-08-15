@@ -235,23 +235,25 @@ const App: React.FC = () => {
     setUser(null);
   };
 
-  // Trigger tour on first login for user
+  // Trigger tour only once on first login
   useEffect(() => {
-    if (user) {
+    if (user && user.id) {
       const tourKey = `isa_tour_completed_${user.id}`;
       const hasCompleted = localStorage.getItem(tourKey);
       if (!hasCompleted) {
-        // Automatically open tour for first-time login
+        // Mark as completed immediately so reloads don't open it again
+        localStorage.setItem(tourKey, 'true');
         const timer = setTimeout(() => {
           setIsTourOpen(true);
         }, 600);
         return () => clearTimeout(timer);
       }
     }
-  }, [user]);
+  }, [user?.id]);
 
-  const handleCompleteTour = () => {
-    if (user) {
+  const handleCloseTour = () => {
+    setIsTourOpen(false);
+    if (user?.id) {
       localStorage.setItem(`isa_tour_completed_${user.id}`, 'true');
     }
   };
@@ -1101,8 +1103,8 @@ const App: React.FC = () => {
       />
       <OnboardingTour
         isOpen={isTourOpen}
-        onClose={() => setIsTourOpen(false)}
-        onComplete={handleCompleteTour}
+        onClose={handleCloseTour}
+        onComplete={handleCloseTour}
         currentView={currentView}
         onViewChange={setCurrentView}
       />
