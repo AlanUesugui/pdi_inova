@@ -11,11 +11,14 @@ class PostgresDb {
     if (!connectionString) {
       throw new Error("DATABASE_URL is not defined in environment variables.");
     }
+    const isLocal = connectionString.includes('localhost') || 
+                    connectionString.includes('127.0.0.1') || 
+                    connectionString.includes('postgres:5432') ||
+                    process.env.DB_SSL === 'false';
+
     this.pool = new Pool({
       connectionString,
-      ssl: {
-        rejectUnauthorized: false
-      }
+      ssl: isLocal ? false : { rejectUnauthorized: false }
     });
   }
 
