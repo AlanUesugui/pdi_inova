@@ -297,6 +297,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     try {
       const response = await api.post('/api/login', { email, password });
       if (response.data.success) {
+        if (response.data.token) {
+          localStorage.setItem('inova_token', response.data.token);
+          localStorage.setItem('inova_user', JSON.stringify(response.data.user));
+        }
         onLoginSuccess(response.data.user);
       }
     } catch (err: any) {

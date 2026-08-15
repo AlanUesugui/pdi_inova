@@ -176,7 +176,16 @@ const EngagementWave: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(() => {
+    try {
+      const savedUser = localStorage.getItem('inova_user');
+      const token = localStorage.getItem('inova_token');
+      return savedUser && token ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [currentView, setCurrentView] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [insight, setInsight] = useState("Carregando diagnóstico do time...");
@@ -200,6 +209,31 @@ const App: React.FC = () => {
 
   // Onboarding Tour State
   const [isTourOpen, setIsTourOpen] = useState(false);
+
+  // Validate stored JWT session on startup
+  useEffect(() => {
+    const token = localStorage.getItem('inova_token');
+    if (token) {
+      api.get('/api/me')
+        .then((res) => {
+          if (res.data.success && res.data.user) {
+            setUser(res.data.user);
+            localStorage.setItem('inova_user', JSON.stringify(res.data.user));
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('inova_token');
+          localStorage.removeItem('inova_user');
+          setUser(null);
+        });
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('inova_token');
+    localStorage.removeItem('inova_user');
+    setUser(null);
+  };
 
   // Trigger tour on first login for user
   useEffect(() => {
@@ -613,6 +647,7 @@ const App: React.FC = () => {
         currentView={currentView}
         onViewChange={setCurrentView}
         userName={user.name}
+        onLogout={handleLogout}
       />
       
       <main className="flex-1 ml-64 p-8">
