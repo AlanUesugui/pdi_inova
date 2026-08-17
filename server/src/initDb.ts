@@ -3,28 +3,50 @@ import * as xlsx from 'xlsx';
 import path from 'path';
 import fs from 'fs';
 import * as csv from 'csv-parse/sync';
+import bcrypt from 'bcryptjs';
+
+function findFile(fileName: string): string {
+  const possiblePaths = [
+    path.join(process.cwd(), fileName),
+    path.join(process.cwd(), '..', fileName),
+    path.join(process.cwd(), 'data', fileName),
+    path.join(__dirname, '..', 'data', fileName),
+    path.join(__dirname, '..', '..', fileName),
+  ];
+  for (const p of possiblePaths) {
+    if (fs.existsSync(p)) return p;
+  }
+  throw new Error(`Arquivo não encontrado: ${fileName}`);
+}
 
 async function importCsv() {
   await initSchema();
   const db = await getDb();
-  
-  const rootDir = path.join(process.cwd(), '..');
-  const serverDataDir = path.join(process.cwd(), 'data');
 
   // Load CSVs
-  const collaborators: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'colaboradores.csv'), 'utf-8').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
-  const pdiResponses: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'pdi_respostas.csv'), 'utf-8').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
-  const managerEvals: any[] = csv.parse(fs.readFileSync(path.join(serverDataDir, 'avaliacoes_gestor.csv'), 'utf-8').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
-  const pdisData: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'pdis.csv'), 'utf-8').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
+  const collabPath = findFile('colaboradores.csv');
+  const pdiRespPath = findFile('pdi_respostas.csv');
+  const managerEvalsPath = findFile('avaliacoes_gestor.csv');
+  const pdisPath = findFile('pdis.csv');
+
+  const parseCsvFile = (filePath: string) => {
+    const raw = fs.readFileSync(filePath, 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, '');
+    return csv.parse(raw, { columns: true, skip_empty_lines: true, trim: true, bom: true });
+  };
+
+  const collaborators: any[] = parseCsvFile(collabPath);
+  const pdiResponses: any[] = parseCsvFile(pdiRespPath);
+  const managerEvals: any[] = parseCsvFile(managerEvalsPath);
+  const pdisData: any[] = parseCsvFile(pdisPath);
 
   console.log("Resetting database...");
-  await db.run('DELETE FROM collaborators');
+  await db.run('DELETE FROM feedbacks');
+  await db.run('DELETE FROM meetings');
   await db.run('DELETE FROM pdi_responses');
   await db.run('DELETE FROM manager_evaluations');
   await db.run('DELETE FROM pdis');
   await db.run('DELETE FROM users');
-  await db.run('DELETE FROM feedbacks');
-  await db.run('DELETE FROM meetings');
+  await db.run('DELETE FROM collaborators');
 
   // Map to identify managers
   const managerIds = new Set(collaborators.map(c => String(c.gestor_id)).filter(id => id && id !== '0' && id !== ''));
@@ -52,9 +74,10 @@ async function importCsv() {
       // Create user login
       const cleanName = collab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim(); 
       const email = `${cleanName.split(' ')[0].toLowerCase()}@pdi.com`.trim();
+      const hashedPassword = bcrypt.hashSync('123456', 10);
       await db.run(
         'INSERT INTO users (email, password, name, collab_id) VALUES (?, ?, ?, ?) ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, name = EXCLUDED.name, collab_id = EXCLUDED.collab_id',
-        [email, '123456', collab.nome.trim(), collabId]
+        [email, hashedPassword, collab.nome.trim(), collabId]
       );
       console.log(`- User created: "${email}" (ID: ${collabId})`);
     }
@@ -134,6 +157,10 @@ async function importCsv() {
   }
 
   console.log("SUCCESS: Database fully synchronized with real data and mocks.");
+  await db.close();
 }
 
-importCsv().catch(console.error);
+importCsv().catch(err => {
+  console.error(err);
+  process.exit(1);
+});

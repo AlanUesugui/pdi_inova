@@ -176,7 +176,16 @@ const EngagementWave: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(() => {
+    try {
+      const savedUser = localStorage.getItem('inova_user');
+      const token = localStorage.getItem('inova_token');
+      return savedUser && token ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [currentView, setCurrentView] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [insight, setInsight] = useState("Carregando diagnóstico do time...");
@@ -201,23 +210,50 @@ const App: React.FC = () => {
   // Onboarding Tour State
   const [isTourOpen, setIsTourOpen] = useState(false);
 
-  // Trigger tour on first login for user
+  // Validate stored JWT session on startup
   useEffect(() => {
-    if (user) {
+    const token = localStorage.getItem('inova_token');
+    if (token) {
+      api.get('/api/me')
+        .then((res) => {
+          if (res.data.success && res.data.user) {
+            setUser(res.data.user);
+            localStorage.setItem('inova_user', JSON.stringify(res.data.user));
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem('inova_token');
+          localStorage.removeItem('inova_user');
+          setUser(null);
+        });
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('inova_token');
+    localStorage.removeItem('inova_user');
+    setUser(null);
+  };
+
+  // Trigger tour only once on first login
+  useEffect(() => {
+    if (user && user.id) {
       const tourKey = `isa_tour_completed_${user.id}`;
       const hasCompleted = localStorage.getItem(tourKey);
       if (!hasCompleted) {
-        // Automatically open tour for first-time login
+        // Mark as completed immediately so reloads don't open it again
+        localStorage.setItem(tourKey, 'true');
         const timer = setTimeout(() => {
           setIsTourOpen(true);
         }, 600);
         return () => clearTimeout(timer);
       }
     }
-  }, [user]);
+  }, [user?.id]);
 
-  const handleCompleteTour = () => {
-    if (user) {
+  const handleCloseTour = () => {
+    setIsTourOpen(false);
+    if (user?.id) {
       localStorage.setItem(`isa_tour_completed_${user.id}`, 'true');
     }
   };
@@ -613,6 +649,7 @@ const App: React.FC = () => {
         currentView={currentView}
         onViewChange={setCurrentView}
         userName={user.name}
+        onLogout={handleLogout}
       />
       
       <main className="flex-1 ml-64 p-8">
@@ -1066,8 +1103,8 @@ const App: React.FC = () => {
       />
       <OnboardingTour
         isOpen={isTourOpen}
-        onClose={() => setIsTourOpen(false)}
-        onComplete={handleCompleteTour}
+        onClose={handleCloseTour}
+        onComplete={handleCloseTour}
         currentView={currentView}
         onViewChange={setCurrentView}
       />

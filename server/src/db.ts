@@ -1,7 +1,11 @@
 import { Pool } from 'pg';
+import path from 'path';
 import dotenv from 'dotenv';
 
 dotenv.config();
+dotenv.config({ path: path.resolve(process.cwd(), 'server/.env') });
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 class PostgresDb {
   private pool: Pool;
@@ -13,12 +17,15 @@ class PostgresDb {
     }
     const isLocal = connectionString.includes('localhost') || 
                     connectionString.includes('127.0.0.1') || 
-                    connectionString.includes('postgres:5432') ||
+                    connectionString.includes('@postgres:') || 
+                    connectionString.includes('@db:') ||
                     process.env.DB_SSL === 'false';
 
     this.pool = new Pool({
       connectionString,
-      ssl: isLocal ? false : { rejectUnauthorized: false }
+      ssl: isLocal ? false : {
+        rejectUnauthorized: false
+      }
     });
   }
 
@@ -39,11 +46,11 @@ class PostgresDb {
     return result.rows[0];
   }
 
-  async run(sql: string, params: any[] = []): Promise<{ lastID?: number | string; changes: number }> {
+  async run(sql: string, params: any[] = []): Promise<{ lastID?: number | string | undefined; changes: number }> {
     let pgSql = this.convertSql(sql);
     
     // Append RETURNING id only for tables that have an 'id' column and need lastID
-    const isInsertWithLastId = /^\s*insert\s+into\s+(feedbacks|meetings)\b/i.test(pgSql);
+    const isInsertWithLastId = /^\s*insert\s+into\s+(feedbacks|meetings|pdi_responses)\b/i.test(pgSql);
     const hasReturning = /returning/i.test(pgSql);
     
     if (isInsertWithLastId && !hasReturning) {
