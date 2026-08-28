@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, ChevronRight, Zap, TrendingUp, ShieldAlert, Target, ShieldCheck, AlertTriangle, ArrowLeft, Briefcase, Users } from 'lucide-react';
+import { Sparkles, ChevronRight, Zap, TrendingUp, ShieldAlert, Target, ShieldCheck, AlertTriangle, ArrowLeft, Users } from 'lucide-react';
 import api from '../utils/api';
 import CareerDetailPanel from './CareerDetailPanel';
 import CollaboratorHoverCard, { type HoverCardData } from './CollaboratorHoverCard';
+import HierarchicalRoleOrgChart from './HierarchicalRoleOrgChart';
 
 export interface CareerTraining {
   nome: string;
@@ -434,7 +435,7 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
       )}
 
       {/* Header section */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
+      <div id="tour-career-section" className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
           <h1 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
             Inteligência de Carreira e Talentos
@@ -468,106 +469,330 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
         </button>
       </div>
 
-      {/* Matriz cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3.5">
-        <div
-          onClick={() => handleCategoryClick('strategic_talents')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-            filterCategory === 'strategic_talents' ? 'bg-purple-600 text-white border-purple-700 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-purple-200'
-          }`}
-        >
+      {/* ── UNIFIED FILTERING: SEGMENTED DONUT CHART & PILL TOGGLES ──────────────── */}
+      <div id="tour-career-distribution-card" className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-50 pb-4">
           <div>
-            <div className="flex items-center justify-between">
-              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'strategic_talents' ? 'text-purple-100' : 'text-gray-400'}`}>
-                Talentos Reconhecidos
-              </span>
-              <Sparkles className={`w-4 h-4 ${filterCategory === 'strategic_talents' ? 'text-yellow-300' : 'text-purple-600'}`} />
-            </div>
-            <span className="text-2xl font-black block mt-2">{strategicTalents}</span>
+            <h3 className="text-lg font-black text-gray-900">Distribuição de Talentos e Carreira</h3>
+            <p className="text-gray-400 text-xs font-medium mt-0.5">
+              Clique em um segmento do gráfico de anel ou em uma pílula para filtrar a análise da equipe.
+            </p>
           </div>
-          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'strategic_talents' ? 'text-purple-200' : 'text-gray-400'}`}>
-            Potencial já identificado
+          <span className="text-xs font-bold text-purple-700 bg-purple-50 px-3 py-1.5 rounded-xl border border-purple-100 self-start sm:self-auto">
+            💡 Filtragem de Inteligência
           </span>
         </div>
 
-        <div
-          onClick={() => handleCategoryClick('successors')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-            filterCategory === 'successors' ? 'bg-emerald-600 text-white border-emerald-700 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-emerald-200'
-          }`}
-        >
-          <div>
-            <div className="flex items-center justify-between">
-              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'successors' ? 'text-emerald-100' : 'text-gray-400'}`}>
-                Sucessores
-              </span>
-              <ShieldCheck className={`w-4 h-4 ${filterCategory === 'successors' ? 'text-white' : 'text-emerald-600'}`} />
-            </div>
-            <span className="text-2xl font-black block mt-2">{successorsCount}</span>
-          </div>
-          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'successors' ? 'text-emerald-200' : 'text-gray-400'}`}>
-            Mapeados para sucessão
-          </span>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-2">
+          {/* Centered Donut Chart Visual (5 cols) */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative py-2">
+            <div className="relative w-64 h-64 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                {/* Background Ring */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  stroke="#f3f4f6"
+                  strokeWidth="12"
+                  fill="transparent"
+                />
 
-        <div
-          onClick={() => handleCategoryClick('high_potential')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-            filterCategory === 'high_potential' ? 'bg-blue-600 text-white border-blue-700 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-blue-200'
-          }`}
-        >
-          <div>
-            <div className="flex items-center justify-between">
-              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'high_potential' ? 'text-blue-100' : 'text-gray-400'}`}>
-                Potencial de Desenvolvimento
-              </span>
-              <TrendingUp className={`w-4 h-4 ${filterCategory === 'high_potential' ? 'text-white' : 'text-blue-600'}`} />
-            </div>
-            <span className="text-2xl font-black block mt-2">{highPotentialCount}</span>
-          </div>
-          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'high_potential' ? 'text-blue-200' : 'text-gray-400'}`}>
-            Perspectiva de evolução
-          </span>
-        </div>
+                {/* Dynamic proportional slices */}
+                {(() => {
+                  const strokeWidth = 12;
+                  const radius = 38;
+                  const circumference = 2 * Math.PI * radius; // ~238.76
 
-        <div
-          onClick={() => handleCategoryClick('hidden_talents')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-            filterCategory === 'hidden_talents' ? 'bg-amber-500 text-white border-amber-600 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-amber-200'
-          }`}
-        >
-          <div>
-            <div className="flex items-center justify-between">
-              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'hidden_talents' ? 'text-amber-100' : 'text-gray-400'}`}>
-                Possíveis talentos não mapeados
-              </span>
-              <Zap className={`w-4 h-4 ${filterCategory === 'hidden_talents' ? 'text-yellow-200' : 'text-amber-500'}`} />
-            </div>
-            <span className="text-2xl font-black block mt-2">{hiddenTalentsCount}</span>
-          </div>
-          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'hidden_talents' ? 'text-amber-100' : 'text-gray-400'}`}>
-            Oportunidade de investigação
-          </span>
-        </div>
+                  // 5 Categories: strategic_talents, successors, high_potential, hidden_talents, high_risk
+                  const c1 = strategicTalents;
+                  const c2 = successorsCount;
+                  const c3 = highPotentialCount;
+                  const c4 = hiddenTalentsCount;
+                  const c5 = highRiskCount;
+                  const totalSum = c1 + c2 + c3 + c4 + c5 || totalTeam || 23;
 
-        <div
-          onClick={() => handleCategoryClick('high_risk')}
-          className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-            filterCategory === 'high_risk' ? 'bg-rose-600 text-white border-rose-700 shadow-lg' : 'bg-white border-gray-100 shadow-sm hover:border-rose-200'
-          }`}
-        >
-          <div>
-            <div className="flex items-center justify-between">
-              <span className={`text-[10px] font-extrabold uppercase tracking-wider ${filterCategory === 'high_risk' ? 'text-rose-100' : 'text-gray-400'}`}>
-                Risco Elevado
-              </span>
-              <ShieldAlert className={`w-4 h-4 ${filterCategory === 'high_risk' ? 'text-white' : 'text-rose-600'}`} />
+                  const pct1 = c1 / totalSum;
+                  const pct2 = c2 / totalSum;
+                  const pct3 = c3 / totalSum;
+                  const pct4 = c4 / totalSum;
+                  const pct5 = c5 / totalSum;
+
+                  const gap = totalSum > 0 ? 1.2 : 0;
+                  const len1 = Math.max(0, pct1 * circumference - gap);
+                  const len2 = Math.max(0, pct2 * circumference - gap);
+                  const len3 = Math.max(0, pct3 * circumference - gap);
+                  const len4 = Math.max(0, pct4 * circumference - gap);
+                  const len5 = Math.max(0, pct5 * circumference - gap);
+
+                  const off1 = 0;
+                  const off2 = -(pct1 * circumference);
+                  const off3 = -((pct1 + pct2) * circumference);
+                  const off4 = -((pct1 + pct2 + pct3) * circumference);
+                  const off5 = -((pct1 + pct2 + pct3 + pct4) * circumference);
+
+                  const is1Selected = filterCategory === 'strategic_talents';
+                  const is2Selected = filterCategory === 'successors';
+                  const is3Selected = filterCategory === 'high_potential';
+                  const is4Selected = filterCategory === 'hidden_talents';
+                  const is5Selected = filterCategory === 'high_risk';
+                  const noSelection = filterCategory === null;
+
+                  return (
+                    <>
+                      {/* Segment 1: Strategic Talents (Purple) */}
+                      {len1 > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r={radius}
+                          stroke="#9333ea"
+                          strokeWidth={is1Selected ? strokeWidth + 2 : strokeWidth}
+                          strokeDasharray={`${len1} ${circumference - len1}`}
+                          strokeDashoffset={off1}
+                          fill="transparent"
+                          className={`transition-all duration-500 cursor-pointer ${
+                            is1Selected ? 'drop-shadow-[0_0_12px_rgba(147,51,234,0.5)] opacity-100' : noSelection ? 'opacity-90 hover:opacity-100' : 'opacity-40 hover:opacity-80'
+                          }`}
+                          onClick={() => handleCategoryClick('strategic_talents')}
+                        />
+                      )}
+
+                      {/* Segment 2: Successors (Emerald) */}
+                      {len2 > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r={radius}
+                          stroke="#10b981"
+                          strokeWidth={is2Selected ? strokeWidth + 2 : strokeWidth}
+                          strokeDasharray={`${len2} ${circumference - len2}`}
+                          strokeDashoffset={off2}
+                          fill="transparent"
+                          className={`transition-all duration-500 cursor-pointer ${
+                            is2Selected ? 'drop-shadow-[0_0_12px_rgba(16,185,129,0.5)] opacity-100' : noSelection ? 'opacity-90 hover:opacity-100' : 'opacity-40 hover:opacity-80'
+                          }`}
+                          onClick={() => handleCategoryClick('successors')}
+                        />
+                      )}
+
+                      {/* Segment 3: High Potential (Blue) */}
+                      {len3 > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r={radius}
+                          stroke="#3b82f6"
+                          strokeWidth={is3Selected ? strokeWidth + 2 : strokeWidth}
+                          strokeDasharray={`${len3} ${circumference - len3}`}
+                          strokeDashoffset={off3}
+                          fill="transparent"
+                          className={`transition-all duration-500 cursor-pointer ${
+                            is3Selected ? 'drop-shadow-[0_0_12px_rgba(59,130,246,0.5)] opacity-100' : noSelection ? 'opacity-90 hover:opacity-100' : 'opacity-40 hover:opacity-80'
+                          }`}
+                          onClick={() => handleCategoryClick('high_potential')}
+                        />
+                      )}
+
+                      {/* Segment 4: Hidden Talents (Amber) */}
+                      {len4 > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r={radius}
+                          stroke="#f59e0b"
+                          strokeWidth={is4Selected ? strokeWidth + 2 : strokeWidth}
+                          strokeDasharray={`${len4} ${circumference - len4}`}
+                          strokeDashoffset={off4}
+                          fill="transparent"
+                          className={`transition-all duration-500 cursor-pointer ${
+                            is4Selected ? 'drop-shadow-[0_0_12px_rgba(245,158,11,0.5)] opacity-100' : noSelection ? 'opacity-90 hover:opacity-100' : 'opacity-40 hover:opacity-80'
+                          }`}
+                          onClick={() => handleCategoryClick('hidden_talents')}
+                        />
+                      )}
+
+                      {/* Segment 5: High Risk (Rose/Red) */}
+                      {len5 > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r={radius}
+                          stroke="#ef4444"
+                          strokeWidth={is5Selected ? strokeWidth + 2 : strokeWidth}
+                          strokeDasharray={`${len5} ${circumference - len5}`}
+                          strokeDashoffset={off5}
+                          fill="transparent"
+                          className={`transition-all duration-500 cursor-pointer ${
+                            is5Selected ? 'drop-shadow-[0_0_12px_rgba(239,68,68,0.5)] opacity-100' : noSelection ? 'opacity-90 hover:opacity-100' : 'opacity-40 hover:opacity-80'
+                          }`}
+                          onClick={() => handleCategoryClick('high_risk')}
+                        />
+                      )}
+                    </>
+                  );
+                })()}
+              </svg>
+
+              {/* Center Donut Label */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-2">
+                <span className="text-4xl font-black text-gray-900 tracking-tight leading-none">
+                  {totalTeam || 23}
+                </span>
+                <span className="text-[10px] font-bold text-gray-400 mt-1 max-w-[110px] leading-tight">
+                  Total de Colaboradores Analisados
+                </span>
+              </div>
             </div>
-            <span className="text-2xl font-black block mt-2">{highRiskCount}</span>
           </div>
-          <span className={`text-[9px] font-bold block mt-2 ${filterCategory === 'high_risk' ? 'text-rose-200' : 'text-gray-400'}`}>
-            Risco de perda + Impacto
-          </span>
+
+          {/* Interactive Legend Pill Toggles (7 cols - 2 Column Grid) */}
+          <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Pill 1: Talentos Reconhecidos (Purple) */}
+            <div
+              onClick={() => handleCategoryClick('strategic_talents')}
+              className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
+                filterCategory === 'strategic_talents'
+                  ? 'bg-purple-50/90 border-purple-300 shadow-[0_4px_20px_rgba(147,51,234,0.18)] scale-[1.02]'
+                  : 'bg-purple-50/30 hover:bg-purple-50/70 border-purple-100 text-gray-700 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-xl bg-purple-100 border border-purple-200 text-purple-700 flex items-center justify-center font-black shrink-0">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div className="overflow-hidden">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black text-purple-950 uppercase tracking-wider truncate">
+                      TALENTOS RECONHECIDOS
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-purple-700 block truncate">
+                    Potencial já identificado
+                  </span>
+                </div>
+              </div>
+              <span className="text-base font-black text-purple-900 bg-purple-100/80 px-2.5 py-0.5 rounded-full shrink-0">
+                {strategicTalents}
+              </span>
+            </div>
+
+            {/* Pill 2: Sucessores (Teal/Emerald) */}
+            <div
+              onClick={() => handleCategoryClick('successors')}
+              className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
+                filterCategory === 'successors'
+                  ? 'bg-emerald-50/90 border-emerald-300 shadow-[0_4px_20px_rgba(16,185,129,0.18)] scale-[1.02]'
+                  : 'bg-emerald-50/30 hover:bg-emerald-50/70 border-emerald-100 text-gray-700 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-xl bg-emerald-100 border border-emerald-200 text-emerald-700 flex items-center justify-center font-black shrink-0">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div className="overflow-hidden">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black text-emerald-950 uppercase tracking-wider truncate">
+                      SUCESSORES
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-emerald-700 block truncate">
+                    Mapeados para sucessão
+                  </span>
+                </div>
+              </div>
+              <span className="text-base font-black text-emerald-900 bg-emerald-100/80 px-2.5 py-0.5 rounded-full shrink-0">
+                {successorsCount}
+              </span>
+            </div>
+
+            {/* Pill 3: Potencial de Desenvolvimento (Light Blue) */}
+            <div
+              onClick={() => handleCategoryClick('high_potential')}
+              className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
+                filterCategory === 'high_potential'
+                  ? 'bg-blue-50/90 border-blue-300 shadow-[0_4px_20px_rgba(59,130,246,0.18)] scale-[1.02]'
+                  : 'bg-blue-50/30 hover:bg-blue-50/70 border-blue-100 text-gray-700 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-xl bg-blue-100 border border-blue-200 text-blue-700 flex items-center justify-center font-black shrink-0">
+                  <TrendingUp className="w-4 h-4" />
+                </div>
+                <div className="overflow-hidden">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black text-blue-950 uppercase tracking-wider truncate">
+                      POTENCIAL DE DESENV.
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-blue-700 block truncate">
+                    Perspectiva de evolução
+                  </span>
+                </div>
+              </div>
+              <span className="text-base font-black text-blue-900 bg-blue-100/80 px-2.5 py-0.5 rounded-full shrink-0">
+                {highPotentialCount}
+              </span>
+            </div>
+
+            {/* Pill 4: Possíveis Talentos Não Mapeados (Amber/Yellow) */}
+            <div
+              onClick={() => handleCategoryClick('hidden_talents')}
+              className={`p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
+                filterCategory === 'hidden_talents'
+                  ? 'bg-amber-50/90 border-amber-300 shadow-[0_4px_20px_rgba(245,158,11,0.18)] scale-[1.02]'
+                  : 'bg-amber-50/30 hover:bg-amber-50/70 border-amber-100 text-gray-700 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-xl bg-amber-100 border border-amber-200 text-amber-700 flex items-center justify-center font-black shrink-0">
+                  <Zap className="w-4 h-4" />
+                </div>
+                <div className="overflow-hidden">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black text-amber-950 uppercase tracking-wider truncate">
+                      NÃO MAPEADOS
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-amber-700 block truncate">
+                    Oportunidade de investigação
+                  </span>
+                </div>
+              </div>
+              <span className="text-base font-black text-amber-900 bg-amber-100/80 px-2.5 py-0.5 rounded-full shrink-0">
+                {hiddenTalentsCount}
+              </span>
+            </div>
+
+            {/* Pill 5: Risco Elevado (Red/Rose - Full Width in 2-col Grid) */}
+            <div
+              onClick={() => handleCategoryClick('high_risk')}
+              className={`sm:col-span-2 p-3.5 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-3 ${
+                filterCategory === 'high_risk'
+                  ? 'bg-rose-50/90 border-rose-300 shadow-[0_4px_20px_rgba(239,68,68,0.18)] scale-[1.01]'
+                  : 'bg-rose-50/30 hover:bg-rose-50/70 border-rose-100 text-gray-700 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 overflow-hidden">
+                <div className="w-8 h-8 rounded-xl bg-rose-100 border border-rose-200 text-rose-700 flex items-center justify-center font-black shrink-0">
+                  <ShieldAlert className="w-4 h-4" />
+                </div>
+                <div className="overflow-hidden">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-black text-rose-950 uppercase tracking-wider truncate">
+                      RISCO ELEVADO
+                    </span>
+                  </div>
+                  <span className="text-[10px] font-semibold text-rose-700 block truncate">
+                    Risco de perda + impacto
+                  </span>
+                </div>
+              </div>
+              <span className="text-base font-black text-rose-900 bg-rose-100/80 px-2.5 py-0.5 rounded-full shrink-0">
+                {highRiskCount}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -654,45 +879,16 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rolesInSelectedCategory.map(roleItem => (
-              <div
-                key={roleItem.roleName}
-                className="bg-white border border-gray-100 shadow-md hover:shadow-xl rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 group hover:-translate-y-0.5"
-              >
-                <div>
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center font-black shrink-0">
-                        <Briefcase className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-base font-extrabold text-gray-900 group-hover:text-purple-600 transition-colors leading-snug">
-                          {roleItem.roleName}
-                        </h4>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                          Cargo na categoria
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100 flex justify-between items-center text-xs my-4">
-                    <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Colaboradores</span>
-                    <span className="text-sm font-black text-gray-900">{roleItem.members.length}</span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setRoleFilter(roleItem.roleName)}
-                  className="w-full mt-2 flex items-center justify-between bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white font-extrabold text-xs py-2.5 px-4 rounded-xl border border-purple-100 transition-all active:scale-95 group-hover:bg-purple-600 group-hover:text-white"
-                >
-                  <span>Ver Pessoas em {roleItem.roleName}</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
+          {/* Hierarchical Role Org-Chart Visualizer for Career */}
+          <HierarchicalRoleOrgChart
+            rolesData={rolesInSelectedCategory.map(r => ({
+              roleName: r.roleName,
+              members: r.members as any,
+              avgProgress: 0,
+              levelRank: 0
+            }))}
+            onSelectRole={(roleName) => setRoleFilter(roleName)}
+          />
         </div>
 
       /* ── 4. CAMADA 3: CARGO SELECIONADO -> LISTA DE COLABORADORES ────────────────── */

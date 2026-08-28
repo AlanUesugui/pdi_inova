@@ -65,3 +65,17 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
 }
+
+@keyframes tourGlowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(30, 67, 130, 0.4), 0 0 20px 4px rgba(30, 67, 130, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 0 6px rgba(30, 67, 130, 0.7), 0 0 30px 8px rgba(30, 67, 130, 0.45);
+  }
+}
+
+.animate-tour-glow {
+  animation: tourGlowPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+

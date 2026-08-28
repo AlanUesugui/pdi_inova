@@ -1043,6 +1043,13 @@ const App: React.FC = () => {
         currentView={currentView}
         onViewChange={setCurrentView}
       />
+      <OnboardingTour
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onComplete={handleCompleteTour}
+        currentView={currentView}
+        onViewChange={setCurrentView}
+      />
     </div>
   );
 };

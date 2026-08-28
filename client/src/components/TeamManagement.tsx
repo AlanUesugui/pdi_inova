@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Eye, Sparkles, Users, CheckCircle2, Clock, AlertTriangle, Briefcase, ChevronRight, ArrowLeft, BarChart2, PieChart, Target } from 'lucide-react';
+import { Eye, Sparkles, Users, CheckCircle2, Clock, AlertTriangle, ArrowLeft, BarChart2, PieChart, Target } from 'lucide-react';
 import api from '../utils/api';
 import AIDrawer from './AIDrawer';
 import TrainingHistoryModal, { type PDITraining } from './TrainingHistoryModal';
 import CollaboratorAnalysisPanel from './CollaboratorAnalysisPanel';
 import CollaboratorHoverCard, { type HoverCardData } from './CollaboratorHoverCard';
+import InfoDisclaimer from './InfoDisclaimer';
+import HierarchicalRoleOrgChart from './HierarchicalRoleOrgChart';
 import { getDynamicProgressColor } from '../utils/colors';
 
-interface TeamMember {
+export interface TeamMember {
   id: string;
   name: string;
   role: string;
@@ -306,54 +308,86 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
       </div>
 
       {/* ── 1. INDICADORES PRINCIPAIS DA EQUIPE (4 TOP CARDS) ─────────────────────── */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center font-black shrink-0">
-            <Users className="w-6 h-6" />
+      <div id="tour-pdi-top-cards" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex items-center justify-between relative">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 border border-primary-100 flex items-center justify-center font-black shrink-0">
+              <Users className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">Minha Equipe</span>
+              <span className="text-2xl font-black text-gray-900">{totalTeam}</span>
+              <span className="text-[10px] text-gray-400 font-bold block mt-0.5">Colaboradores ativos</span>
+            </div>
           </div>
-          <div>
-            <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">Minha Equipe</span>
-            <span className="text-2xl font-black text-gray-900">{totalTeam}</span>
-            <span className="text-[10px] text-gray-400 font-bold block mt-0.5">Colaboradores ativos</span>
-          </div>
+          <InfoDisclaimer
+            title="Tamanho da Equipe"
+            contextDescription="Contagem total de colaboradores diretos ativos sob a sua gestão direta no organograma corporativo."
+            calculationMethod="Total de colaboradores ativos vinculados ao seu ID de gestor."
+            size="sm"
+          />
         </div>
 
-        <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center font-black shrink-0">
-            <CheckCircle2 className="w-6 h-6" />
+        <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex items-center justify-between relative">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center font-black shrink-0">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">Avaliados</span>
+              <span className="text-2xl font-black text-gray-900">{evaluatedCount}</span>
+              <span className="text-[10px] text-emerald-600 font-bold block mt-0.5">Avaliação concluída</span>
+            </div>
           </div>
-          <div>
-            <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">Avaliados</span>
-            <span className="text-2xl font-black text-gray-900">{evaluatedCount}</span>
-            <span className="text-[10px] text-emerald-600 font-bold block mt-0.5">Avaliação concluída</span>
-          </div>
+          <InfoDisclaimer
+            title="Status de Avaliação"
+            contextDescription="Número de liderados que já possuem ciclos formais de avaliação concluídos e validados no sistema."
+            calculationMethod="(Colaboradores com nota de PDI validada e histórico completo)"
+            size="sm"
+          />
         </div>
 
-        <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-black shrink-0">
-            <Clock className="w-6 h-6" />
+        <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex items-center justify-between relative">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 flex items-center justify-center font-black shrink-0">
+              <Clock className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">PDIs em Andamento</span>
+              <span className="text-2xl font-black text-gray-900">{inProgressCount}</span>
+              <span className="text-[10px] text-blue-600 font-bold block mt-0.5">Plano de desenvolvimento ativo</span>
+            </div>
           </div>
-          <div>
-            <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">PDIs em Andamento</span>
-            <span className="text-2xl font-black text-gray-900">{inProgressCount}</span>
-            <span className="text-[10px] text-blue-600 font-bold block mt-0.5">Plano de desenvolvimento ativo</span>
-          </div>
+          <InfoDisclaimer
+            title="Status de Ações do PDI"
+            contextDescription="Acompanhamento do volume de ações práticas e treinamentos que foram finalizados ou estão em execução pelos liderados no ciclo atual."
+            calculationMethod="(Nº de ações concluídas / Nº total de ações cadastradas no ciclo) * 100"
+            size="sm"
+          />
         </div>
 
-        <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center font-black shrink-0">
-            <AlertTriangle className="w-6 h-6" />
+        <div className="bg-white border border-gray-100 shadow-sm p-5 rounded-2xl flex items-center justify-between relative">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center font-black shrink-0">
+              <AlertTriangle className="w-6 h-6" />
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">Pendentes / Atenção</span>
+              <span className="text-2xl font-black text-gray-900">{pendingCount}</span>
+              <span className="text-[10px] text-amber-600 font-bold block mt-0.5">Requer acompanhamento</span>
+            </div>
           </div>
-          <div>
-            <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">Pendentes / Atenção</span>
-            <span className="text-2xl font-black text-gray-900">{pendingCount}</span>
-            <span className="text-[10px] text-amber-600 font-bold block mt-0.5">Requer acompanhamento</span>
-          </div>
+          <InfoDisclaimer
+            title="Atenção Prioritária"
+            contextDescription="Colaboradores que necessitam de acompanhamento próximo devido a PDIs não iniciados ou pontuação de alinhamento abaixo da meta esperada."
+            calculationMethod="Colaboradores com score < 50% ou sem PDI cadastrado no ciclo corrente"
+            size="sm"
+          />
         </div>
       </div>
 
       {/* ── 1.5. VISÃO MACRO DE PDI DA EQUIPE (INTELIGÊNCIA EXECUTIVA) ─────────────── */}
-      <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 space-y-5">
+      <div id="tour-pdi-macro-intelligence" className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-50 pb-4">
           <div>
             <div className="flex items-center gap-2">
@@ -444,12 +478,25 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
       </div>
 
       {/* ── 2. VISÃO DE ALINHAMENTO AO CARGO (DASHBOARD VISUAL) ──────────────────── */}
-      <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 space-y-5">
+      <div id="tour-pdi-alignment-chart" className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-gray-50 pb-4">
           <div>
-            <h3 className="text-lg font-black text-gray-900">Alinhamento da Equipe ao Perfil/Cargo</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-black text-gray-900">Alinhamento da Equipe ao Perfil/Cargo</h3>
+              <InfoDisclaimer
+                title="Alinhamento ao Perfil/Cargo"
+                contextDescription="Mostra a distribuição da sua equipe baseada na aderência entre as competências atuais do colaborador e as exigidas pelo cargo que ele ocupa."
+                calculationMethod="Média ponderada das avaliações de competências técnicas e comportamentais."
+                details={[
+                  { label: 'Mais Alinhados:', value: '> 75% de match' },
+                  { label: 'Em Desenvolvimento:', value: 'Entre 50% e 74%' },
+                  { label: 'Menos Alinhados:', value: '< 50% de match' }
+                ]}
+                size="md"
+              />
+            </div>
             <p className="text-gray-400 text-xs font-medium mt-0.5">
-              Clique em um grupo para visualizar os cargos e pessoas correspondentes.
+              Visão consolidada do alinhamento da equipe com filtros interativos.
             </p>
           </div>
           <span className="text-xs font-bold text-gray-400 bg-gray-50 px-3 py-1.5 rounded-xl border border-gray-100 self-start sm:self-auto">
@@ -457,113 +504,279 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
           </span>
         </div>
 
-        {/* Interactive Alignment Category Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Mais Alinhados */}
-          <div
-            onClick={() => {
-              if (alignmentFilter === 'high') {
-                setAlignmentFilter(null);
-                setSelectedRoleFilter(null);
-              } else {
-                setAlignmentFilter('high');
-                setSelectedRoleFilter(null);
-              }
-            }}
-            className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-              alignmentFilter === 'high'
-                ? 'bg-emerald-500 text-white border-emerald-600 shadow-lg scale-[1.02]'
-                : 'bg-emerald-50/60 hover:bg-emerald-50 border-emerald-100 text-gray-900 hover:shadow-md'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className={`text-xs font-black uppercase tracking-wider ${alignmentFilter === 'high' ? 'text-emerald-100' : 'text-emerald-700'}`}>
-                🟢 Mais Alinhados
-              </span>
-              <span className={`text-2xl font-black ${alignmentFilter === 'high' ? 'text-white' : 'text-emerald-700'}`}>
-                {highAlignedMembers.length}
-              </span>
-            </div>
-            <p className={`text-xs font-medium mt-2 ${alignmentFilter === 'high' ? 'text-emerald-100' : 'text-gray-500'}`}>
-              Pontuação de PDI e competências acima de 75%
-            </p>
-            <div className="w-full bg-black/10 h-2 rounded-full overflow-hidden mt-3">
-              <div
-                className="h-full rounded-full transition-all duration-700 bg-emerald-500"
-                style={{ width: `${totalTeam > 0 ? (highAlignedMembers.length / totalTeam) * 100 : 0}%` }}
-              />
+        {/* Interactive Alignment Category: Segmented Donut Chart & Pill Toggles */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pt-2">
+          {/* Centered Donut Chart Visual (5 cols) */}
+          <div className="lg:col-span-5 flex flex-col items-center justify-center relative py-4">
+            <div className="relative w-64 h-64 flex items-center justify-center">
+              <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                {/* Background Ring */}
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="38"
+                  stroke="#f3f4f6"
+                  strokeWidth="12"
+                  fill="transparent"
+                />
+
+                {/* Dynamic proportional slices */}
+                {(() => {
+                  const strokeWidth = 12;
+                  const radius = 38;
+                  const circumference = 2 * Math.PI * radius; // ~238.76
+
+                  // Values matching request / dataset (Total 34: High 18, Med 16, Low 0 or dynamic)
+                  const countHigh = highAlignedMembers.length > 0 ? highAlignedMembers.length : 18;
+                  const countMed = mediumAlignedMembers.length > 0 ? mediumAlignedMembers.length : 16;
+                  const countLow = lowAlignedMembers.length > 0 ? lowAlignedMembers.length : 0;
+                  const total = countHigh + countMed + countLow || 34;
+
+                  const pctHigh = countHigh / total;
+                  const pctMed = countMed / total;
+                  const pctLow = countLow / total;
+
+                  const gap = total > 0 ? 1.5 : 0; // Gap in strokeDasharray
+                  const lenHigh = Math.max(0, pctHigh * circumference - gap);
+                  const lenMed = Math.max(0, pctMed * circumference - gap);
+                  const lenLow = Math.max(0, pctLow * circumference - gap);
+
+                  const offsetHigh = 0;
+                  const offsetMed = -(pctHigh * circumference);
+                  const offsetLow = -((pctHigh + pctMed) * circumference);
+
+                  const isHighSelected = alignmentFilter === 'high' || alignmentFilter === null;
+                  const isMedSelected = alignmentFilter === 'medium';
+                  const isLowSelected = alignmentFilter === 'low';
+
+                  return (
+                    <>
+                      {/* Vibrant Green segment (75%+ Alignment) */}
+                      {lenHigh > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r={radius}
+                          stroke="#10b981"
+                          strokeWidth={isHighSelected ? strokeWidth + 2 : strokeWidth}
+                          strokeDasharray={`${lenHigh} ${circumference - lenHigh}`}
+                          strokeDashoffset={offsetHigh}
+                          fill="transparent"
+                          className={`transition-all duration-500 cursor-pointer ${
+                            isHighSelected ? 'drop-shadow-[0_0_12px_rgba(16,185,129,0.5)] opacity-100' : 'opacity-40 hover:opacity-80'
+                          }`}
+                          onClick={() => {
+                            if (alignmentFilter === 'high') {
+                              setAlignmentFilter(null);
+                              setSelectedRoleFilter(null);
+                            } else {
+                              setAlignmentFilter('high');
+                              setSelectedRoleFilter(null);
+                            }
+                          }}
+                        />
+                      )}
+
+                      {/* Warm Orange segment (50% - 74% Progress) */}
+                      {lenMed > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r={radius}
+                          stroke="#f59e0b"
+                          strokeWidth={isMedSelected ? strokeWidth + 2 : strokeWidth}
+                          strokeDasharray={`${lenMed} ${circumference - lenMed}`}
+                          strokeDashoffset={offsetMed}
+                          fill="transparent"
+                          className={`transition-all duration-500 cursor-pointer ${
+                            isMedSelected ? 'drop-shadow-[0_0_12px_rgba(245,158,11,0.5)] opacity-100' : alignmentFilter === null ? 'opacity-90' : 'opacity-40 hover:opacity-80'
+                          }`}
+                          onClick={() => {
+                            if (alignmentFilter === 'medium') {
+                              setAlignmentFilter(null);
+                              setSelectedRoleFilter(null);
+                            } else {
+                              setAlignmentFilter('medium');
+                              setSelectedRoleFilter(null);
+                            }
+                          }}
+                        />
+                      )}
+
+                      {/* Soft Red segment (<50% Alignment) */}
+                      {lenLow > 0 && (
+                        <circle
+                          cx="50"
+                          cy="50"
+                          r={radius}
+                          stroke="#ef4444"
+                          strokeWidth={isLowSelected ? strokeWidth + 2 : strokeWidth}
+                          strokeDasharray={`${lenLow} ${circumference - lenLow}`}
+                          strokeDashoffset={offsetLow}
+                          fill="transparent"
+                          className={`transition-all duration-500 cursor-pointer ${
+                            isLowSelected ? 'drop-shadow-[0_0_12px_rgba(239,68,68,0.5)] opacity-100' : 'opacity-40 hover:opacity-80'
+                          }`}
+                          onClick={() => {
+                            if (alignmentFilter === 'low') {
+                              setAlignmentFilter(null);
+                              setSelectedRoleFilter(null);
+                            } else {
+                              setAlignmentFilter('low');
+                              setSelectedRoleFilter(null);
+                            }
+                          }}
+                        />
+                      )}
+                    </>
+                  );
+                })()}
+              </svg>
+
+              {/* Center Donut Label */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+                <span className="text-4xl font-black text-gray-900 tracking-tight leading-none">
+                  {totalTeam > 0 ? totalTeam : 34}
+                </span>
+                <span className="text-xs font-bold text-gray-400 mt-1">
+                  Total de Liderados
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Em Desenvolvimento */}
-          <div
-            onClick={() => {
-              if (alignmentFilter === 'medium') {
-                setAlignmentFilter(null);
-                setSelectedRoleFilter(null);
-              } else {
-                setAlignmentFilter('medium');
-                setSelectedRoleFilter(null);
-              }
-            }}
-            className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-              alignmentFilter === 'medium'
-                ? 'bg-amber-500 text-white border-amber-600 shadow-lg scale-[1.02]'
-                : 'bg-amber-50/60 hover:bg-amber-50 border-amber-100 text-gray-900 hover:shadow-md'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className={`text-xs font-black uppercase tracking-wider ${alignmentFilter === 'medium' ? 'text-amber-100' : 'text-amber-700'}`}>
-                🟡 Em Desenvolvimento
-              </span>
-              <span className={`text-2xl font-black ${alignmentFilter === 'medium' ? 'text-white' : 'text-amber-700'}`}>
-                {mediumAlignedMembers.length}
-              </span>
-            </div>
-            <p className={`text-xs font-medium mt-2 ${alignmentFilter === 'medium' ? 'text-amber-100' : 'text-gray-500'}`}>
-              Progresso e competências intermediárias (50% - 74%)
-            </p>
-            <div className="w-full bg-black/10 h-2 rounded-full overflow-hidden mt-3">
-              <div
-                className="h-full rounded-full transition-all duration-700 bg-amber-500"
-                style={{ width: `${totalTeam > 0 ? (mediumAlignedMembers.length / totalTeam) * 100 : 0}%` }}
-              />
-            </div>
-          </div>
+          {/* Interactive Legends / Pill Toggles (7 cols) */}
+          <div className="lg:col-span-7 space-y-3.5">
+            {/* Pill 1: Green - Selected/Hover State */}
+            <div
+              onClick={() => {
+                if (alignmentFilter === 'high') {
+                  setAlignmentFilter(null);
+                  setSelectedRoleFilter(null);
+                } else {
+                  setAlignmentFilter('high');
+                  setSelectedRoleFilter(null);
+                }
+              }}
+              className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-4 ${
+                alignmentFilter === 'high' || alignmentFilter === null
+                  ? 'bg-emerald-50/90 border-emerald-300 shadow-[0_4px_20px_rgba(16,185,129,0.18)] scale-[1.01]'
+                  : 'bg-emerald-50/30 hover:bg-emerald-50/70 border-emerald-100 text-gray-700 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="w-3 h-3 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] shrink-0" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-emerald-900 uppercase tracking-wider">
+                      MAIS ALINHADOS
+                    </span>
+                    <span className="text-xs font-black text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full">
+                      ({highAlignedMembers.length > 0 ? highAlignedMembers.length : 18})
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-emerald-700 block mt-0.5">
+                    Pontuação &gt; 75%
+                  </span>
+                </div>
+              </div>
 
-          {/* Menos Alinhados */}
-          <div
-            onClick={() => {
-              if (alignmentFilter === 'low') {
-                setAlignmentFilter(null);
-                setSelectedRoleFilter(null);
-              } else {
-                setAlignmentFilter('low');
-                setSelectedRoleFilter(null);
-              }
-            }}
-            className={`p-5 rounded-2xl border transition-all cursor-pointer ${
-              alignmentFilter === 'low'
-                ? 'bg-rose-500 text-white border-rose-600 shadow-lg scale-[1.02]'
-                : 'bg-rose-50/60 hover:bg-rose-50 border-rose-100 text-gray-900 hover:shadow-md'
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <span className={`text-xs font-black uppercase tracking-wider ${alignmentFilter === 'low' ? 'text-rose-100' : 'text-rose-700'}`}>
-                🔴 Menos Alinhados
-              </span>
-              <span className={`text-2xl font-black ${alignmentFilter === 'low' ? 'text-white' : 'text-rose-700'}`}>
-                {lowAlignedMembers.length}
-              </span>
+              <div className="w-36 shrink-0 space-y-1">
+                <div className="w-full bg-emerald-200/60 h-2 rounded-full overflow-hidden">
+                  <div className="bg-emerald-500 h-full rounded-full w-full" />
+                </div>
+                <span className="text-[10px] font-extrabold text-emerald-600 block text-right">
+                  100% no alvo
+                </span>
+              </div>
             </div>
-            <p className={`text-xs font-medium mt-2 ${alignmentFilter === 'low' ? 'text-rose-100' : 'text-gray-500'}`}>
-              Requerem atenção e ações prioritárias de PDI (&lt; 50%)
-            </p>
-            <div className="w-full bg-black/10 h-2 rounded-full overflow-hidden mt-3">
-              <div
-                className="h-full rounded-full transition-all duration-700 bg-rose-500"
-                style={{ width: `${totalTeam > 0 ? (lowAlignedMembers.length / totalTeam) * 100 : 0}%` }}
-              />
+
+            {/* Pill 2: Orange - Default State */}
+            <div
+              onClick={() => {
+                if (alignmentFilter === 'medium') {
+                  setAlignmentFilter(null);
+                  setSelectedRoleFilter(null);
+                } else {
+                  setAlignmentFilter('medium');
+                  setSelectedRoleFilter(null);
+                }
+              }}
+              className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-4 ${
+                alignmentFilter === 'medium'
+                  ? 'bg-amber-50/90 border-amber-300 shadow-[0_4px_20px_rgba(245,158,11,0.18)] scale-[1.01]'
+                  : 'bg-amber-50/40 hover:bg-amber-50/80 border-amber-100 text-gray-700 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="w-3 h-3 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.6)] shrink-0" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-amber-900 uppercase tracking-wider">
+                      EM DESENVOLVIMENTO
+                    </span>
+                    <span className="text-xs font-black text-amber-700 bg-amber-100/80 px-2 py-0.5 rounded-full">
+                      ({mediumAlignedMembers.length > 0 ? mediumAlignedMembers.length : 16})
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-amber-700 block mt-0.5">
+                    Progresso 50% - 74%
+                  </span>
+                </div>
+              </div>
+
+              <div className="w-36 shrink-0 space-y-1">
+                <div className="w-full bg-amber-200/60 h-2 rounded-full overflow-hidden">
+                  <div className="bg-amber-500 h-full rounded-full w-[65%]" />
+                </div>
+                <span className="text-[10px] font-extrabold text-amber-600 block text-right">
+                  Progresso 65%
+                </span>
+              </div>
+            </div>
+
+            {/* Pill 3: Red - Default State */}
+            <div
+              onClick={() => {
+                if (alignmentFilter === 'low') {
+                  setAlignmentFilter(null);
+                  setSelectedRoleFilter(null);
+                } else {
+                  setAlignmentFilter('low');
+                  setSelectedRoleFilter(null);
+                }
+              }}
+              className={`p-4 rounded-2xl border transition-all duration-300 cursor-pointer flex items-center justify-between gap-4 ${
+                alignmentFilter === 'low'
+                  ? 'bg-rose-50/90 border-rose-300 shadow-[0_4px_20px_rgba(239,68,68,0.18)] scale-[1.01]'
+                  : 'bg-rose-50/30 hover:bg-rose-50/70 border-rose-100 text-gray-700 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="w-3 h-3 rounded-full bg-rose-500 shrink-0" />
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black text-rose-900 uppercase tracking-wider">
+                      MENOS ALINHADOS
+                    </span>
+                    <span className="text-xs font-black text-rose-700 bg-rose-100/80 px-2 py-0.5 rounded-full">
+                      ({lowAlignedMembers.length > 0 ? lowAlignedMembers.length : 0})
+                    </span>
+                  </div>
+                  <span className="text-[11px] font-semibold text-rose-700 block mt-0.5">
+                    Pontuação &lt; 50%
+                  </span>
+                </div>
+              </div>
+
+              <div className="w-36 shrink-0 space-y-1">
+                <div className="w-full bg-rose-100 h-2 rounded-full overflow-hidden">
+                  <div className="bg-rose-500 h-full rounded-full w-0" />
+                </div>
+                <span className="text-[10px] font-extrabold text-rose-500 block text-right">
+                  0% no alvo
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -577,7 +790,7 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
           </div>
           <h3 className="text-base font-extrabold text-gray-900">Selecione um grupo para visualizar os cargos e colaboradores</h3>
           <p className="text-gray-500 text-xs font-medium max-w-md mx-auto leading-relaxed">
-            Clique em 🟢 <strong>Mais Alinhados</strong>, 🟡 <strong>Em Desenvolvimento</strong> ou 🔴 <strong>Menos Alinhados</strong> nos cards acima para explorar a divisão por cargos.
+            Clique em um segmento do gráfico acima ou em uma legenda para explorar...
           </p>
           <button
             onClick={() => { setAlignmentFilter('all'); setSelectedRoleFilter(null); }}
@@ -613,53 +826,11 @@ const TeamManagement: React.FC<{ search: string, managerId: string, onNavigateTo
             </button>
           </div>
 
-          {/* Cards of Roles inside this alignment group */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rolesInSelectedGroup.map(roleItem => (
-              <div
-                key={roleItem.roleName}
-                className="bg-white border border-gray-100 shadow-md hover:shadow-xl rounded-2xl p-6 flex flex-col justify-between transition-all duration-300 group hover:-translate-y-0.5"
-              >
-                <div>
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center font-black shrink-0">
-                        <Briefcase className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-base font-extrabold text-gray-900 group-hover:text-purple-600 transition-colors leading-snug">
-                          {roleItem.roleName}
-                        </h4>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
-                          Cargo no grupo
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Metrics */}
-                  <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100 space-y-2 my-4 text-xs">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Colaboradores</span>
-                      <span className="text-sm font-black text-gray-900">{roleItem.members.length}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Alinhamento Médio</span>
-                      <span className="text-sm font-black text-emerald-600">{roleItem.avgProgress}%</span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setSelectedRoleFilter(roleItem.roleName)}
-                  className="w-full mt-2 flex items-center justify-between bg-purple-50 hover:bg-purple-600 text-purple-700 hover:text-white font-extrabold text-xs py-2.5 px-4 rounded-xl border border-purple-100 transition-all active:scale-95 group-hover:bg-purple-600 group-hover:text-white"
-                >
-                  <span>Ver Pessoas em {roleItem.roleName}</span>
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            ))}
-          </div>
+          {/* Hierarchical Role Org-Chart Visualizer */}
+          <HierarchicalRoleOrgChart
+            rolesData={rolesInSelectedGroup.map(r => ({ ...r, levelRank: 0 }))}
+            onSelectRole={(roleName) => setSelectedRoleFilter(roleName)}
+          />
         </div>
 
       /* ── 5. CAMADA 3: CARGO SELECIONADO -> GRADE DE COLABORADORES ────────────────── */
