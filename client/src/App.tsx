@@ -5,8 +5,10 @@ import RolesManagement from './components/RolesManagement';
 import CareerMap from './components/CareerMap';
 import FeedbackManagement from './components/FeedbackManagement';
 import Login from './components/Login';
+import SettingsView from './components/SettingsView';
+import NotificationsPanel from './components/NotificationsPanel';
 import { getDynamicProgressColor } from './utils/colors';
-import { Search, ChevronRight, HelpCircle } from 'lucide-react';
+import { Search, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import ExplainabilityModal from './components/ExplainabilityModal';
 
@@ -18,9 +20,9 @@ const RadarChart: React.FC<RadarChartProps> = ({ averages }) => {
   const cx = 150;
   const cy = 120;
   const r = 70;
-  
+
   const angles = [-90, -18, 54, 126, 198];
-  
+
   const getPoint = (angle: number, pct: number) => {
     const rad = (angle * Math.PI) / 180;
     const dist = r * pct;
@@ -176,7 +178,14 @@ const EngagementWave: React.FC = () => {
 };
 
 const App: React.FC = () => {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<any>(() => {
+    try {
+      const saved = sessionStorage.getItem('pdi_inova_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
   const [currentView, setCurrentView] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [insight, setInsight] = useState("Carregando diagnóstico do time...");
@@ -184,6 +193,7 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [fullTeam, setFullTeam] = useState<any[]>([]);
   const [explainModalOpen, setExplainModalOpen] = useState(false);
+  // @ts-expect-error unused setter
   const [explainData, setExplainData] = useState<any>(null);
   const [stats, setStats] = useState<any>({
     activeMembersCount: 24,
@@ -196,6 +206,16 @@ const App: React.FC = () => {
     coursesRate: 42,
     certsRate: 91
   });
+
+
+  // Persistir sessão no sessionStorage (persiste em reloads, mas limpa ao fechar a aba)
+  useEffect(() => {
+    if (user) {
+      sessionStorage.setItem('pdi_inova_user', JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem('pdi_inova_user');
+    }
+  }, [user]);
 
   // Fetch dashboard stats dynamically
   useEffect(() => {
@@ -274,7 +294,15 @@ const App: React.FC = () => {
     }
   }, [user]);
 
-
+  // Handle outlook success redirect
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('outlook_success') === 'true') {
+      alert('Integração com o Outlook realizada com sucesso!');
+      window.history.replaceState({}, document.title, window.location.pathname);
+      setCurrentView('settings');
+    }
+  }, []);
 
   // Calculate team distribution stats
   const totalCollabs = fullTeam.length || 1;
@@ -316,7 +344,7 @@ const App: React.FC = () => {
       member.pdiHistory.forEach((h: any) => {
         const name = (h.treinamento_nome || "").toLowerCase();
         let catIndex = 1; // Default to Tech
-        
+
         if (name.includes("liderança") || name.includes("feedback") || name.includes("gestão situacional")) {
           catIndex = 0; // Liderança
         } else if (name.includes("comunicação") || name.includes("assertiva") || name.includes("empatia")) {
@@ -326,7 +354,7 @@ const App: React.FC = () => {
         } else if (name.includes("negócio") || name.includes("financeiro") || name.includes("vendas") || name.includes("cliente")) {
           catIndex = 4; // Negócio
         }
-        
+
         categoryScores[catIndex] += h.score / 100;
         categoryCounts[catIndex] += 1;
       });
@@ -340,33 +368,35 @@ const App: React.FC = () => {
     return defaultAverages[i]!;
   });
 
+
   if (!user) {
     return <Login onLoginSuccess={setUser} />;
   }
 
   return (
     <div className="flex min-h-screen bg-gray-50/50">
-      <Sidebar 
-        onGenerateReport={handleGenerateReport} 
+      <Sidebar
+        onGenerateReport={handleGenerateReport}
         currentView={currentView}
         onViewChange={setCurrentView}
         userName={user.name}
       />
-      
+
       <main className="flex-1 ml-64 p-8">
         {/* Header */}
-        <header className="flex justify-between items-center mb-8">
+        <header className="flex justify-between items-center mb-8 gap-4">
           <div className="flex-1 max-w-xl relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-primary-600 transition-colors" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Buscar colaboradores, competências ou trilhas..." 
+              placeholder="Buscar colaboradores, competências ou trilhas..."
               className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-600/10 focus:border-primary-600 transition-all shadow-sm font-medium text-sm"
             />
           </div>
-          
+
+          <NotificationsPanel userEmail={user?.email || user?.login || ''} />
 
         </header>
 
@@ -405,7 +435,7 @@ const App: React.FC = () => {
                   </div>
                 </div>
                 <div className="pt-4 border-t border-gray-100/50 mt-4">
-                  <button 
+                  <button
                     onClick={handleGenerateReport}
                     className="w-full flex items-center justify-between text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50/50 hover:bg-primary-50 border border-primary-100/50 px-4 py-3 rounded-xl transition-all"
                   >
@@ -426,7 +456,7 @@ const App: React.FC = () => {
                     Mapeamento Ativo
                   </span>
                 </div>
-                
+
                 <RadarChart averages={radarAverages} />
               </div>
             </div>
@@ -532,7 +562,7 @@ const App: React.FC = () => {
 
             {/* Bottom Row: Dashboard de Dados Gerais dos Colaboradores */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
-              
+
               {/* Card 1: Distribuição de Saúde / Risco (AI Health) */}
               <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
                 <div>
@@ -542,50 +572,50 @@ const App: React.FC = () => {
                       <p className="text-gray-400 text-[10px] font-bold uppercase tracking-wider mt-0.5">Indicador de engajamento e risco de desvio no PDI</p>
                     </div>
                   </div>
-                  
+
                   <div className="flex items-center justify-center py-6 relative">
                     <svg className="w-36 h-36 transform -rotate-90">
                       {/* Base Track */}
                       <circle cx="72" cy="72" r="54" fill="transparent" stroke="#F3F4F6" strokeWidth="12" />
-                      
+
                       {/* Arc 1: Healthy */}
-                      <circle 
-                        cx="72" 
-                        cy="72" 
-                        r="54" 
-                        fill="transparent" 
-                        stroke="#10B981" 
-                        strokeWidth="12" 
+                      <circle
+                        cx="72"
+                        cy="72"
+                        r="54"
+                        fill="transparent"
+                        stroke="#10B981"
+                        strokeWidth="12"
                         strokeDasharray={`${2 * Math.PI * 54}`}
                         strokeDashoffset={`${2 * Math.PI * 54 * (1 - (healthyCount / totalCollabs))}`}
                         className="transition-all duration-1000 ease-out"
                       />
-                      
+
                       {/* Arc 2: Attention */}
                       {attentionCount > 0 && (
-                        <circle 
-                          cx="72" 
-                          cy="72" 
-                          r="54" 
-                          fill="transparent" 
-                          stroke="#F59E0B" 
-                          strokeWidth="12" 
+                        <circle
+                          cx="72"
+                          cy="72"
+                          r="54"
+                          fill="transparent"
+                          stroke="#F59E0B"
+                          strokeWidth="12"
                           strokeDasharray={`${2 * Math.PI * 54}`}
                           strokeDashoffset={`${2 * Math.PI * 54 * (1 - (attentionCount / totalCollabs))}`}
                           style={{ transform: `rotate(${(healthyCount / totalCollabs) * 360}deg)`, transformOrigin: '72px 72px' }}
                           className="transition-all duration-1000 ease-out"
                         />
                       )}
-                      
+
                       {/* Arc 3: Risk */}
                       {riskCount > 0 && (
-                        <circle 
-                          cx="72" 
-                          cy="72" 
-                          r="54" 
-                          fill="transparent" 
-                          stroke="#EF4444" 
-                          strokeWidth="12" 
+                        <circle
+                          cx="72"
+                          cy="72"
+                          r="54"
+                          fill="transparent"
+                          stroke="#EF4444"
+                          strokeWidth="12"
                           strokeDasharray={`${2 * Math.PI * 54}`}
                           strokeDashoffset={`${2 * Math.PI * 54 * (1 - (riskCount / totalCollabs))}`}
                           style={{ transform: `rotate(${((healthyCount + attentionCount) / totalCollabs) * 360}deg)`, transformOrigin: '72px 72px' }}
@@ -593,14 +623,14 @@ const App: React.FC = () => {
                         />
                       )}
                     </svg>
-                    
+
                     <div className="absolute flex flex-col items-center justify-center">
                       <span className="text-2xl font-black text-gray-900">{fullTeam.length}</span>
                       <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Membros</span>
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="space-y-2 mt-4 pt-4 border-t border-gray-50">
                   <div className="flex justify-between items-center text-xs font-bold">
                     <div className="flex items-center gap-2 text-emerald-600">
@@ -705,8 +735,8 @@ const App: React.FC = () => {
                           <span className="text-gray-500">{count} ({Math.round((count / totalCollabs) * 100)}%)</span>
                         </div>
                         <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full rounded-full transition-all duration-1000 ease-out" 
+                          <div
+                            className="h-full rounded-full transition-all duration-1000 ease-out"
                             style={{ width: `${(count / totalCollabs) * 100}%`, backgroundColor: getDynamicProgressColor((count / totalCollabs) * 100) }}
                           ></div>
                         </div>
@@ -716,7 +746,7 @@ const App: React.FC = () => {
                 </div>
 
                 <div className="pt-4 border-t border-gray-50 mt-4">
-                  <button 
+                  <button
                     onClick={() => setCurrentView('team')}
                     className="w-full flex items-center justify-between text-xs font-bold text-primary-600 hover:text-primary-700 bg-primary-50/50 hover:bg-primary-50 border border-primary-100/50 px-4 py-3 rounded-xl transition-all"
                   >
@@ -732,16 +762,18 @@ const App: React.FC = () => {
           <RolesManagement />
         ) : currentView === 'career' ? (
           <CareerMap search={searchTerm} managerId={user.id} />
+        ) : currentView === 'settings' ? (
+          <SettingsView user={user} />
         ) : currentView === 'feedback' ? (
           <FeedbackManagement managerId={user.id} />
         ) : (
           <TeamManagement search={searchTerm} managerId={user.id} onNavigateToCareer={() => setCurrentView('career')} />
         )}
       </main>
-      <ExplainabilityModal 
-        isOpen={explainModalOpen} 
-        onClose={() => setExplainModalOpen(false)} 
-        data={explainData} 
+      <ExplainabilityModal
+        isOpen={explainModalOpen}
+        onClose={() => setExplainModalOpen(false)}
+        data={explainData}
       />
     </div>
   );

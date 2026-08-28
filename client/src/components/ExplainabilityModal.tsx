@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Calendar, Database, FileText, Sparkles, BookOpen } from 'lucide-react';
+import { Joyride, STATUS } from 'react-joyride';
+import type { Step } from 'react-joyride';
 
 export interface ExplainabilityData {
   title: string;
@@ -26,20 +28,92 @@ interface Props {
 }
 
 const ExplainabilityModal: React.FC<Props> = ({ isOpen, onClose, data }) => {
+  const [runTutorial, setRunTutorial] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && data) {
+      const hasSeen = sessionStorage.getItem('tour_explainability_modal');
+      if (!hasSeen) {
+        const timer = setTimeout(() => setRunTutorial(true), 500);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setRunTutorial(false);
+    }
+  }, [isOpen, data]);
+
+  const handleJoyrideCallback = (data: any) => {
+    const { status } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+    if (finishedStatuses.includes(status as any)) {
+      setRunTutorial(false);
+      sessionStorage.setItem('tour_explainability_modal', 'true');
+    }
+  };
+
   if (!isOpen || !data) return null;
+
+  const steps: Step[] = [
+    {
+      target: '#tour-expl-header',
+      content: 'Aqui você visualiza qual indicador está sendo analisado no momento.',
+      placement: 'bottom',
+    },
+    {
+      target: '#tour-expl-formula',
+      content: 'Neste quadro, explicamos a fórmula exata usada e os itens considerados para chegar no resultado final.',
+      placement: 'top',
+    },
+    {
+      target: '#tour-expl-rules',
+      content: 'Essas são as regras de negócio que filtram e validam a informação, garantindo precisão.',
+      placement: 'right',
+    },
+    {
+      target: '#tour-expl-source',
+      content: 'A origem do dado, garantindo que você saiba de onde extraímos a informação e qual o seu período de análise.',
+      placement: 'left',
+    },
+  ];
+
+  if (data?.aiDetails) {
+    steps.push({
+      target: '#tour-expl-ai',
+      content: 'Quando a inteligência artificial atua, mostramos os prompts usados, a confiança do modelo e quaisquer limitações encontradas.',
+      placement: 'top',
+    });
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity duration-300"
         onClick={onClose}
       />
 
       {/* Modal Container */}
       <div className="relative bg-white border border-gray-100 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden z-10 flex flex-col max-h-[85vh] transition-transform transform duration-300 scale-100">
+        <Joyride
+          steps={steps}
+          run={runTutorial}
+          continuous={true}
+          onEvent={handleJoyrideCallback}
+          options={{
+            primaryColor: '#5B2F8C',
+            zIndex: 100000,
+            showProgress: true,
+          }}
+          locale={{
+            back: 'Anterior',
+            close: 'Fechar',
+            last: 'Concluir',
+            next: 'Próximo',
+            skip: 'Pular'
+          }}
+        />
         {/* Header */}
-        <div className="bg-gradient-to-r from-primary-600 to-indigo-700 px-6 py-5 text-white flex items-center justify-between">
+        <div className="bg-gradient-to-r from-primary-600 to-indigo-700 px-6 py-5 text-white flex items-center justify-between" id="tour-expl-header">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
               <BookOpen className="w-4 h-4 text-white" />
@@ -49,8 +123,8 @@ const ExplainabilityModal: React.FC<Props> = ({ isOpen, onClose, data }) => {
               <p className="text-white/75 text-[10px] uppercase tracking-wider font-bold mt-0.5">{data.indicatorName}</p>
             </div>
           </div>
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-all active:scale-95"
             aria-label="Fechar"
           >
@@ -61,12 +135,12 @@ const ExplainabilityModal: React.FC<Props> = ({ isOpen, onClose, data }) => {
         {/* Scrollable Body */}
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Main Calculation Block */}
-          <div className="space-y-4">
+          <div className="space-y-4" id="tour-expl-formula">
             <h3 className="text-sm font-black text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-2">
               <span className="w-2 h-2 rounded-full bg-primary-600" />
               Como este resultado foi calculado?
             </h3>
-            
+
             {/* Formula / Desc */}
             <div className="bg-gray-50 border border-gray-100 rounded-2xl p-4 text-sm text-gray-600 leading-relaxed font-medium">
               {data.formulaDescription}
@@ -88,7 +162,7 @@ const ExplainabilityModal: React.FC<Props> = ({ isOpen, onClose, data }) => {
 
           {/* Business Rules & Filters */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-2 shadow-sm">
+            <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-2 shadow-sm" id="tour-expl-rules">
               <p className="text-[10px] text-gray-400 font-black uppercase tracking-wider flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5 text-gray-400" />
                 Regras de Negócio Aplicadas
@@ -103,7 +177,7 @@ const ExplainabilityModal: React.FC<Props> = ({ isOpen, onClose, data }) => {
               </ul>
             </div>
 
-            <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-3 shadow-sm flex flex-col justify-between">
+            <div className="bg-white border border-gray-100 rounded-2xl p-4 space-y-3 shadow-sm flex flex-col justify-between" id="tour-expl-source">
               <div>
                 <p className="text-[10px] text-gray-400 font-black uppercase tracking-wider flex items-center gap-1.5 mb-2">
                   <Database className="w-3.5 h-3.5 text-gray-400" />
@@ -123,12 +197,12 @@ const ExplainabilityModal: React.FC<Props> = ({ isOpen, onClose, data }) => {
 
           {/* AI Explainability (if applicable) */}
           {data.aiDetails && (
-            <div className="bg-purple-50/50 border border-purple-100 rounded-2xl p-5 space-y-4">
+            <div className="bg-purple-50/50 border border-purple-100 rounded-2xl p-5 space-y-4" id="tour-expl-ai">
               <h3 className="text-sm font-black text-purple-900 flex items-center gap-2 border-b border-purple-100 pb-2">
                 <Sparkles className="w-4 h-4 text-purple-500" />
                 Como a IA chegou nesta conclusão?
               </h3>
-              
+
               {data.aiDetails.prompt && (
                 <div className="space-y-1">
                   <p className="text-[10px] text-purple-400 font-black uppercase tracking-wider">Prompt de Instrução</p>
@@ -142,7 +216,7 @@ const ExplainabilityModal: React.FC<Props> = ({ isOpen, onClose, data }) => {
                 <div className="space-y-1">
                   <p className="text-[10px] text-purple-400 font-black uppercase tracking-wider">Variáveis Consideradas pela IA</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {data.aiDetails.dataUsed.map((variable, idx) => (
+                    {data.aiDetails.dataUsed.map((variable: string, idx: number) => (
                       <span key={idx} className="text-[10px] font-black bg-purple-100 text-purple-700 px-2.5 py-1 rounded-lg">
                         {variable}
                       </span>
@@ -174,8 +248,8 @@ const ExplainabilityModal: React.FC<Props> = ({ isOpen, onClose, data }) => {
 
         {/* Footer */}
         <div className="bg-gray-50 border-t border-gray-100 px-6 py-4 flex justify-end">
-          <button 
-            onClick={onClose} 
+          <button
+            onClick={onClose}
             className="bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-black text-xs px-5 py-2.5 rounded-xl transition-all active:scale-95 shadow-sm"
           >
             Entendido

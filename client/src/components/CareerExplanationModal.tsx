@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, CheckCircle2, AlertTriangle, HelpCircle, Database, FileText, ShieldCheck, Target } from 'lucide-react';
+import { Joyride, STATUS } from 'react-joyride';
+import type { Step } from 'react-joyride';
 
 export interface EvidenceTableRow {
   factor: string;
@@ -47,14 +49,77 @@ const CareerExplanationModal: React.FC<CareerExplanationModalProps> = ({
   sourcesUsed = [],
   disclaimer = 'A análise funciona como apoio técnico à decisão do gestor e do RH. Nenhuma promoção ou movimentação é automatizada.'
 }) => {
-  const [showDataDetails, setShowDataDetails] = React.useState(false);
+  const [showDataDetails, setShowDataDetails] = useState(false);
+  const [runTutorial, setRunTutorial] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      const hasSeen = sessionStorage.getItem('tour_career_modal');
+      if (!hasSeen) {
+        const timer = setTimeout(() => setRunTutorial(true), 500);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setRunTutorial(false);
+    }
+  }, [isOpen]);
+
+  const handleJoyrideCallback = (data: any) => {
+    const { status } = data;
+    const finishedStatuses: string[] = [STATUS.FINISHED, STATUS.SKIPPED];
+    if (finishedStatuses.includes(status as any)) {
+      setRunTutorial(false);
+      sessionStorage.setItem('tour_career_modal', 'true');
+    }
+  };
 
   if (!isOpen) return null;
 
+  const steps: Step[] = [
+    {
+      target: '#tour-career-conclusion',
+      content: 'Aqui apresentamos a conclusão principal baseada na análise de carreira.',
+      placement: 'bottom',
+    },
+    {
+      target: '#tour-career-evidence',
+      content: 'As evidências que sustentam a conclusão estão listadas aqui, como engajamento em treinamentos e feedbacks.',
+      placement: 'top',
+    },
+    {
+      target: '#tour-career-reasoning',
+      content: 'Este é o raciocínio feito pela IA conectando as evidências à conclusão final.',
+      placement: 'top',
+    },
+    {
+      target: '#tour-career-impact',
+      content: 'Dica de como o gestor deve interpretar essa informação e conduzir a conversa de desenvolvimento.',
+      placement: 'top',
+    },
+  ];
+
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-navy-950/65 backdrop-blur-sm animate-in fade-in duration-200 flex items-center justify-center p-4">
+      <Joyride
+        steps={steps}
+        run={runTutorial}
+        continuous={true}
+        onEvent={handleJoyrideCallback}
+        options={{
+          primaryColor: '#5B2F8C',
+          zIndex: 100000,
+          showProgress: true,
+        }}
+        locale={{
+          back: 'Anterior',
+          close: 'Fechar',
+          last: 'Concluir',
+          next: 'Próximo',
+          skip: 'Pular'
+        }}
+      />
       <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 max-w-2xl w-full overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
-        
+
         {/* Modal Header */}
         <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-start">
           <div className="flex items-center gap-3">
@@ -76,9 +141,9 @@ const CareerExplanationModal: React.FC<CareerExplanationModalProps> = ({
 
         {/* Modal Scrollable Content */}
         <div className="p-6 space-y-6 overflow-y-auto flex-1 text-xs">
-          
+
           {/* Result & Confidence Banner */}
-          <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center justify-between gap-4">
+          <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex items-center justify-between gap-4" id="tour-career-conclusion">
             <div>
               <span className="text-[10px] font-extrabold text-gray-400 uppercase tracking-wider block">1. O que identificamos (Conclusão)</span>
               <span className={`inline-block text-xs font-black px-3 py-1 mt-1 rounded-full border ${resultBadgeClass}`}>
@@ -95,7 +160,7 @@ const CareerExplanationModal: React.FC<CareerExplanationModalProps> = ({
           </div>
 
           {/* 2. Por que identificamos isso (Evidências) */}
-          <div className="space-y-2.5">
+          <div className="space-y-2.5" id="tour-career-evidence">
             <h4 className="font-extrabold text-gray-900 text-xs uppercase tracking-wider flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               2. Por que identificamos isso (Evidências encontradas)
@@ -111,7 +176,7 @@ const CareerExplanationModal: React.FC<CareerExplanationModalProps> = ({
           </div>
 
           {/* 3. Como as evidências sustentam essa conclusão */}
-          <div className="space-y-2.5">
+          <div className="space-y-2.5" id="tour-career-reasoning">
             <h4 className="font-extrabold text-gray-900 text-xs uppercase tracking-wider flex items-center gap-2">
               <FileText className="w-4 h-4 text-purple-600" />
               3. Raciocínio & Sustentação dos Dados
@@ -122,7 +187,7 @@ const CareerExplanationModal: React.FC<CareerExplanationModalProps> = ({
           </div>
 
           {/* 4. O que isso significa para a gestão */}
-          <div className="space-y-2.5">
+          <div className="space-y-2.5" id="tour-career-impact">
             <h4 className="font-extrabold text-gray-900 text-xs uppercase tracking-wider flex items-center gap-2">
               <Target className="w-4 h-4 text-blue-600" />
               4. O que isso significa para a gestão?

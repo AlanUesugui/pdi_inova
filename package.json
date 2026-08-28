@@ -1,6 +1,7 @@
 {
   "name": "pdi-hub-root",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "dev:client": "npm run dev --prefix client",
     "dev:server": "npm run dev --prefix server",
@@ -9,5 +10,10 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "pg": "^8.23.0",
+    "pkg": "^5.8.1"
   }
 }

@@ -41,8 +41,13 @@ export async function exchangeCodeForTokens(userEmail: string, code: string): Pr
     // Save mock credentials in the database
     const mockEmail = userEmail.includes('@') ? userEmail : `${userEmail}@inova.com`;
     await db.run(
-      `INSERT OR REPLACE INTO outlook_tokens (email, access_token, refresh_token, expires_at, outlook_email)
-       VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO outlook_tokens (email, access_token, refresh_token, expires_at, outlook_email)
+       VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT (email) DO UPDATE SET
+         access_token = EXCLUDED.access_token,
+         refresh_token = EXCLUDED.refresh_token,
+         expires_at = EXCLUDED.expires_at,
+         outlook_email = EXCLUDED.outlook_email`,
       [userEmail, 'mock_access_token', 'mock_refresh_token', now + 3600 * 1000, `outlook.${mockEmail}`]
     );
     return true;
@@ -86,8 +91,13 @@ export async function exchangeCodeForTokens(userEmail: string, code: string): Pr
     }
 
     await db.run(
-      `INSERT OR REPLACE INTO outlook_tokens (email, access_token, refresh_token, expires_at, outlook_email)
-       VALUES (?, ?, ?, ?, ?)`,
+      `INSERT INTO outlook_tokens (email, access_token, refresh_token, expires_at, outlook_email)
+       VALUES (?, ?, ?, ?, ?)
+       ON CONFLICT (email) DO UPDATE SET
+         access_token = EXCLUDED.access_token,
+         refresh_token = EXCLUDED.refresh_token,
+         expires_at = EXCLUDED.expires_at,
+         outlook_email = EXCLUDED.outlook_email`,
       [
         userEmail,
         data.access_token,

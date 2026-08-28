@@ -11,10 +11,10 @@ class PostgresDb {
     if (!connectionString) {
       throw new Error("DATABASE_URL is not defined in environment variables.");
     }
-    const isLocal = connectionString.includes('localhost') || 
-                    connectionString.includes('127.0.0.1') || 
-                    connectionString.includes('postgres:5432') ||
-                    process.env.DB_SSL === 'false';
+    const isLocal = connectionString.includes('localhost') ||
+      connectionString.includes('127.0.0.1') ||
+      connectionString.includes('postgres:5432') ||
+      process.env.DB_SSL === 'false';
 
     this.pool = new Pool({
       connectionString,
@@ -41,17 +41,17 @@ class PostgresDb {
 
   async run(sql: string, params: any[] = []): Promise<{ lastID?: number | string; changes: number }> {
     let pgSql = this.convertSql(sql);
-    
+
     // Append RETURNING id only for tables that have an 'id' column and need lastID
     const isInsertWithLastId = /^\s*insert\s+into\s+(feedbacks|meetings|weekly_report_log)\b/i.test(pgSql);
     const hasReturning = /returning/i.test(pgSql);
-    
+
     if (isInsertWithLastId && !hasReturning) {
       pgSql += ' RETURNING id';
     }
 
     const result = await this.pool.query(pgSql, params);
-    
+
     let lastID: any = undefined;
     if (isInsertWithLastId && result.rows && result.rows.length > 0) {
       lastID = result.rows[0].id;
@@ -83,7 +83,7 @@ export async function getDb() {
 
 export async function initSchema() {
   const db = await getDb();
-  
+
   await db.exec(`
     CREATE TABLE IF NOT EXISTS collaborators (
       id TEXT PRIMARY KEY,

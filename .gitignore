@@ -27,6 +27,9 @@ server/uploads/*
 .env.production.local
 *.pem
 *.key
+docker-compose.yml
+docker-compose.prod.yml
+docker-compose.dev.yml
 
 # Logs and diagnostic files
 logs

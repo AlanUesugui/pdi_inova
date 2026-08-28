@@ -1,30 +1,30 @@
 import { getDb, initSchema } from './db';
 import * as xlsx from 'xlsx';
-import path from 'path';
-import fs from 'fs';
+import * as path from 'path'; //Alterei e inclui * as path from path
+import * as fs from 'fs'; //Alterei e inclui * as path from path
 import * as csv from 'csv-parse/sync';
 
 async function importCsv() {
   await initSchema();
   const db = await getDb();
-  
+
   const rootDir = path.join(process.cwd(), '..');
   const serverDataDir = path.join(process.cwd(), 'data');
 
   // Load CSVs
-  const collaborators: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'colaboradores.csv'), 'utf-8').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
-  const pdiResponses: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'pdi_respostas.csv'), 'utf-8').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
-  const managerEvals: any[] = csv.parse(fs.readFileSync(path.join(serverDataDir, 'avaliacoes_gestor.csv'), 'utf-8').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
-  const pdisData: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'pdis.csv'), 'utf-8').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
+  const collaborators: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'colaboradores.csv'), 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
+  const pdiResponses: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'pdi_respostas.csv'), 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
+  const managerEvals: any[] = csv.parse(fs.readFileSync(path.join(serverDataDir, 'avaliacoes_gestor.csv'), 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
+  const pdisData: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'pdis.csv'), 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
 
   console.log("Resetting database...");
-  await db.run('DELETE FROM collaborators');
   await db.run('DELETE FROM pdi_responses');
   await db.run('DELETE FROM manager_evaluations');
   await db.run('DELETE FROM pdis');
-  await db.run('DELETE FROM users');
   await db.run('DELETE FROM feedbacks');
   await db.run('DELETE FROM meetings');
+  await db.run('DELETE FROM users');
+  await db.run('DELETE FROM collaborators');
 
   // Map to identify managers
   const managerIds = new Set(collaborators.map(c => String(c.gestor_id)).filter(id => id && id !== '0' && id !== ''));
@@ -40,7 +40,7 @@ async function importCsv() {
     const status = isManager ? 'Gestor' : 'Colaborador';
 
     await db.run(
-      'INSERT INTO collaborators (id, nome, cargo, departamento, gestor_id, status, data_admissao, modalidade_trabalho, email, nivel_cargo, centro_de_custo, tipo_contrato, superior_imediato) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT (id) DO UPDATE SET superior_imediato = EXCLUDED.superior_imediato, gestor_id = EXCLUDED.gestor_id',
+      'INSERT INTO collaborators (id, nome, cargo, departamento, gestor_id, status, data_admissao, modalidade_trabalho, email, nivel_cargo, centro_de_custo, tipo_contrato, superior_imediato) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) ON CONFLICT (id) DO UPDATE SET superior_imediato = EXCLUDED.superior_imediato, gestor_id = EXCLUDED.gestor_id',
       [
         collabId, collab.nome, collab.cargo, collab.departamento, collab.gestor_id, status,
         collab.data_admissao || "", collab.modalidade_trabalho || "", collab.email || "",
@@ -50,10 +50,10 @@ async function importCsv() {
     );
     if (isManager) {
       // Create user login
-      const cleanName = collab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim(); 
+      const cleanName = collab.nome.normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
       const email = `${cleanName.split(' ')[0].toLowerCase()}@pdi.com`.trim();
       await db.run(
-        'INSERT INTO users (email, password, name, collab_id) VALUES (?, ?, ?, ?) ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, name = EXCLUDED.name, collab_id = EXCLUDED.collab_id',
+        'INSERT INTO users (email, password, name, collab_id) VALUES ($1, $2, $3, $4) ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password, name = EXCLUDED.name, collab_id = EXCLUDED.collab_id',
         [email, '123456', collab.nome.trim(), collabId]
       );
       console.log(`- User created: "${email}" (ID: ${collabId})`);
@@ -64,7 +64,7 @@ async function importCsv() {
   for (const pdi of pdiResponses) {
     if (!pdi.id_colaborador) continue;
     await db.run(
-      'INSERT INTO pdi_responses (id_colaborador, treinamento_nome, q1_conhecimento, q2_aplicacao, q3_desempenho, q4_eficacia, data_resposta, modalidade_treinamento, carga_horaria, provedor_treinamento, custo_treinamento, competencia_desenvolvida, q5_recomendaria, nota_geral_treinamento, aplicou_no_trabalho) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO pdi_responses (id_colaborador, treinamento_nome, q1_conhecimento, q2_aplicacao, q3_desempenho, q4_eficacia, data_resposta, modalidade_treinamento, carga_horaria, provedor_treinamento, custo_treinamento, competencia_desenvolvida, q5_recomendaria, nota_geral_treinamento, aplicou_no_trabalho) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)',
       [
         String(pdi.id_colaborador), pdi.treinamento_nome, pdi.q1_conhecimento, pdi.q2_aplicacao, pdi.q3_desempenho, pdi.q4_eficacia,
         pdi.data_resposta || "", pdi.modalidade_treinamento || "", pdi.carga_horaria || "",
@@ -78,7 +78,7 @@ async function importCsv() {
   for (const evaluation of managerEvals) {
     if (!evaluation.id_colaborador) continue;
     await db.run(
-      'INSERT INTO manager_evaluations (id_colaborador, comentarios_soft_skills, avaliacao_pessoal_texto, data, data_avaliacao, periodo_referencia, nota_desempenho_geral, potencial_crescimento, comentarios_gestor, metas_atingidas, numero_de_feedbacks_dados, colaborador_tem_pdi_ativo, data_ultima_conversa_1_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO manager_evaluations (id_colaborador, comentarios_soft_skills, avaliacao_pessoal_texto, data, data_avaliacao, periodo_referencia, nota_desempenho_geral, potencial_crescimento, comentarios_gestor, metas_atingidas, numero_de_feedbacks_dados, colaborador_tem_pdi_ativo, data_ultima_conversa_1_1) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)',
       [
         String(evaluation.id_colaborador), evaluation.comentarios_soft_skills, evaluation.avaliacao_pessoal_texto, evaluation.data,
         evaluation.data_avaliacao || "", evaluation.periodo_referencia || "", evaluation.nota_desempenho_geral || "",
@@ -92,7 +92,7 @@ async function importCsv() {
   for (const pdi of pdisData) {
     if (!pdi.id_pdi) continue;
     await db.run(
-      'INSERT INTO pdis (id_pdi, id_colaborador, data_criacao, data_prazo, status_pdi, objetivo_principal, gestor_responsavel, percentual_conclusao, data_ultima_revisao, proxima_revisao) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO pdis (id_pdi, id_colaborador, data_criacao, data_prazo, status_pdi, objetivo_principal, gestor_responsavel, percentual_conclusao, data_ultima_revisao, proxima_revisao) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
       [
         String(pdi.id_pdi), String(pdi.id_colaborador), pdi.data_criacao || "", pdi.data_prazo || "",
         pdi.status_pdi || "", pdi.objetivo_principal || "", pdi.gestor_responsavel || "",
@@ -113,7 +113,7 @@ async function importCsv() {
 
   for (const fb of mockFeedbacks) {
     await db.run(
-      'INSERT INTO feedbacks (id_colaborador, gestor_id, tipo, conteudo, data) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO feedbacks (id_colaborador, gestor_id, tipo, conteudo, data) VALUES ($1, $2, $3, $4, $5)',
       [fb.id_colaborador, fb.gestor_id, fb.tipo, fb.conteudo, fb.data]
     );
   }
@@ -128,7 +128,7 @@ async function importCsv() {
 
   for (const mt of mockMeetings) {
     await db.run(
-      'INSERT INTO meetings (id_colaborador, gestor_id, data, hora, tipo, status, link, observacoes) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      'INSERT INTO meetings (id_colaborador, gestor_id, data, hora, tipo, status, link, observacoes) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
       [mt.id_colaborador, mt.gestor_id, mt.data, mt.hora, mt.tipo, mt.status, mt.link, mt.observacoes]
     );
   }

@@ -2,20 +2,13 @@ import cron from 'node-cron';
 import { runWeeklyReportForAllManagers } from './weeklyReport';
 
 /**
- * Schedules the weekly report cron job.
- *
- * Default schedule: every Monday at 07:00 AM (server local time).
+ * Toda segunda-feira as 07:00 (no tempo do server local).
  * Cron expression: '0 7 * * 1'
  *   - 0   → minute 0
  *   - 7   → hour 7
  *   - *   → any day of month
  *   - *   → any month
  *   - 1   → Monday (0=Sunday, 1=Monday, … 6=Saturday)
- *
- * You can override the schedule via the WEEKLY_REPORT_CRON env variable.
- * Examples:
- *   WEEKLY_REPORT_CRON="0 8 * * 1"   → Monday at 08:00
- *   WEEKLY_REPORT_CRON="0 7 * * 1,5" → Monday and Friday at 07:00
  */
 export function startScheduler(): void {
   const cronExpression = process.env.WEEKLY_REPORT_CRON || '0 7 * * 1';
@@ -23,7 +16,7 @@ export function startScheduler(): void {
   if (!cron.validate(cronExpression)) {
     console.error(
       `[Scheduler] Invalid cron expression: "${cronExpression}". ` +
-        'Weekly report will NOT be scheduled. Check WEEKLY_REPORT_CRON env variable.'
+      'Weekly report will NOT be scheduled. Check WEEKLY_REPORT_CRON env variable.'
     );
     return;
   }
