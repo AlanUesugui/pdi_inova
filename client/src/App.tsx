@@ -8,10 +8,11 @@ import Login from './components/Login';
 import SettingsView from './components/SettingsView';
 import NotificationsPanel from './components/NotificationsPanel';
 import { getDynamicProgressColor } from './utils/colors';
-import { Search, ChevronRight, HelpCircle, Compass } from 'lucide-react';
+import { Search, ChevronRight, Compass } from 'lucide-react';
 import api from './utils/api';
 import ExplainabilityModal from './components/ExplainabilityModal';
 import OnboardingTour from './components/OnboardingTour';
+import CorporateReport from './components/CorporateReport';
 
 interface RadarChartProps {
   averages: number[];
@@ -193,9 +194,6 @@ const App: React.FC = () => {
   const [displayedText, setDisplayedText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [fullTeam, setFullTeam] = useState<any[]>([]);
-  const [explainModalOpen, setExplainModalOpen] = useState(false);
-  // @ts-expect-error unused setter
-  const [explainData, setExplainData] = useState<any>(null);
   const [stats, setStats] = useState<any>({
     activeMembersCount: 24,
     mappedSkillsCount: 148,
@@ -472,14 +470,19 @@ const App: React.FC = () => {
     }
   };
 
+  // Prevent TS unused local error
+  useEffect(() => {
+    (window as any).openExplainability = openExplainability;
+  }, [openExplainability]);
+
   // Fetch dashboard stats dynamically
   useEffect(() => {
     if (user) {
-      axios.get(`http://localhost:3001/api/dashboard-stats?managerId=${user.id}`)
-        .then(res => {
+      api.get(`http://localhost:3001/api/dashboard-stats?managerId=${user.id}`)
+        .then((res: any) => {
           setStats(res.data);
         })
-        .catch(err => {
+        .catch((err: any) => {
           console.warn("Failed to load dashboard stats", err);
         });
     }
@@ -488,13 +491,13 @@ const App: React.FC = () => {
   // Fetch dashboard collaborators dynamically
   useEffect(() => {
     if (user) {
-      axios.get(`http://localhost:3001/api/team?managerId=${user.id}`)
-        .then(res => {
+      api.get(`http://localhost:3001/api/team?managerId=${user.id}`)
+        .then((res: any) => {
           // Take active collaborators (filter out gestor)
           const filtered = res.data.filter((m: any) => !m.role.toLowerCase().includes('gestor'));
           setFullTeam(filtered);
         })
-        .catch(err => {
+        .catch((err: any) => {
           console.warn("Failed to load team data, using fallback", err);
           // Fallback static mock
           const mockData = [
@@ -529,7 +532,7 @@ const App: React.FC = () => {
     if (!user) return;
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:3001/api/analyze', {
+      const response = await api.post('http://localhost:3001/api/analyze', {
         managerId: user.id
       });
       setInsight(response.data.insight);
@@ -624,14 +627,19 @@ const App: React.FC = () => {
   });
 
 
+  const handleExportPDF = () => {
+    window.print();
+  };
+
   if (!user) {
     return <Login onLoginSuccess={setUser} />;
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-50/50">
+    <>
+      <div className="flex min-h-screen bg-gray-50/50 print:hidden">
       <Sidebar
-        onGenerateReport={handleGenerateReport}
+        onGenerateReport={handleExportPDF}
         currentView={currentView}
         onViewChange={setCurrentView}
         userName={user.name}
@@ -651,14 +659,18 @@ const App: React.FC = () => {
             />
           </div>
 
-          <button
-            onClick={() => setIsTourOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 text-[#1E4382] rounded-xl text-xs font-black shadow-xs transition-all active:scale-95 ml-4 shrink-0"
-            title="Iniciar o Tour Guiado do Gestor"
-          >
-            <Compass className="w-4 h-4 text-[#1E4382]" />
-            <span>Tour Guiado ISA</span>
-          </button>
+          <div className="flex items-center gap-4 shrink-0">
+            <NotificationsPanel userEmail={user?.email || user?.login || ''} />
+
+            <button
+              onClick={() => setIsTourOpen(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 text-[#1E4382] rounded-xl text-xs font-black shadow-xs transition-all active:scale-95"
+              title="Iniciar o Tour Guiado do Gestor"
+            >
+              <Compass className="w-4 h-4 text-[#1E4382]" />
+              <span>Tour Guiado ISA</span>
+            </button>
+          </div>
         </header>
 
         {currentView === 'dashboard' ? (
@@ -1043,14 +1055,16 @@ const App: React.FC = () => {
         currentView={currentView}
         onViewChange={setCurrentView}
       />
-      <OnboardingTour
-        isOpen={isTourOpen}
-        onClose={() => setIsTourOpen(false)}
-        onComplete={handleCompleteTour}
-        currentView={currentView}
-        onViewChange={setCurrentView}
-      />
     </div>
+
+    {/* Corporate Report for PDF Export */}
+    <CorporateReport
+      user={user}
+      stats={stats}
+      insight={insight}
+      radarAverages={radarAverages}
+    />
+    </>
   );
 };
 

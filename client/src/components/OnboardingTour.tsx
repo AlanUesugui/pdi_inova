@@ -208,6 +208,10 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({
     }
 
     const timer = setTimeout(() => {
+      const el = currentStep?.targetId ? document.getElementById(currentStep.targetId) : null;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
       updateTargetRect();
     }, 150);
 
@@ -228,17 +232,20 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({
     const handleGlobalClick = (e: MouseEvent) => {
       const targetEl = document.getElementById(currentStep.targetId!);
       if (targetEl && (targetEl.contains(e.target as Node) || e.target === targetEl)) {
-        if (currentStepIndex < TOUR_STEPS.length - 1) {
-          setCurrentStepIndex(prev => prev + 1);
-        } else {
-          handleFinish();
-        }
+        // Delay advancing to allow React's synthetic event (like onClick) to process first
+        setTimeout(() => {
+          if (currentStepIndex < TOUR_STEPS.length - 1) {
+            setCurrentStepIndex(prev => prev + 1);
+          } else {
+            handleFinish();
+          }
+        }, 50);
       }
     };
 
-    window.addEventListener('click', handleGlobalClick, { capture: true });
+    window.addEventListener('click', handleGlobalClick);
     return () => {
-      window.removeEventListener('click', handleGlobalClick, { capture: true });
+      window.removeEventListener('click', handleGlobalClick);
     };
   }, [currentStepIndex, isOpen, currentStep]);
 
@@ -294,8 +301,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({
       position: 'fixed',
       top: `${top}px`,
       left: `${left}px`,
-      width: '380px',
-      zIndex: 99999
+      width: '380px'
     };
   };
 
@@ -308,24 +314,24 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity duration-300 pointer-events-auto"
+            className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 pointer-events-auto"
           />
         ) : (
           targetRect && (
             <div className="fixed inset-0 z-[9991] pointer-events-none">
               {/* Top Backdrop */}
               <div
-                className="absolute bg-slate-950/75 transition-all duration-300 pointer-events-auto"
+                className="absolute bg-slate-900/40 backdrop-blur-sm transition-all duration-300 pointer-events-none"
                 style={{ top: 0, left: 0, right: 0, height: `${Math.max(0, targetRect.top - 8)}px` }}
               />
               {/* Bottom Backdrop */}
               <div
-                className="absolute bg-slate-950/75 transition-all duration-300 pointer-events-auto"
+                className="absolute bg-slate-900/40 backdrop-blur-sm transition-all duration-300 pointer-events-none"
                 style={{ top: `${targetRect.bottom + 8}px`, left: 0, right: 0, bottom: 0 }}
               />
               {/* Left Backdrop */}
               <div
-                className="absolute bg-slate-950/75 transition-all duration-300 pointer-events-auto"
+                className="absolute bg-slate-900/40 backdrop-blur-sm transition-all duration-300 pointer-events-none"
                 style={{
                   top: `${Math.max(0, targetRect.top - 8)}px`,
                   left: 0,
@@ -335,7 +341,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({
               />
               {/* Right Backdrop */}
               <div
-                className="absolute bg-slate-950/75 transition-all duration-300 pointer-events-auto"
+                className="absolute bg-slate-900/40 backdrop-blur-sm transition-all duration-300 pointer-events-none"
                 style={{
                   top: `${Math.max(0, targetRect.top - 8)}px`,
                   left: `${targetRect.right + 8}px`,
@@ -347,7 +353,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({
           )
         )}
 
-        {/* Pulsing Highlight Box around target element */}
+        {/* Pulsing Highlight Box */}
         {!isModalCenter && targetRect && (
           <div
             className="fixed pointer-events-none rounded-2xl border-2 border-[#1E4382] animate-tour-glow transition-all duration-300 z-[9992]"
@@ -411,7 +417,7 @@ const OnboardingTour: React.FC<OnboardingTourProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 8 }}
             style={getTooltipStyle()}
-            className="bg-white rounded-[20px] p-6 shadow-2xl border border-gray-100 relative overflow-hidden pointer-events-auto"
+            className="bg-white rounded-[20px] p-6 shadow-2xl border border-gray-100 relative overflow-hidden pointer-events-auto z-[9999]"
           >
             {/* Header / Step indicator */}
             <div className="flex items-center justify-between mb-3">

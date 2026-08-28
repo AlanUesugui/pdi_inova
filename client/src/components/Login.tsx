@@ -86,7 +86,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       points = [];
       particles = [];
       const densityWidth = 1000 / settings.pointDensity;
-      
+
       for (let x = -100; x < canvas.width + 100; x += densityWidth) {
         for (let y = -100; y < canvas.height + 100; y += densityWidth) {
           const px = Math.floor(x + Math.random() * densityWidth);
@@ -169,10 +169,10 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         const point = points[i];
         const attractionOffset = { x: 0, y: 0 };
         const distanceToMouse = getDistance({ x: point.originX, y: point.originY }, mousePoint);
-        
+
         if (distanceToMouse <= settings.attractionRange) {
-          const displacementFactor = 
-            ((Math.cos((distanceToMouse / settings.attractionRange) * Math.PI) + 1) / 2) * 
+          const displacementFactor =
+            ((Math.cos((distanceToMouse / settings.attractionRange) * Math.PI) + 1) / 2) *
             settings.attractionFactor;
           attractionOffset.x = displacementFactor * (mousePoint.x - point.x);
           attractionOffset.y = displacementFactor * (mousePoint.y - point.y);
@@ -248,7 +248,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         ctx.beginPath();
         ctx.moveTo(particle.x, particle.y);
         ctx.lineTo(
-          particle.x - particle.direction.x * settings.particleLength, 
+          particle.x - particle.direction.x * settings.particleLength,
           particle.y - particle.direction.y * settings.particleLength
         );
         ctx.strokeStyle = settings.particleColor;
@@ -259,7 +259,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
       // Draw Neural Nodes (Circles)
       for (let i = 0; i < points.length; i++) {
         const point = points[i];
-        
+
         // Node Glow Flash
         if (point.flashOpacity > 0) {
           ctx.beginPath();
@@ -320,7 +320,7 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
         <canvas ref={canvasRef} className="absolute inset-0 w-full h-full z-0 block pointer-events-none" />
 
         {/* Soft violet radial overlay gradient */}
-        <div 
+        <div
           className="absolute inset-0 z-0 pointer-events-none"
           style={{
             backgroundImage: 'radial-gradient(rgba(168, 85, 247, 0) 10%, rgba(91, 47, 140, 0.2) 100%)'
