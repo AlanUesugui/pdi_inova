@@ -39,6 +39,8 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+clean.cjs
+clean.cmd
 
 # OS and system caches
 .DS_Store
