@@ -8,9 +8,10 @@ import Login from './components/Login';
 import SettingsView from './components/SettingsView';
 import NotificationsPanel from './components/NotificationsPanel';
 import { getDynamicProgressColor } from './utils/colors';
-import { Search, ChevronRight } from 'lucide-react';
-import axios from 'axios';
+import { Search, ChevronRight, HelpCircle, Compass } from 'lucide-react';
+import api from './utils/api';
 import ExplainabilityModal from './components/ExplainabilityModal';
+import OnboardingTour from './components/OnboardingTour';
 
 interface RadarChartProps {
   averages: number[];
@@ -207,15 +208,269 @@ const App: React.FC = () => {
     certsRate: 91
   });
 
+  const [explainModalOpen, setExplainModalOpen] = useState(false);
+  const [explainData, setExplainData] = useState<any>(null);
 
-  // Persistir sessão no sessionStorage (persiste em reloads, mas limpa ao fechar a aba)
+  // Onboarding Tour State
+  const [isTourOpen, setIsTourOpen] = useState(false);
+
+  // Trigger tour on first login for user
   useEffect(() => {
     if (user) {
-      sessionStorage.setItem('pdi_inova_user', JSON.stringify(user));
-    } else {
-      sessionStorage.removeItem('pdi_inova_user');
+      const tourKey = `isa_tour_completed_${user.id}`;
+      const hasCompleted = localStorage.getItem(tourKey);
+      if (!hasCompleted) {
+        // Automatically open tour for first-time login
+        const timer = setTimeout(() => {
+          setIsTourOpen(true);
+        }, 600);
+        return () => clearTimeout(timer);
+      }
     }
   }, [user]);
+
+  const handleCompleteTour = () => {
+    if (user) {
+      localStorage.setItem(`isa_tour_completed_${user.id}`, 'true');
+    }
+  };
+
+  const openExplainability = (type: string) => {
+    let data: any = null;
+    const todayStr = new Date().toLocaleDateString('pt-BR');
+
+    switch (type) {
+      case 'membros_ativos':
+        data = {
+          title: "Membros Ativos do Time",
+          indicatorName: "Quantidade de liderados diretos",
+          formulaDescription: "Contagem simples de registros de colaboradores ativos na tabela de banco de dados onde o gestor direto é igual ao usuário logado, excluindo cargos de gestão para evitar duplicidade de liderança.",
+          breakdownItems: [
+            `Total de colaboradores vinculados ao seu ID: ${stats.activeMembersCount}`,
+            "Exclusão de cargos contendo a palavra 'gestor': Ativo"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Apenas colaboradores com status ativo.",
+            "Desconsidera o próprio gestor e cargos de liderança direta."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'collaborators'"
+        };
+        break;
+      case 'skills_mapeados':
+        data = {
+          title: "Skills Mapeados",
+          indicatorName: "Competências exigidas nos cargos do time",
+          formulaDescription: "Mapeamento das competências únicas necessárias para o escopo de atuação do time. Lê a matriz de cargos oficiais cadastrada no sistema e cruza com as atribuições dos seus liderados.",
+          breakdownItems: [
+            `Competências mapeadas ativas: ${stats.mappedSkillsCount}`
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Mapeado com base no cargo atual cadastrado para cada colaborador.",
+            "Faz um agrupamento único (distinct) de competências técnicas e comportamentais."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Matriz Corporativa de Cargos → Arquivo 'competencias_por_cargo.csv'"
+        };
+        break;
+      case 'enps':
+        data = {
+          title: "eNPS (Employee Net Promoter Score)",
+          indicatorName: "Engajamento e Satisfação de Clima",
+          formulaDescription: "Percentual de promotores (colaboradores com alto potencial de crescimento/satisfação) menos o percentual de detratores (colaboradores com baixo potencial). Varia de -100 a +100.",
+          breakdownItems: [
+            `Promotores (Potencial Alto): ${Math.round(stats.eNPS >= 78 ? stats.activeMembersCount * 0.8 : stats.activeMembersCount * 0.5)}`,
+            `Detratores (Potencial Baixo): ${Math.round(stats.eNPS >= 78 ? 0 : stats.activeMembersCount * 0.2)}`,
+            `Fórmula: % Promotores - % Detratores`
+          ],
+          period: "Últimos 6 meses",
+          rules: [
+            "Notas de Potencial Alto = Promotores.",
+            "Notas de Potencial Baixo = Detratores.",
+            "Notas de Potencial Médio = Neutros (não afetam eNPS)."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'manager_evaluations'"
+        };
+        break;
+      case 'mood_avg':
+        data = {
+          title: "Mood Avg (Clima Médio)",
+          indicatorName: "Média de satisfação geral",
+          formulaDescription: "Média aritmética simples das avaliações quantitativas de desempenho geral preenchidas pelos gestores para cada membro da equipe.",
+          breakdownItems: [
+            `Nota Média Consolidada: ${stats.moodAvg}/5`,
+            `Fórmula: Soma de todas as notas / Total de avaliações`
+          ],
+          period: "Últimos 6 meses",
+          rules: [
+            "Apenas avaliações preenchidas pelo gestor imediato contendo nota geral são elegíveis."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'manager_evaluations'"
+        };
+        break;
+      case 'retencao':
+        data = {
+          title: "Taxa de Retenção Ativa",
+          indicatorName: "Índice de Estabilidade da Equipe",
+          formulaDescription: "Percentual de colaboradores que não possuem risco imediato de perda (potencial baixo ou descontentamento explícito nas avaliações).",
+          breakdownItems: [
+            `Colaboradores Estáveis: ${stats.retentionRate}%`,
+            `Fórmula: (Colaboradores com Risco Baixo ou Médio / Total de Colaboradores) * 100`
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Colaboradores sem avaliação recente do gestor entram no cálculo como estáveis por padrão."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'manager_evaluations'"
+        };
+        break;
+      case 'workshops':
+        data = {
+          title: "Conclusão de Workshops Técnicos",
+          indicatorName: "Taxa de Eficácia em Workshops",
+          formulaDescription: "Percentual de workshops concluídos nos quais a eficácia prática da aplicação das competências no trabalho foi avaliada pelo colaborador como positiva ('Sim').",
+          breakdownItems: [
+            `Eficácia Consolidada: ${stats.workshopsRate}%`,
+            "Fórmula: (Workshops com Eficácia Sim / Total Workshops Concluídos) * 100"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Filtra treinamentos com termos: Excel, Inteligência, Power BI.",
+            "Considera apenas respostas onde o colaborador avaliou a eficácia de aplicação prática."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdi_responses'"
+        };
+        break;
+      case 'mentoring':
+        data = {
+          title: "Programas de Mentoria",
+          indicatorName: "Taxa de Eficácia de Mentoria",
+          formulaDescription: "Percentual de programas de mentoria concluídos nos quais a eficácia de aplicação das competências no trabalho foi avaliada pelo colaborador como positiva ('Sim').",
+          breakdownItems: [
+            `Eficácia Consolidada: ${stats.mentoringRate}%`,
+            "Fórmula: (Mentorias com Eficácia Sim / Total Mentorias Concluídas) * 100"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Filtra treinamentos com termos: Feedback, Liderança, Tempo.",
+            "Considera apenas respostas onde o colaborador avaliou a eficácia de aplicação prática."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdi_responses'"
+        };
+        break;
+      case 'courses':
+        data = {
+          title: "Cursos Externos",
+          indicatorName: "Taxa de Eficácia em Cursos",
+          formulaDescription: "Percentual de cursos externos concluídos nos quais a eficácia de aplicação das competências no trabalho foi avaliada pelo colaborador como positiva ('Sim').",
+          breakdownItems: [
+            `Eficácia Consolidada: ${stats.coursesRate}%`,
+            "Fórmula: (Cursos com Eficácia Sim / Total Cursos Concluídos) * 100"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Filtra treinamentos com termos: Segurança, Comunicação, Dados.",
+            "Considera apenas respostas onde o colaborador avaliou a eficácia de aplicação prática."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdi_responses'"
+        };
+        break;
+      case 'certs':
+        data = {
+          title: "Certificações",
+          indicatorName: "Taxa de Eficácia de Certificações",
+          formulaDescription: "Percentual de certificações concluídas nas quais a eficácia de aplicação das competências no trabalho foi avaliada pelo colaborador como positiva ('Sim').",
+          breakdownItems: [
+            `Eficácia Consolidada: ${stats.certsRate}%`,
+            "Fórmula: (Certificações com Eficácia Sim / Total Certificações Concluídas) * 100"
+          ],
+          period: "Ciclo Vigente de 2026",
+          rules: [
+            "Filtra treinamentos com termos: Projetos, Gestão.",
+            "Considera apenas respostas onde o colaborador avaliou a eficácia de aplicação prática."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdi_responses'"
+        };
+        break;
+      case 'ai_health':
+        data = {
+          title: "Saúde do Time (AI Health)",
+          indicatorName: "Mapeamento e Status de Alerta de PDIs",
+          formulaDescription: "Classifica os PDIs do time em 3 categorias de engajamento baseando-se no percentual de progresso e no número de dias decorridos desde a última atualização/revisão feita pelo gestor.",
+          breakdownItems: [
+            "Healthy: Progresso >= 50% e atualização < 14 dias.",
+            "Attention: Progresso < 50% ou sem atualização por > 14 dias.",
+            "Risk: Progresso < 20% e sem atualização por > 30 dias."
+          ],
+          period: "Tempo Real",
+          rules: [
+            "Cruza a coluna percentual_conclusao da tabela pdis com a coluna data_ultima_revisao.",
+            "Fórmulas matemáticas automatizadas executam em lote para todo o time."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Supabase → Tabela 'pdis'"
+        };
+        break;
+      case 'ai_insight':
+        data = {
+          title: "Diagnóstico de Performance da Equipe por IA",
+          indicatorName: "Insights Inteligentes de PDI",
+          formulaDescription: "Modelo de Inteligência Artificial consolidando em tempo real todas as atividades, scores e conclusões de PDI dos liderados para gerar um resumo executivo com planos práticos de ação.",
+          breakdownItems: [
+            "Consolidação de PDIs Ativos",
+            "Mapeamento de Riscos e Gaps de Treinamento",
+            "Aceleração de Competências Chave"
+          ],
+          period: "Atualizado na última recarga",
+          rules: [
+            "Consome os dados estruturados de PDI do time e o contexto dos cargos."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "Serviço Express → API /api/analyze",
+          aiDetails: {
+            prompt: "Você é um consultor estratégico de RH e IA. Faça uma análise crítica e traga um insight geral de 3 a 4 sentenças sobre o andamento dos PDIs, engajamento e prontidão de equipe...",
+            dataUsed: ["Tamanho do Time", "Média de Progresso de PDI", "Nomes dos Colaboradores", "Score Individual do PDI"],
+            limitations: "Gera recomendações de apoio com base em dados de PDI informados no backend. Não substitui o feedback qualitativo contínuo do gestor.",
+            confidence: "92%"
+          }
+        };
+        break;
+      case 'skill_matrix':
+        data = {
+          title: "Radar Chart - Skill Matrix",
+          indicatorName: "Média do Time vs Target da Área",
+          formulaDescription: "Mapeia os níveis de proficiência média obtidos pelo time in cada competência chave e compara com o baseline/target definido pela empresa para cada cargo correspondente.",
+          breakdownItems: [
+            "Target de proficiência oficial da organização",
+            "Média real apurada nas avaliações do time"
+          ],
+          period: "Ciclo 2026",
+          rules: [
+            "Fórmula de Média simples por categoria de proficiência.",
+            "Lê a planilha de target de cargo para calibrar a linha cinza tracejada."
+          ],
+          lastUpdate: todayStr,
+          dataSource: "CSV Matriz de Competências & XLSX Avaliações Gestor"
+        };
+        break;
+      default:
+        break;
+    }
+
+    if (data) {
+      setExplainData(data);
+      setExplainModalOpen(true);
+    }
+  };
 
   // Fetch dashboard stats dynamically
   useEffect(() => {
@@ -396,14 +651,20 @@ const App: React.FC = () => {
             />
           </div>
 
-          <NotificationsPanel userEmail={user?.email || user?.login || ''} />
-
+          <button
+            onClick={() => setIsTourOpen(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 text-[#1E4382] rounded-xl text-xs font-black shadow-xs transition-all active:scale-95 ml-4 shrink-0"
+            title="Iniciar o Tour Guiado do Gestor"
+          >
+            <Compass className="w-4 h-4 text-[#1E4382]" />
+            <span>Tour Guiado ISA</span>
+          </button>
         </header>
 
         {currentView === 'dashboard' ? (
           <>
             {/* Title Block */}
-            <div className="mb-8 flex justify-between items-end">
+            <div id="tour-dashboard-section" className="mb-8 flex justify-between items-end">
               <div>
                 <h1 className="text-3xl font-black text-gray-900 tracking-tight">Indicadores e Evolução do Time</h1>
                 <p className="text-gray-500 mt-2 text-sm font-medium">Visão analítica de performance, engajamento e desenvolvimento contínuo.</p>
@@ -413,7 +674,7 @@ const App: React.FC = () => {
             {/* Top Row: AI Insight + Radar Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* Insight da IA */}
-              <div className="ai-card flex flex-col justify-between">
+              <div id="tour-card-ai-insight" className="ai-card flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-4">
                     <span className="text-[10px] font-black tracking-widest uppercase text-primary-600 bg-primary-50 border border-primary-100 px-2 py-0.5 rounded">Operações</span>
@@ -446,7 +707,7 @@ const App: React.FC = () => {
               </div>
 
               {/* Skill Matrix */}
-              <div className="lg:col-span-2 bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
+              <div id="tour-card-skill-matrix" className="lg:col-span-2 bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h2 className="text-lg font-black text-gray-900">Skill Matrix</h2>
@@ -464,7 +725,7 @@ const App: React.FC = () => {
             {/* Second Row: KPI Cards + Sentiment + Course Progress */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
               {/* Stats column */}
-              <div className="flex flex-col gap-6">
+              <div id="tour-card-team-stats" className="flex flex-col gap-6">
                 <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex items-center justify-between group hover:-translate-y-1 transition-all duration-300">
                   <div>
                     <p className="text-gray-400 text-[10px] font-black uppercase tracking-wider">Membros Ativos</p>
@@ -564,7 +825,7 @@ const App: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
 
               {/* Card 1: Distribuição de Saúde / Risco (AI Health) */}
-              <div className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
+              <div id="tour-card-ai-health" className="bg-white border border-gray-100 shadow-md rounded-2xl p-6 flex flex-col justify-between">
                 <div>
                   <div className="flex justify-between items-start mb-4">
                     <div>
@@ -774,6 +1035,13 @@ const App: React.FC = () => {
         isOpen={explainModalOpen}
         onClose={() => setExplainModalOpen(false)}
         data={explainData}
+      />
+      <OnboardingTour
+        isOpen={isTourOpen}
+        onClose={() => setIsTourOpen(false)}
+        onComplete={handleCompleteTour}
+        currentView={currentView}
+        onViewChange={setCurrentView}
       />
     </div>
   );
