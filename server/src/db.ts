@@ -17,12 +17,11 @@ export interface IDb {
   isSqlite?: boolean;
 }
 
-<<<<<<< HEAD
-  constructor() {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error("DATABASE_URL is not defined in environment variables.");
-    }
+class PostgresDb implements IDb {
+  private pool: Pool;
+  public isSqlite = false;
+
+  constructor(connectionString: string) {
     const isLocal = connectionString.includes('localhost') ||
       connectionString.includes('127.0.0.1') ||
       connectionString.includes('postgres:5432') ||
@@ -30,20 +29,8 @@ export interface IDb {
 
     this.pool = new Pool({
       connectionString,
-      ssl: isLocal ? false : { rejectUnauthorized: false }
-=======
-class PostgresDb implements IDb {
-  private pool: Pool;
-  public isSqlite = false;
-
-  constructor(connectionString: string) {
-    this.pool = new Pool({
-      connectionString,
-      ssl: {
-        rejectUnauthorized: false
-      },
+      ssl: isLocal ? false : { rejectUnauthorized: false },
       connectionTimeoutMillis: 5000
->>>>>>> 3b10e33 (Atualiza projeto)
     });
   }
 
@@ -66,14 +53,8 @@ class PostgresDb implements IDb {
 
   async run(sql: string, params: any[] = []): Promise<{ lastID?: number | string; changes: number }> {
     let pgSql = this.convertSql(sql);
-<<<<<<< HEAD
-
     // Append RETURNING id only for tables that have an 'id' column and need lastID
     const isInsertWithLastId = /^\s*insert\s+into\s+(feedbacks|meetings|weekly_report_log)\b/i.test(pgSql);
-=======
-    
-    const isInsertWithLastId = /^\s*insert\s+into\s+(feedbacks|meetings)\b/i.test(pgSql);
->>>>>>> 3b10e33 (Atualiza projeto)
     const hasReturning = /returning/i.test(pgSql);
 
     if (isInsertWithLastId && !hasReturning) {
@@ -312,11 +293,7 @@ export async function seedDatabase(db: IDb): Promise<void> {
 
 export async function initSchema() {
   const db = await getDb();
-<<<<<<< HEAD
-=======
-  
   const idType = db.isSqlite ? 'INTEGER PRIMARY KEY AUTOINCREMENT' : 'SERIAL PRIMARY KEY';
->>>>>>> 3b10e33 (Atualiza projeto)
 
   await db.exec(`
     CREATE TABLE IF NOT EXISTS collaborators (

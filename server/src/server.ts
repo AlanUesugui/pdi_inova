@@ -648,7 +648,8 @@ app.get('/api/auth/outlook/callback', async (req, res) => {
 
   const success = await exchangeCodeForTokens(userEmail, code as string);
   if (success) {
-    res.redirect(`http://localhost:5173/?outlook_success=true`);
+    const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    res.redirect(`${clientUrl}/?outlook_success=true`);
   } else {
     res.status(500).send('<h1>Erro de Integração</h1><p>Não foi possível vincular a sua conta do Outlook. Tente novamente mais tarde.</p>');
   }

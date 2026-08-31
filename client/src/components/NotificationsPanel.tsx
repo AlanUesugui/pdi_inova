@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import React, { useState, useEffect, useRef } from "react";
+import api from "../utils/api";
 import { Bell, Mail, Calendar, X, ExternalLink } from "lucide-react";
 
 interface Notification {
@@ -61,8 +61,8 @@ const NotificationsPanel: React.FC<NotificationsPanelProps> = ({ userEmail }) =>
   useEffect(() => {
     if (!open || !userEmail) return;
     setLoading(true);
-    axios
-      .get(`http://localhost:3001/api/outlook/notifications?userEmail=${encodeURIComponent(userEmail)}`)
+    api
+      .get(`/api/outlook/notifications?userEmail=${encodeURIComponent(userEmail)}`)
       .then((res) => setNotifications(res.data))
       .catch(() => setNotifications([]))
       .finally(() => setLoading(false));

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Mail, CheckCircle, AlertCircle, Link as LinkIcon, Unlink } from 'lucide-react';
-import axios from 'axios';
+import api from '../utils/api';
 
 interface SettingsViewProps {
   user: any;
@@ -12,7 +12,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user }) => {
 
   const fetchStatus = async () => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/auth/outlook/status?userEmail=${user.email}`);
+      const res = await api.get(`/api/auth/outlook/status?userEmail=${user.email}`);
       setOutlookStatus(res.data);
     } catch (error) {
       console.error('Erro ao buscar status do Outlook:', error);
@@ -27,7 +27,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user }) => {
 
   const handleConnect = async () => {
     try {
-      const res = await axios.get(`http://localhost:3001/api/auth/outlook?userEmail=${user.email}`);
+      const res = await api.get(`/api/auth/outlook?userEmail=${user.email}`);
       if (res.data.authUrl) {
         window.location.href = res.data.authUrl;
       }
@@ -40,7 +40,7 @@ const SettingsView: React.FC<SettingsViewProps> = ({ user }) => {
   const handleDisconnect = async () => {
     if (!window.confirm('Tem certeza que deseja desconectar sua conta do Outlook?')) return;
     try {
-      await axios.post(`http://localhost:3001/api/auth/outlook/disconnect`, { userEmail: user.email });
+      await api.post(`/api/auth/outlook/disconnect`, { userEmail: user.email });
       setOutlookStatus({ connected: false });
     } catch (error) {
       console.error('Erro ao desconectar Outlook:', error);

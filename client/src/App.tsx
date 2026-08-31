@@ -478,7 +478,7 @@ const App: React.FC = () => {
   // Fetch dashboard stats dynamically
   useEffect(() => {
     if (user) {
-      api.get(`http://localhost:3001/api/dashboard-stats?managerId=${user.id}`)
+      api.get(`/api/dashboard-stats?managerId=${user.id}`)
         .then((res: any) => {
           setStats(res.data);
         })
@@ -491,7 +491,7 @@ const App: React.FC = () => {
   // Fetch dashboard collaborators dynamically
   useEffect(() => {
     if (user) {
-      api.get(`http://localhost:3001/api/team?managerId=${user.id}`)
+      api.get(`/api/team?managerId=${user.id}`)
         .then((res: any) => {
           // Take active collaborators (filter out gestor)
           const filtered = res.data.filter((m: any) => !m.role.toLowerCase().includes('gestor'));
@@ -532,7 +532,7 @@ const App: React.FC = () => {
     if (!user) return;
     setIsLoading(true);
     try {
-      const response = await api.post('http://localhost:3001/api/analyze', {
+      const response = await api.post('/api/analyze', {
         managerId: user.id
       });
       setInsight(response.data.insight);
