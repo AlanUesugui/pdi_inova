@@ -11,20 +11,44 @@ async function importCsv() {
   const rootDir = path.join(process.cwd(), '..');
   const serverDataDir = path.join(process.cwd(), 'data');
 
+  const readCsv = (p: string) => {
+    const raw = fs.readFileSync(p, 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, '');
+    return csv.parse(raw, { columns: true, skip_empty_lines: true, trim: true });
+  };
+
   // Load CSVs
+<<<<<<< HEAD
   const collaborators: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'colaboradores.csv'), 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
   const pdiResponses: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'pdi_respostas.csv'), 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
   const managerEvals: any[] = csv.parse(fs.readFileSync(path.join(serverDataDir, 'avaliacoes_gestor.csv'), 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
   const pdisData: any[] = csv.parse(fs.readFileSync(path.join(rootDir, 'pdis.csv'), 'utf-8').replace(/^\uFEFF/, '').replace(/\r/g, ''), { columns: true, skip_empty_lines: true });
 
   console.log("Resetting database...");
+=======
+  const collaborators: any[] = readCsv(path.join(rootDir, 'colaboradores.csv'));
+  const pdiResponses: any[] = readCsv(path.join(rootDir, 'pdi_respostas.csv'));
+  const managerEvals: any[] = readCsv(path.join(serverDataDir, 'avaliacoes_gestor.csv'));
+  const pdisData: any[] = readCsv(path.join(rootDir, 'pdis.csv'));
+
+  console.log("Resetting database...");
+  if (db.isSqlite) {
+    await db.exec('PRAGMA foreign_keys = OFF;');
+  }
+>>>>>>> 3b10e33 (Atualiza projeto)
   await db.run('DELETE FROM pdi_responses');
   await db.run('DELETE FROM manager_evaluations');
   await db.run('DELETE FROM pdis');
   await db.run('DELETE FROM feedbacks');
   await db.run('DELETE FROM meetings');
+<<<<<<< HEAD
   await db.run('DELETE FROM users');
   await db.run('DELETE FROM collaborators');
+=======
+  await db.run('DELETE FROM collaborators');
+  if (db.isSqlite) {
+    await db.exec('PRAGMA foreign_keys = ON;');
+  }
+>>>>>>> 3b10e33 (Atualiza projeto)
 
   // Map to identify managers
   const managerIds = new Set(collaborators.map(c => String(c.gestor_id)).filter(id => id && id !== '0' && id !== ''));

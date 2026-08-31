@@ -4,6 +4,7 @@ import api from '../utils/api';
 import CareerDetailPanel from './CareerDetailPanel';
 import CollaboratorHoverCard, { type HoverCardData } from './CollaboratorHoverCard';
 import HierarchicalRoleOrgChart from './HierarchicalRoleOrgChart';
+import { analyzeCareerProfile, parseShortLabel as parseShortLabelRule } from '../utils/careerRules';
 
 export interface CareerTraining {
   nome: string;
@@ -79,7 +80,8 @@ export interface HiddenTalentResult {
 // ─── Utilities ────────────────────────────────────────────────────────────────
 
 export const parseProntidao = (raw: string) => {
-  if (!raw) return { label: 'Não avaliado', bg: 'bg-gray-100', border: 'border-gray-200', text: 'text-gray-500' };
+  if (!raw || /não avaliad|nao avaliad/i.test(raw)) return { label: 'Não avaliado', bg: 'bg-gray-100', border: 'border-gray-200', text: 'text-gray-500' };
+  if (/não está no mapa|nao esta no mapa/i.test(raw)) return { label: 'Não está no mapa de sucessão', bg: 'bg-gray-100', border: 'border-gray-200', text: 'text-gray-600' };
   const label = raw.split(' - ')[0] || raw;
   if (/agora|imediata/i.test(raw)) return { label, bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-700' };
   if (/6 meses/i.test(raw)) return { label, bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-700' };
@@ -88,105 +90,34 @@ export const parseProntidao = (raw: string) => {
   return { label, bg: 'bg-gray-100', border: 'border-gray-200', text: 'text-gray-500' };
 };
 
-export const parseShortLabel = (raw: string): string => raw?.split(' - ')[0] || raw || 'Não avaliado';
+export const parseShortLabel = (raw: string): string => parseShortLabelRule(raw);
 
 export const computeHiddenTalent = (m: CareerMember): HiddenTalentResult => {
+  const analysis = analyzeCareerProfile(m);
   const signals: HiddenTalentSignal[] = [];
-  const capacityEvidences: string[] = [];
 
-  // Ev 1: High Readiness
-  const isReadySoon = /agora|6 meses|imediata/i.test(m.nivel_prontidao);
-  if (isReadySoon) {
-    capacityEvidences.push(`Prontidão estimada de curto prazo: ${parseShortLabel(m.nivel_prontidao)}`);
-  }
+  const extraSkillsCount = [m.competencia_tecnica_1, m.competencia_tecnica_2, m.competencia_tecnica_3].filter(Boolean).length;
+  const potentialAreas: string[] = [];
+  if (extraSkillsCount > 0) potentialAreas.push('Arquitetura & Especialização');
+  if (analysis.potentialStatus === 'HIGH_POTENTIAL') potentialAreas.push('Liderança & Sucessão');
 
-  // Ev 2: High Performance
-  const perfNum = parseFloat(m.nota_desempenho);
-  const isHighPerformance = (!isNaN(perfNum) && perfNum >= 4.0) || /alto|excelente|supera/i.test(m.nota_desempenho);
-  if (isHighPerformance) {
-    capacityEvidences.push(`Desempenho elevado registrado: ${m.nota_desempenho}`);
-  }
-
-  // Ev 3: Skills declared above current requirements
-  const requiredNames = (m.competencias_exigidas || []).map(c => c.competencia.toLowerCase());
-  const declaredSkills = [m.competencia_tecnica_1, m.competencia_tecnica_2, m.competencia_tecnica_3].filter(Boolean) as string[];
-  const extraSkills = declaredSkills.filter(skill =>
-    skill && !requiredNames.some(req =>
-      req.includes(skill.toLowerCase()) || skill.toLowerCase().includes(req.split(' ')[0] || '')
-    )
-  );
-  if (extraSkills.length > 0) {
-    capacityEvidences.push(`Competência técnica adicional não exigida: "${extraSkills[0]}"`);
-  }
-
-  // Ev 4: Training effectiveness
-  const hasEffectiveTrainings = (m.treinamentos || []).filter(t => t.eficacia === 'Sim').length >= 2;
-  if (hasEffectiveTrainings) {
-    capacityEvidences.push(`${m.treinamentos.filter(t => t.eficacia === 'Sim').length} treinamentos com eficácia comprovada`);
-  }
-
-  // Ev 5: Manager feedback favorable
-  const isManagerFavorable = !!m.comentarios_gestor && /excelente|destaque|promissor|supera|evolução|crescimento|ótimo|alta capacidade|liderança|pronto/i.test(m.comentarios_gestor);
-  if (isManagerFavorable) {
-    capacityEvidences.push(`Avaliação do gestor favorável: "${m.comentarios_gestor.length > 40 ? m.comentarios_gestor.substring(0, 40) + '...' : m.comentarios_gestor}"`);
-  }
-
-  // Critério B: Potencial relevante
-  const isHighPotential = /alto/i.test(m.potencial_crescimento);
-
-  // Critério C: Desalinhamento com o reconhecimento atual (Não mapeado na sucessão)
-  const isUnmapped = (!m.mapa_sucessao || /não/i.test(m.mapa_sucessao)) && (!m.designacao_sucessao || /nenhum|não/i.test(m.designacao_sucessao) || m.designacao_sucessao.trim() === '');
-
-  // Critério D & E: Relevância & Evidências independentes (pelo menos duas)
-  const isUnmappedTalent = isHighPotential && isUnmapped && capacityEvidences.length >= 2;
-
-  // Hierarquia de Rótulos
-  let classificationName = 'Sem classificação especial';
-  let hasTalent = false;
-
-  const isSuccessor = /sim|sucessor/i.test(m.mapa_sucessao) || (m.designacao_sucessao && m.designacao_sucessao.trim() !== '' && !/não|nenhum/i.test(m.designacao_sucessao));
-  
-  const isRecognizedTalent = !isSuccessor && isHighPotential && (isReadySoon || (m.mapa_sucessao && !/não/i.test(m.mapa_sucessao)));
-
-  const isPotentialDevelopment = !isSuccessor && !isRecognizedTalent && !isUnmappedTalent && (isHighPotential || /médio|medio/i.test(m.potencial_crescimento) || isReadySoon || (!isNaN(perfNum) && perfNum >= 3.0));
-
-  const isAlternativeTrajectory = !isSuccessor && !isRecognizedTalent && !isUnmappedTalent && !isPotentialDevelopment && (extraSkills.length > 0 || hasEffectiveTrainings);
-
-  if (isSuccessor) {
-    classificationName = 'Sucessor formal';
-  } else if (isRecognizedTalent) {
-    classificationName = 'Talento reconhecido';
-  } else if (isUnmappedTalent) {
-    classificationName = 'Possível talento não mapeado';
-    hasTalent = true;
-  } else if (isPotentialDevelopment) {
-    classificationName = 'Potencial de desenvolvimento';
-  } else if (isAlternativeTrajectory) {
-    classificationName = 'Trajetória alternativa';
-  }
-
-  // Populate signals if they have unmapped talent or alternative trajectory to preserve structure
-  if (isUnmappedTalent) {
+  if (analysis.hiddenTalentStatus === 'UNMAPPED_TALENT') {
     signals.push({
       tipo: 'Possível talento não mapeado',
-      descricao: 'Demonstra alto potencial e prontidão ou desempenho elevado, porém não consta no planejamento sucessório.',
-      evidencias: capacityEvidences,
-      interpretacao: 'Os dados disponíveis apresentam sinais consistentes de capacidade para atuação em maior nível de complexidade, porém esse potencial ainda não aparece refletido no planejamento sucessório atual.',
-      confianca: capacityEvidences.length >= 4 ? 'Alta' : 'Média'
+      descricao: 'Demonstra alto potencial e evidências consistentes de capacidade, porém não consta no planejamento sucessório formal.',
+      evidencias: analysis.capacityEvidences,
+      interpretacao: 'Os dados estruturados apresentam sinais consistentes de capacidade para atuação em maior nível de complexidade, sem indicação sucessória formal correspondente.',
+      confianca: analysis.capacityEvidences.length >= 4 ? 'Alta' : 'Média'
     });
-  } else if (isAlternativeTrajectory) {
+  } else if (analysis.hiddenTalentStatus === 'ALTERNATIVE_TRAJECTORY') {
     signals.push({
       tipo: 'Possível trajetória alternativa',
       descricao: 'Demonstra aderência técnica ou qualificações extras para outros contextos.',
-      evidencias: capacityEvidences.length > 0 ? capacityEvidences : ['Histórico profissional/formação compatível'],
+      evidencias: analysis.capacityEvidences.length > 0 ? analysis.capacityEvidences : ['Histórico profissional/formação compatível'],
       interpretacao: 'Identificada possibilidade de trilha técnica (Especialista) ou mobilidade entre departamentos.',
       confianca: 'Média'
     });
   }
-
-  const potentialAreas: string[] = [];
-  if (extraSkills.length > 0) potentialAreas.push('Arquitetura & Especialização');
-  if (isHighPotential) potentialAreas.push('Liderança & Sucessão');
 
   const confirmations = [
     'Avaliação específica de competências de liderança/complexidade superior',
@@ -195,26 +126,26 @@ export const computeHiddenTalent = (m: CareerMember): HiddenTalentResult => {
   ];
 
   let confidence: 'Alta' | 'Moderada' | 'Limitada' | 'Sem evidência suficiente' = 'Sem evidência suficiente';
-  if (capacityEvidences.length >= 4) {
+  if (analysis.capacityEvidences.length >= 4) {
     confidence = 'Alta';
-  } else if (capacityEvidences.length >= 2) {
+  } else if (analysis.capacityEvidences.length >= 2) {
     confidence = 'Moderada';
-  } else if (capacityEvidences.length === 1) {
+  } else if (analysis.capacityEvidences.length === 1) {
     confidence = 'Limitada';
   }
 
   return {
-    hasTalent,
+    hasTalent: analysis.hiddenTalentStatus === 'UNMAPPED_TALENT',
     signals,
-    suggestion: isUnmappedTalent
-      ? `A análise identificou uma combinação incomum entre prontidão elevada, desempenho favorável e aderência às competências de uma posição superior, apesar de o colaborador ainda não estar formalmente identificado no mapa de sucessão.`
-      : (isRecognizedTalent ? 'Perfil de talento reconhecido pela organização.' : 'Perfil alinhado à trajetória atual ou com potencial de desenvolvimento padrão.'),
+    suggestion: analysis.hiddenTalentStatus === 'UNMAPPED_TALENT'
+      ? `A análise identificou uma combinação de evidências de capacidade e potencial elevado, sem que haja sucessão formal mapeada na organização.`
+      : (analysis.hiddenTalentStatus === 'RECOGNIZED_TALENT' ? 'Perfil de talento reconhecido pela organização.' : 'Perfil alinhado à trajetória atual ou com potencial de desenvolvimento padrão.'),
     potentialAreas: potentialAreas.length > 0 ? potentialAreas : ['Desenvolvimento no Cargo'],
-    classificationName,
-    reasons: capacityEvidences,
+    classificationName: analysis.classificationName,
+    reasons: analysis.capacityEvidences,
     confirmations,
     confidence,
-    evidencesCount: capacityEvidences.length
+    evidencesCount: analysis.capacityEvidences.length
   };
 };
 
@@ -261,15 +192,15 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
     );
 
     if (filterCategory === 'successors') {
-      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Sucessor formal');
+      result = result.filter(m => analyzeCareerProfile(m).isFormalSuccessor);
     } else if (filterCategory === 'strategic_talents') {
-      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Talento reconhecido');
+      result = result.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'RECOGNIZED_TALENT');
     } else if (filterCategory === 'high_potential') {
-      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Potencial de desenvolvimento');
+      result = result.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'POTENTIAL_DEVELOPMENT');
     } else if (filterCategory === 'hidden_talents') {
-      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Possível talento não mapeado');
+      result = result.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'UNMAPPED_TALENT');
     } else if (filterCategory === 'high_risk') {
-      result = result.filter(m => /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida));
+      result = result.filter(m => analyzeCareerProfile(m).isRetentionPriority);
     } else if (filterCategory === 'all') {
       // no filter
     }
@@ -311,14 +242,13 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
     }, 150);
   };
 
-  // Team Aggregation Metrics
+  // Team Aggregation Metrics (USANDO REGRA CENTRALIZADA REPRODUZÍVEL)
   const totalTeam = members.length;
-  const strategicTalents = members.filter(m => computeHiddenTalent(m).classificationName === 'Talento reconhecido').length;
-  const successorsCount = members.filter(m => computeHiddenTalent(m).classificationName === 'Sucessor formal').length;
-  const highPotentialCount = members.filter(m => computeHiddenTalent(m).classificationName === 'Potencial de desenvolvimento').length;
-  const hiddenTalentsCount = members.filter(m => computeHiddenTalent(m).classificationName === 'Possível talento não mapeado').length;
-  const highRiskCount = members.filter(m => /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida)).length;
-
+  const successorsCount = members.filter(m => analyzeCareerProfile(m).isFormalSuccessor).length;
+  const strategicTalents = members.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'RECOGNIZED_TALENT').length;
+  const highPotentialCount = members.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'POTENTIAL_DEVELOPMENT').length;
+  const hiddenTalentsCount = members.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'UNMAPPED_TALENT').length;
+  const highRiskCount = members.filter(m => analyzeCareerProfile(m).isRetentionPriority).length;
 
   // Check 9-box matrix data availability
   const membersWithPerformanceAndPotential = members.filter(m => m.nota_desempenho && m.potencial_crescimento);
@@ -329,15 +259,15 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
     if (!filterCategory) return [];
     let result = members;
     if (filterCategory === 'successors') {
-      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Sucessor formal');
+      result = result.filter(m => analyzeCareerProfile(m).isFormalSuccessor);
     } else if (filterCategory === 'strategic_talents') {
-      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Talento reconhecido');
+      result = result.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'RECOGNIZED_TALENT');
     } else if (filterCategory === 'high_potential') {
-      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Potencial de desenvolvimento');
+      result = result.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'POTENTIAL_DEVELOPMENT');
     } else if (filterCategory === 'hidden_talents') {
-      result = result.filter(m => computeHiddenTalent(m).classificationName === 'Possível talento não mapeado');
+      result = result.filter(m => analyzeCareerProfile(m).hiddenTalentStatus === 'UNMAPPED_TALENT');
     } else if (filterCategory === 'high_risk') {
-      result = result.filter(m => /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida));
+      result = result.filter(m => analyzeCareerProfile(m).isRetentionPriority);
     } else if (filterCategory === 'all') {
       result = members;
     }
@@ -921,9 +851,8 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
               </div>
             ) : (
               filteredMembers.map((m) => {
+                const analysis = analyzeCareerProfile(m);
                 const prontidaoInfo = parseProntidao(m.nivel_prontidao);
-                const hiddenTalents = computeHiddenTalent(m);
-                const isHighLossRisk = /alto/i.test(m.risco_perda) && /alto/i.test(m.impacto_saida);
 
                 return (
                   <div
@@ -936,28 +865,28 @@ const CareerMap: React.FC<{ search: string, managerId: string }> = ({ search, ma
                     <div>
                       {/* Badges Bar */}
                       <div className="flex flex-wrap gap-1.5 mb-3">
-                        {hiddenTalents.classificationName === 'Sucessor formal' && (
+                        {analysis.isFormalSuccessor && (
                           <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1 uppercase tracking-wider">
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
                             Sucessor Identificado
                           </span>
                         )}
 
-                        {hiddenTalents.classificationName === 'Talento reconhecido' && (
+                        {analysis.hiddenTalentStatus === 'RECOGNIZED_TALENT' && (
                           <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200 flex items-center gap-1 uppercase tracking-wider">
                             <Sparkles className="w-3.5 h-3.5 text-yellow-500 fill-current" />
                             Talento Reconhecido
                           </span>
                         )}
 
-                        {hiddenTalents.classificationName === 'Possível talento não mapeado' && (
+                        {analysis.hiddenTalentStatus === 'UNMAPPED_TALENT' && (
                           <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1 uppercase tracking-wider">
                             <Zap className="w-3.5 h-3.5 text-amber-500 fill-current" />
                             Talento Não Mapeado
                           </span>
                         )}
 
-                        {isHighLossRisk && (
+                        {analysis.isRetentionPriority && (
                           <span className="text-[9px] font-black px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-1 uppercase tracking-wider">
                             <ShieldAlert className="w-3.5 h-3.5 text-rose-600" />
                             Prioridade Retenção

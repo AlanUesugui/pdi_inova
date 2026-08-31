@@ -2,7 +2,9 @@ import { getDb } from './db';
 import * as fs from 'fs';
 import * as csv from 'csv-parse/sync';
 import * as path from 'path';
+import * as xlsx from 'xlsx';
 import OpenAI from 'openai';
+import { buildCuratedAssessment, CuratedCareerAssessment, CareerMemberRawData } from './careerAnalyticsEngine';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || ''
@@ -17,65 +19,16 @@ interface Competencia {
   nivel_necessario: string;
 }
 
-interface PDIResponse {
-  id_colaborador: string;
-  treinamento_nome: string;
-  q1_conhecimento: string;
-  q2_aplicacao: string;
-  q3_desempenho: string;
-  q4_eficacia: string;
-  data_resposta?: string;
-  modalidade_treinamento?: string;
-  carga_horaria?: string;
-  provedor_treinamento?: string;
-  custo_treinamento?: string;
-  competencia_desenvolvida?: string;
-  q5_recomendaria?: string;
-  nota_geral_treinamento?: string;
-  aplicou_no_trabalho?: string;
-}
-
-interface AvaliacaoGestor {
-  id_colaborador: string;
-  comentarios_soft_skills: string;
-  avaliacao_pessoal_texto: string;
-  data: string;
-  data_avaliacao?: string;
-  periodo_referencia?: string;
-  nota_desempenho_geral?: string;
-  potencial_crescimento?: string;
-  comentarios_gestor?: string;
-  metas_atingidas?: string;
-  numero_de_feedbacks_dados?: string;
-  colaborador_tem_pdi_ativo?: string;
-  data_ultima_conversa_1_1?: string;
-}
-
-interface Colaborador {
-  id: string;
-  nome: string;
-  cargo: string;
-  departamento: string;
-  gestor_id: string;
-  data_admissao?: string;
-  status?: string;
-  modalidade_trabalho?: string;
-  email?: string;
-  nivel_cargo?: string;
-  centro_de_custo?: string;
-  tipo_contrato?: string;
-}
-
 export const analyzeCollaborator = async (collaboratorId: string) => {
   const db = await getDb();
 
   // Fetch collaborator from database
-  const collaborator = await db.get('SELECT * FROM collaborators WHERE id = ?', [collaboratorId]) as Colaborador | undefined;
+  const collaborator = await db.get('SELECT * FROM collaborators WHERE id = ?', [collaboratorId]);
   if (!collaborator) {
     throw new Error('Colaborador não encontrado');
   }
 
-  if (!collaborator.gestor_id || collaborator.cargo.toLowerCase().includes('gestor')) {
+  if (!collaborator.gestor_id || (collaborator.cargo && collaborator.cargo.toLowerCase().includes('gestor'))) {
     throw new Error('A análise deve ser feita apenas para colaboradores, não gestores.');
   }
 
@@ -91,233 +44,145 @@ export const analyzeCollaborator = async (collaboratorId: string) => {
   } catch (e) {
     console.error("Error reading competencies CSV in analyzer", e);
   }
-  const competenciasCargo = competencies.filter(c => c.cargo.toLowerCase() === collaborator.cargo.toLowerCase());
+  const competenciasCargo = competencies.filter(c => c.cargo.toLowerCase() === (collaborator.cargo || '').toLowerCase());
 
-  // Fetch PDI responses, evaluations and new feedbacks from database
-  const treinamentos = await db.all('SELECT * FROM pdi_responses WHERE id_colaborador = ?', [collaboratorId]) as PDIResponse[];
-  const feedbacks = await db.all('SELECT * FROM manager_evaluations WHERE id_colaborador = ?', [collaboratorId]) as AvaliacaoGestor[];
-  const newFeedbacks = await db.all('SELECT * FROM feedbacks WHERE id_colaborador = ?', [collaboratorId]);
-
-  const prompt = `Você é um especialista em Recursos Humanos responsável por cruzar as competências exigidas pelo cargo com o perfil atual de um colaborador. Analise se ele atende aos requisitos do cargo atual.
- 
-**Colaborador:**
-- Nome: ${collaborator.nome}
-- Cargo: ${collaborator.cargo}
-- Departamento: ${collaborator.departamento}
- 
-**Competências Exigidas para o Cargo:**
-${competenciasCargo.map(c => `- ${c.competencia} (Tipo: ${c.tipo}, Nível Necessário: ${c.nivel_necessario})`).join('\n')}
- 
-**Treinamentos Realizados (PDI):**
-${treinamentos.map(t => `- Nome: ${t.treinamento_nome} | Conhecimento: ${t.q1_conhecimento} | Aplicação: ${t.q2_aplicacao} | Desempenho: ${t.q3_desempenho} | Eficácia (Sim/Não): ${t.q4_eficacia}`).join('\n') || "Nenhum treinamento realizado."}
- 
-**Avaliação do Gestor e Comentários:**
-${feedbacks.map(f => `- Data: ${f.data || f.data_avaliacao || ''} | Soft Skills: ${f.comentarios_soft_skills} | Avaliação Texto: ${f.avaliacao_pessoal_texto}`).join('\n') || "Nenhuma avaliação de ciclo encontrada."}
-
-**Novos Feedbacks Registrados:**
-${newFeedbacks.map(f => `- Data: ${f.data} | Tipo: ${f.tipo} | Conteúdo: ${f.conteudo}`).join('\n') || "Nenhum feedback adicional."}
- 
-**Regras da Análise:**
-1. Cruzar as competências exigidas com os treinamentos, respostas de avaliação e avaliação do gestor.
-2. Considerar que no PDI: Ótimo = impacto alto, Bom = impacto médio, Ruim = impacto negativo. Eficácia "Sim" = reforço positivo, "Não" = alerta de baixa efetividade.
-3. A avaliação do gestor serve como evidência qualitativa.
-4. Gere um score de "score_meta_requisitos_cargo" em valor numérico inteiro de 0 a 100, baseado nesta aderência.
-5. Classificação final baseada no score:
-   - 85 a 100: Alta aderência ao cargo
-   - 70 a 84: Boa aderência ao cargo
-   - 50 a 69: Aderência parcial
-   - Abaixo de 50: Baixa aderência ao cargo
- 
-Você deve responder APENAS E ESTRITAMENTE num formato JSON válido que siga a seguinte estrutura, sem nenhum texto adicional fora do JSON:
-{
-  "nome": "${collaborator.nome}",
-  "cargo": "${collaborator.cargo}",
-  "departamento": "${collaborator.departamento}",
-  "competencias_exigidas": ["array de strings das competencias formatadas de forma legível (ex: Nome da Competencia (Tipo - Nivel))"],
-  "treinamentos_relacionados": ["array de strings apenas com os nomes dos treinamentos"],
-  "pontos_importantes": ["array de strings detalhando pontos e destaques importantes do colaborador e do seu momento"],
-  "pontos_fortes": ["array de strings detalhando os pontos fortes detectados na analise (positivos)"],
-  "pontos_de_atencao": ["array de strings detalhando os gaps/pontos de atencao (negativos)"],
-  "evidencias": ["array de strings com as frases de evidencia capturadas da avaliacao do gestor"],
-  "score": <numero inteiro de 0 a 100>,
-  "classificacao_final": "String da classificacao correspondente",
-  "previsao": "Uma previsao detalhada do desenvolvimento ou prontidao futura do colaborador (ex: prontidao de promocao, estabilidade no cargo, ou necessidade de intervencao)",
-  "recomendacoes": ["array de strings de recomendacoes acionaveis de RH baseadas no perfil e analise"]
-}`;
+  // Load evaluations and curriculos from xlsx
+  let rawEval: any = {};
+  let rawCV: any = {};
+  try {
+    const rootDir = path.join(process.cwd(), '..');
+    const fEval = xlsx.readFile(path.join(rootDir, 'avaliacoes_gestor.xlsx'));
+    const dataEval: any[] = xlsx.utils.sheet_to_json(fEval.Sheets[fEval.SheetNames[0]!] as xlsx.WorkSheet, { defval: '' });
+    rawEval = dataEval.find(r => String(r['ID']) === String(collaboratorId) || String(r['id']) === String(collaboratorId)) || {};
+  } catch (_) { }
 
   try {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error("OPENAI_API_KEY não configurada. Usando fallback dinâmico.");
-    }
+    const rootDir = path.join(process.cwd(), '..');
+    const fCv = xlsx.readFile(path.join(rootDir, 'curriculos.xlsx'));
+    const dataCv: any[] = xlsx.utils.sheet_to_json(fCv.Sheets[fCv.SheetNames[0]!] as xlsx.WorkSheet, { defval: '' });
+    rawCV = dataCv.find(r => String(r['ID']) === String(collaboratorId) || String(r['id']) === String(collaboratorId)) || {};
+  } catch (_) { }
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.7,
-      response_format: { type: "json_object" }
-    });
+  // Fetch PDI responses, evaluations and new feedbacks from database
+  const treinamentos = await db.all('SELECT * FROM pdi_responses WHERE id_colaborador = ?', [collaboratorId]);
+  const managerEvalsDb = await db.all('SELECT * FROM manager_evaluations WHERE id_colaborador = ?', [collaboratorId]);
+  const newFeedbacks = await db.all('SELECT * FROM feedbacks WHERE id_colaborador = ?', [collaboratorId]);
 
-    const aiResult = response.choices[0]?.message?.content;
-    if (!aiResult) {
-      throw new Error("Resposta da IA vazia.");
-    }
-    
-    return JSON.parse(aiResult);
-  } catch (error) {
-    console.log("Usando fallback de geração dinâmica para:", collaborator.nome);
+  const firstEvalDb = managerEvalsDb[0] || {};
 
-    // Calcular um score dinâmico com base nos treinamentos e feedbacks
-    let scoreBase = 70;
-    if (treinamentos.length > 0) {
-      const parseScoreValue = (value: string) => {
-        if (value === 'Ótimo') return 100;
-        if (value === 'Bom') return 70;
-        if (value === 'Ruim') return 30;
-        return 50;
-      };
-      const sumScores = treinamentos.reduce((acc, t) => {
-        const score = (parseScoreValue(t.q1_conhecimento) + parseScoreValue(t.q2_aplicacao) + parseScoreValue(t.q3_desempenho)) / 3;
-        return acc + score;
-      }, 0);
-      scoreBase = sumScores / treinamentos.length;
-    }
-    
-    if (feedbacks.length > 0 || newFeedbacks.length > 0) {
-      const text = [
-        ...feedbacks.map(f => f.comentarios_soft_skills + " " + f.avaliacao_pessoal_texto),
-        ...newFeedbacks.map(f => f.conteudo)
-      ].join(" ").toLowerCase();
+  // Build raw member model
+  const rawMember: CareerMemberRawData = {
+    id: String(collaborator.id),
+    nome: collaborator.nome,
+    cargo: collaborator.cargo,
+    departamento: collaborator.departamento,
+    gestor_id: collaborator.gestor_id,
+    superior_imediato: collaborator.superior_imediato || 'Gestor Logado',
+    data_admissao: collaborator.data_admissao || '',
+    fit_cultural: rawEval['01. Fit Cultural'] || '',
+    mapa_sucessao: rawEval['02. Mapa de Sucessão'] || '',
+    nivel_prontidao: rawEval['03. Nível de Prontidão'] || '',
+    risco_perda: rawEval['04. Risco de Perda'] || '',
+    impacto_saida: rawEval['05. Impacto de Saída'] || '',
+    designacao_sucessao: rawEval['06. Designação de Sucessão'] || '',
+    potencial_crescimento: rawEval['potencial_crescimento'] || firstEvalDb.potencial_crescimento || '',
+    nota_desempenho: rawEval['nota_desempenho_geral'] || firstEvalDb.nota_desempenho_geral || '',
+    comentarios_gestor: rawEval['comentarios_gestor'] || firstEvalDb.comentarios_gestor || firstEvalDb.avaliacao_pessoal_texto || '',
+    treinamentos: treinamentos.map(t => ({
+      nome: t.treinamento_nome,
+      conhecimento: t.q1_conhecimento,
+      aplicacao: t.q2_aplicacao,
+      desempenho: t.q3_desempenho,
+      eficacia: t.q4_eficacia,
+      data: t.data_resposta || '',
+      carga_horaria: t.carga_horaria || '',
+      provedor: t.provedor_treinamento || ''
+    })),
+    competencias_exigidas: competenciasCargo.map(c => ({
+      competencia: c.competencia,
+      tipo: c.tipo,
+      nivel: c.nivel_necessario
+    })),
+    feedbacks: newFeedbacks.map(f => ({
+      tipo: f.tipo,
+      conteudo: f.conteudo,
+      data: f.data
+    }))
+  };
 
-      if (text.includes("excelente") || text.includes("otimo") || text.includes("destaque") || text.includes("muito bom")) {
-        scoreBase += 10;
-      }
-      if (text.includes("atencao") || text.includes("melhorar") || text.includes("dificuldade") || text.includes("falha")) {
-        scoreBase -= 10;
-      }
-    }
-    const score = Math.min(100, Math.max(0, Math.round(scoreBase)));
+  // Run Deterministic Engine FIRST
+  const curatedAssessment = buildCuratedAssessment(rawMember);
 
-    let classificacao_final = "Aderência parcial";
-    if (score >= 85) classificacao_final = "Alta aderência ao cargo";
-    else if (score >= 70) classificacao_final = "Boa aderência ao cargo";
-    else if (score < 50) classificacao_final = "Baixa aderência ao cargo";
+  // If OpenAI is available, request text explanation bounded by curatedAssessment
+  let aiNarrative = null;
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      const prompt = `Você é um consultor analítico de RH. Sua função é EXPLICAR e SINTETIZAR a análise de carreira do colaborador com base ESTREITA e EXCLUSIVA nos dados oficiais curados fornecidos a seguir.
+      
+REGRAS ABSOLUTAS:
+1. Você NÃO pode alterar nenhuma classificação, código, risco, potencial ou indicação sucessória definida pelo motor determinístico.
+2. Se o risco oficial for BAIXO, você NUNCA pode escrever "Risco elevado", "Prioridade de retenção" ou sugerir ameaça iminente de perda.
+3. Se o potencial for NÃO AVALIADO, declare explicitamente a ausência de avaliação em vez de inferir potencial.
+4. Diga "NÃO HÁ EVIDÊNCIAS SUFICIENTES" caso os dados sejam escassos.
+5. Estruture sua resposta estritamente no formato JSON solicitado.
 
-    const competencias_exigidas = competenciasCargo.map(c => `${c.competencia} (${c.tipo} - ${c.nivel_necessario})`);
-    const treinamentos_relacionados = treinamentos.map(t => t.treinamento_nome);
-    
-    const pontos_importantes = [
-      `Colaborador atua na área de ${collaborator.departamento} como ${collaborator.cargo}.`,
-      treinamentos.length > 0 
-        ? `Já concluiu ${treinamentos.length} treinamentos listados no PDI, demonstrando proatividade.` 
-        : `Ainda não possui treinamentos registrados neste ciclo de PDI.`,
-      feedbacks.length > 0
-        ? `Possui avaliações registradas pelo gestor com foco em desenvolvimento contínuo.`
-        : `Sem avaliações recentes do gestor registradas no sistema.`
-    ];
+Dados Curados Oficiais:
+${JSON.stringify(curatedAssessment, null, 2)}
 
-    const pontos_fortes: string[] = [];
-    const pontos_de_atencao: string[] = [];
-    const evidencias: string[] = [];
+Formato JSON esperado:
+{
+  "resumoExecutivo": "síntese profissional de 2 a 3 frases explicando a situação sem contradizer o diagnóstico oficial",
+  "narrativaTrajetoria": "explicação do momento de carreira e caminhos futuros possíveis",
+  "leituraGestor": "orientações práticas e conservadoras para o gestor"
+}`;
 
-    if (feedbacks.length > 0) {
-      feedbacks.forEach(f => {
-        if (f.avaliacao_pessoal_texto) evidencias.push(f.avaliacao_pessoal_texto);
-        if (f.comentarios_soft_skills) evidencias.push(`Soft skills: ${f.comentarios_soft_skills}`);
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.2,
+        response_format: { type: "json_object" }
       });
 
-      const fullFeedbackText = feedbacks.map(f => f.avaliacao_pessoal_texto + " " + f.comentarios_soft_skills).join(" ");
-      const sentences = fullFeedbackText.split(/[.!?]/);
-      sentences.forEach(s => {
-        const clean = s.trim();
-        if (!clean) return;
-        const low = clean.toLowerCase();
-        if (low.includes("bom") || low.includes("destaque") || low.includes("facilidade") || low.includes("otimo") || low.includes("excelente") || low.includes("entrega") || low.includes("proativo") || low.includes("lidera") || low.includes("parabens")) {
-          if (pontos_fortes.length < 3) pontos_fortes.push(clean);
-        } else if (low.includes("atencao") || low.includes("melhorar") || low.includes("desafio") || low.includes("gargalo") || low.includes("dificuldade") || low.includes("falha") || low.includes("falta") || low.includes("precisa")) {
-          if (pontos_de_atencao.length < 3) pontos_de_atencao.push(clean);
-        }
-      });
-    }
-
-    if (newFeedbacks.length > 0) {
-      newFeedbacks.forEach(f => {
-        evidencias.push(`[Feedback ${f.tipo}] ${f.conteudo}`);
-        const low = f.conteudo.toLowerCase();
-        if (low.includes("bom") || low.includes("parabéns") || low.includes("excelente") || low.includes("ótimo") || low.includes("evolução")) {
-          if (pontos_fortes.length < 3) pontos_fortes.push(f.conteudo);
-        } else if (low.includes("melhorar") || low.includes("atenção") || low.includes("atraso") || low.includes("dificuldade")) {
-          if (pontos_de_atencao.length < 3) pontos_de_atencao.push(f.conteudo);
-        }
-      });
-    }
-
-    // Fallbacks se não encontramos frases específicas
-    if (pontos_fortes.length === 0) {
-      if (treinamentos.some(t => t.q4_eficacia.toLowerCase() === 'sim')) {
-        pontos_fortes.push("Demonstra aplicação prática eficaz dos conhecimentos adquiridos em treinamentos recentes.");
+      const content = response.choices[0]?.message?.content;
+      if (content) {
+        aiNarrative = JSON.parse(content);
       }
-      pontos_fortes.push("Comprometimento com o cronograma de desenvolvimento e atividades do cargo.");
-      pontos_fortes.push("Bom relacionamento interpessoal no departamento.");
+    } catch (e) {
+      console.warn("OpenAI prompt failed or skipped. Using deterministic assessment text.");
     }
-    if (pontos_de_atencao.length === 0) {
-      const ineficazes = treinamentos.filter(t => t.q4_eficacia.toLowerCase() === 'nao');
-      if (ineficazes.length > 0) {
-        pontos_de_atencao.push(`Treinamento "${ineficazes[0]?.treinamento_nome}" não apresentou a eficácia prática desejada pelo gestor.`);
-      }
-      if (competenciasCargo.length > treinamentos.length) {
-        pontos_de_atencao.push("Necessidade de expandir o escopo do PDI para cobrir competências do cargo ainda não treinadas.");
-      }
-      pontos_de_atencao.push("Consolidar a autonomia nas tarefas de maior complexidade do escopo atual.");
-    }
-
-    // Previsão baseada no score
-    let previsao = "";
-    if (score >= 85) {
-      previsao = `Tendência de alta performance e prontidão para assumir novos desafios ou progressão de carreira nos próximos 6 meses. O colaborador demonstra forte estabilidade e consistência na entrega.`;
-    } else if (score >= 70) {
-      previsao = `Expectativa de consolidação total no cargo atual nos próximos 3 meses, necessitando apenas de pequenos ajustes técnicos. Baixo risco de turnover técnico.`;
-    } else {
-      previsao = `Requer atenção de médio prazo. Caso não haja intervenção com mentorias focadas, o colaborador pode apresentar estagnação nas entregas ou dificuldade de acompanhar a evolução da área nos próximos 90 dias.`;
-    }
-
-    // Recomendações
-    const recomendacoes = [];
-    if (treinamentos.some(t => t.q4_eficacia.toLowerCase() === 'nao')) {
-      const tName = treinamentos.find(t => t.q4_eficacia.toLowerCase() === 'nao')?.treinamento_nome;
-      recomendacoes.push(`Realizar uma sessão de alinhamento 1:1 para entender as barreiras na aplicação prática do treinamento "${tName}".`);
-    }
-    
-    // Sugerir novos treinamentos baseados nas competências do cargo não cobertas
-    const competeciasTreinadas = new Set(treinamentos.map(t => t.treinamento_nome.toLowerCase()));
-    const compNaoTreinada = competenciasCargo.find(c => !competeciasTreinadas.has(c.competencia.toLowerCase()));
-    if (compNaoTreinada) {
-      recomendacoes.push(`Incluir ação de desenvolvimento focada em "${compNaoTreinada.competencia}" no próximo ciclo de PDI.`);
-    } else {
-      recomendacoes.push("Iniciar programa de mentoria reversa para compartilhar conhecimentos fortes com juniores da equipe.");
-    }
-
-    recomendacoes.push("Estabelecer marcos claros de entrega quinzenais para acompanhamento de autonomia técnica.");
-    recomendacoes.push("Agendar próxima conversa de desenvolvimento individual em 30 dias.");
-
-    if (evidencias.length === 0) {
-      evidencias.push("Sem comentários textuais prévios registrados no banco para este colaborador.");
-    }
-
-    return {
-      nome: collaborator.nome,
-      cargo: collaborator.cargo,
-      departamento: collaborator.departamento,
-      competencias_exigidas,
-      treinamentos_relacionados,
-      pontos_importantes,
-      pontos_fortes,
-      pontos_de_atencao,
-      evidencias,
-      score,
-      classificacao_final,
-      previsao,
-      recomendacoes
-    };
   }
-};
 
+  // Calculate score and legacy response fields for backward compatibility
+  let scoreBase = 70;
+  if (treinamentos.length > 0) {
+    const parseScoreValue = (value: string) => {
+      if (value === 'Ótimo') return 100;
+      if (value === 'Bom') return 70;
+      if (value === 'Ruim') return 30;
+      return 50;
+    };
+    const sumScores = treinamentos.reduce((acc: number, t: any) => {
+      const s = (parseScoreValue(t.q1_conhecimento) + parseScoreValue(t.q2_aplicacao) + parseScoreValue(t.q3_desempenho)) / 3;
+      return acc + s;
+    }, 0);
+    scoreBase = sumScores / treinamentos.length;
+  }
+  const score = Math.min(100, Math.max(0, Math.round(scoreBase)));
+
+  let classificacao_final = "Aderência parcial";
+  if (score >= 85) classificacao_final = "Alta aderência ao cargo";
+  else if (score >= 70) classificacao_final = "Boa aderência ao cargo";
+  else if (score < 50) classificacao_final = "Baixa aderência ao cargo";
+
+  return {
+    nome: collaborator.nome,
+    cargo: collaborator.cargo,
+    departamento: collaborator.departamento,
+    score,
+    classificacao_final,
+    curatedAssessment,
+    aiNarrative,
+    previsao: aiNarrative?.resumoExecutivo || curatedAssessment.whyThisConclusion.interpretation,
+    recomendacoes: curatedAssessment.recommendations.map(r => r.action)
+  };
+};
